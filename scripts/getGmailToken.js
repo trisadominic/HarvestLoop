@@ -3,8 +3,12 @@ const { google } = require('googleapis');
 const express = require('express');
 const app = express();
 
+// Validate environment variables
 if (!process.env.GMAIL_CLIENT_ID || !process.env.GMAIL_CLIENT_SECRET) {
-    console.error('❌ Missing required environment variables');
+    console.error('❌ Environment variables missing');
+    console.log('Required variables:');
+    console.log('- GMAIL_CLIENT_ID');
+    console.log('- GMAIL_CLIENT_SECRET');
     process.exit(1);
 }
 
@@ -14,6 +18,7 @@ const oauth2Client = new google.auth.OAuth2(
     'http://localhost:3000/oauth2callback'
 );
 
+// Generate auth URL
 const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['https://mail.google.com/'],
