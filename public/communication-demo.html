@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarvestLoop Communication Features Demo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .feature-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    .demo-screenshot {
+      border: 3px solid #7dde83;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-screen" style="background: radial-gradient(circle at top, #f6f0e9, #e8dcc6);">
+
+  <!-- Header -->
+  <nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <a href="/" class="flex items-center gap-2 text-xl font-bold text-[#7dde83]">
+            <img src="/assets/Logo.png" alt="Logo" class="w-8 h-8 rounded-full object-cover" />
+            HarvestLoop Communication Demo
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="home.html" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            Home
+          </a>
+          <a href="communication-hub.html" class="px-4 py-2 text-sm bg-[#7dde83] text-white rounded-lg hover:bg-[#608d58] transition-colors">
+            Try Communication Hub
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">
+        🌾 Revolutionary Farmer-Consumer Communication 🤝
+      </h1>
+      <p class="text-xl text-gray-600 mb-8">
+        Connect directly with AI-powered assistance for seamless agricultural trade
+      </p>
+      
+      <div class="flex justify-center gap-4">
+        <a href="communication-hub.html" class="px-8 py-4 bg-[#7dde83] text-white rounded-lg text-lg font-semibold hover:bg-[#608d58] transition-colors">
+          🚀 Start Communicating Now
+        </a>
+        <a href="chatbot.html" class="px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-semibold hover:bg-blue-600 transition-colors">
+          🤖 Try AI Assistant
+        </a>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mb-16">
+      
+      <!-- Feature 1: Direct Communication -->
+      <div class="feature-card rounded-2xl p-6 shadow-lg">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-gradient-to-r from-[#7dde83] to-[#608d58] rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-comments text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Direct Chat</h3>
+          <p class="text-gray-600">Real-time messaging between farmers and consumers</p>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-[#7dde83]"></i>
+            <span>Instant messaging system</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-[#7dde83]"></i>
+            <span>Message history & search</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-[#7dde83]"></i>
+            <span>Online status indicators</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-[#7dde83]"></i>
+            <span>Mobile responsive design</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: AI Mediation -->
+      <div class="feature-card rounded-2xl p-6 shadow-lg">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-robot text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">AI Assistance</h3>
+          <p class="text-gray-600">Smart AI mediator helps facilitate conversations</p>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-blue-500"></i>
+            <span>Context-aware suggestions</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-blue-500"></i>
+            <span>Deal facilitation tips</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-blue-500"></i>
+            <span>Price negotiation guidance</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-blue-500"></i>
+            <span>Conversation summaries</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Role-Based Experience -->
+      <div class="feature-card rounded-2xl p-6 shadow-lg">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-users text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Smart Matching</h3>
+          <p class="text-gray-600">Find the right people based on your role and needs</p>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-orange-500"></i>
+            <span>Farmer-Consumer matching</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-orange-500"></i>
+            <span>Location-based search</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-orange-500"></i>
+            <span>Product category filtering</span>
+          </div>
+          <div class="flex items-center gap-3 text-sm text-gray-700">
+            <i class="fas fa-check-circle text-orange-500"></i>
+            <span>Verified user profiles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-16">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">How It Works</h2>
+      
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="w-12 h-12 bg-[#7dde83] rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+            1
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Login</h4>
+          <p class="text-sm text-gray-600">Sign in as a Farmer or Consumer using your existing HarvestLoop account</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+            2
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Find Users</h4>
+          <p class="text-sm text-gray-600">Search for farmers or consumers to start meaningful conversations</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+            3
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Start Chatting</h4>
+          <p class="text-sm text-gray-600">Begin conversations with AI assistance and smart suggestions</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="text-center">
+          <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+            4
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Make Deals</h4>
+          <p class="text-sm text-gray-600">Complete transactions with AI-guided negotiations and agreements</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Use Cases Section -->
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      
+      <!-- Farmer Use Cases -->
+      <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8">
+        <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center gap-3">
+          <i class="fas fa-seedling"></i>
+          For Farmers
+        </h3>
+        
+        <div class="space-y-4">
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">🌾 "I have 100kg of fresh tomatoes ready"</h4>
+            <p class="text-sm text-gray-600">Connect directly with buyers, negotiate prices, and arrange delivery</p>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">💰 "What's the current market rate?"</h4>
+            <p class="text-sm text-gray-600">AI provides market insights and pricing recommendations</p>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">🤝 "Looking for regular buyers"</h4>
+            <p class="text-sm text-gray-600">Build long-term relationships with consistent customers</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consumer Use Cases -->
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8">
+        <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center gap-3">
+          <i class="fas fa-shopping-cart"></i>
+          For Consumers
+        </h3>
+        
+        <div class="space-y-4">
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">🛒 "Need organic vegetables for my restaurant"</h4>
+            <p class="text-sm text-gray-600">Find quality suppliers and establish supply contracts</p>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">📅 "Weekly delivery schedule needed"</h4>
+            <p class="text-sm text-gray-600">Coordinate logistics and delivery schedules with farmers</p>
+          </div>
+          
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h4 class="font-semibold text-gray-800 mb-2">💡 "Best seasonal produce recommendations?"</h4>
+            <p class="text-sm text-gray-600">Get AI suggestions for seasonal and fresh options</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Features Showcase -->
+    <div class="bg-gradient-to-r from-orange-100 to-yellow-100 rounded-2xl p-8 mb-16">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">🤖 AI-Powered Features</h2>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-lightbulb text-white text-2xl"></i>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Smart Suggestions</h4>
+          <p class="text-sm text-gray-600">AI analyzes conversations and provides relevant suggestions for better deals</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-handshake text-white text-2xl"></i>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Deal Facilitation</h4>
+          <p class="text-sm text-gray-600">Helps both parties reach mutually beneficial agreements</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-chart-line text-white text-2xl"></i>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Market Insights</h4>
+          <p class="text-sm text-gray-600">Real-time market data and pricing recommendations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center bg-white rounded-2xl p-12 shadow-lg">
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">Ready to Start Communicating?</h2>
+      <p class="text-lg text-gray-600 mb-8">Join thousands of farmers and consumers already using HarvestLoop's communication platform</p>
+      
+      <div class="flex justify-center gap-6">
+        <a href="communication-hub.html" class="px-8 py-4 bg-[#7dde83] text-white rounded-lg text-lg font-semibold hover:bg-[#608d58] transition-colors flex items-center gap-2">
+          <i class="fas fa-comments"></i>
+          Open Communication Hub
+        </a>
+        
+        <a href="signup.html" class="px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2">
+          <i class="fas fa-user-plus"></i>
+          Create Account
+        </a>
+      </div>
+      
+      <p class="text-sm text-gray-500 mt-6">
+        💡 <strong>Pro Tip:</strong> Also try our floating chatbot widget on any page for quick AI assistance!
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-[#ddccb1] py-8 text-center text-gray-700 text-sm mt-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>&copy; 2025 HarvestLoop. All rights reserved.</p>
+      <p class="mt-2">Revolutionizing agricultural communication with AI-powered solutions</p>
+    </div>
+  </footer>
+
+</body>
+</html>

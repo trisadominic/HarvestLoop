@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Simple Mobile Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c7744;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4ded80;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        button:hover {
+            background-color: #3dc069;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>HarvestLoop Ultra-Simple Mobile Test</h1>
+        <p>Designed specifically for the ultra-simple-server.js</p>
+    </div>
+
+    <div class="card">
+        <h2>1. Basic Connectivity Test</h2>
+        <div id="basicStatus" class="info">Click the button to test</div>
+        <div>
+            <button onclick="testBasicPing()">Test Basic Ping</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. API Connectivity Test</h2>
+        <div id="apiStatus" class="info">Click the button to test</div>
+        <div>
+            <button onclick="testApiPing()">Test API Ping</button>
+        </div>
+        <div id="apiResponse" class="hidden">
+            <h3>Response:</h3>
+            <pre id="apiResponseData"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. Products API Test</h2>
+        <div id="productsStatus" class="info">Click the button to test</div>
+        <div>
+            <button onclick="testProductsApi()">Test Products API</button>
+        </div>
+        <div id="productsResponse" class="hidden">
+            <h3>Response:</h3>
+            <pre id="productsResponseData"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. Orders API Test</h2>
+        <div id="ordersStatus" class="info">Click the button to test</div>
+        <div>
+            <button onclick="testOrdersApi()">Test Orders API</button>
+        </div>
+        <div id="ordersResponse" class="hidden">
+            <h3>Response:</h3>
+            <pre id="ordersResponseData"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Connection Information</h2>
+        <p><strong>Server URL:</strong> <span id="serverUrl"></span></p>
+        <p><strong>Device Type:</strong> <span id="deviceType">Detecting...</span></p>
+        <p><strong>Browser:</strong> <span id="browserInfo">Detecting...</span></p>
+    </div>
+
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            detectEnvironment();
+        });
+
+        // Detect environment
+        function detectEnvironment() {
+            // Show server URL
+            document.getElementById('serverUrl').textContent = window.location.origin;
+            
+            // Detect device type
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            document.getElementById('deviceType').textContent = isMobile ? 'Mobile Device' : 'Desktop/Laptop';
+            
+            // Detect browser
+            const ua = navigator.userAgent;
+            let browserName = "Unknown";
+            
+            if (ua.indexOf("Firefox") > -1) {
+                browserName = "Firefox";
+            } else if (ua.indexOf("SamsungBrowser") > -1) {
+                browserName = "Samsung Browser";
+            } else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) {
+                browserName = "Opera";
+            } else if (ua.indexOf("Trident") > -1) {
+                browserName = "Internet Explorer";
+            } else if (ua.indexOf("Edge") > -1) {
+                browserName = "Edge";
+            } else if (ua.indexOf("Chrome") > -1) {
+                browserName = "Chrome";
+            } else if (ua.indexOf("Safari") > -1) {
+                browserName = "Safari";
+            }
+            
+            document.getElementById('browserInfo').textContent = browserName;
+        }
+
+        // Test basic ping
+        function testBasicPing() {
+            const statusElement = document.getElementById('basicStatus');
+            statusElement.className = 'info';
+            statusElement.textContent = 'Testing basic ping...';
+            
+            fetch('/ping')
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error(`HTTP error: ${response.status}`);
+                })
+                .then(text => {
+                    statusElement.className = 'success';
+                    statusElement.textContent = `✅ Success! Server responded with: "${text}"`;
+                })
+                .catch(error => {
+                    statusElement.className = 'error';
+                    statusElement.textContent = `❌ Error: ${error.message}`;
+                    console.error('Basic ping error:', error);
+                });
+        }
+
+        // Test API ping
+        function testApiPing() {
+            const statusElement = document.getElementById('apiStatus');
+            const responseElement = document.getElementById('apiResponse');
+            const dataElement = document.getElementById('apiResponseData');
+            
+            statusElement.className = 'info';
+            statusElement.textContent = 'Testing API ping...';
+            responseElement.className = 'hidden';
+            
+            fetch('/api/ping')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(`HTTP error: ${response.status}`);
+                })
+                .then(data => {
+                    statusElement.className = 'success';
+                    statusElement.textContent = '✅ API ping successful!';
+                    
+                    dataElement.textContent = JSON.stringify(data, null, 2);
+                    responseElement.className = '';
+                })
+                .catch(error => {
+                    statusElement.className = 'error';
+                    statusElement.textContent = `❌ API ping failed: ${error.message}`;
+                    console.error('API ping error:', error);
+                });
+        }
+
+        // Test Products API
+        function testProductsApi() {
+            const statusElement = document.getElementById('productsStatus');
+            const responseElement = document.getElementById('productsResponse');
+            const dataElement = document.getElementById('productsResponseData');
+            
+            statusElement.className = 'info';
+            statusElement.textContent = 'Testing Products API...';
+            responseElement.className = 'hidden';
+            
+            fetch('/api/products')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(`HTTP error: ${response.status}`);
+                })
+                .then(data => {
+                    statusElement.className = 'success';
+                    statusElement.textContent = '✅ Products API successful!';
+                    
+                    dataElement.textContent = JSON.stringify(data, null, 2);
+                    responseElement.className = '';
+                })
+                .catch(error => {
+                    statusElement.className = 'error';
+                    statusElement.textContent = `❌ Products API failed: ${error.message}`;
+                    console.error('Products API error:', error);
+                });
+        }
+
+        // Test Orders API
+        function testOrdersApi() {
+            const statusElement = document.getElementById('ordersStatus');
+            const responseElement = document.getElementById('ordersResponse');
+            const dataElement = document.getElementById('ordersResponseData');
+            
+            statusElement.className = 'info';
+            statusElement.textContent = 'Testing Orders API...';
+            responseElement.className = 'hidden';
+            
+            fetch('/api/orders/my-orders')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(`HTTP error: ${response.status}`);
+                })
+                .then(data => {
+                    statusElement.className = 'success';
+                    statusElement.textContent = '✅ Orders API successful!';
+                    
+                    dataElement.textContent = JSON.stringify(data, null, 2);
+                    responseElement.className = '';
+                })
+                .catch(error => {
+                    statusElement.className = 'error';
+                    statusElement.textContent = `❌ Orders API failed: ${error.message}`;
+                    console.error('Orders API error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-white">
+    <header class="bg-white">
+        <div class="fixed top-0 left-0 w-full z-50 bg-white flex items-center justify-between px-8 py-4 shadow-sm">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/public/consumer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Center Navigation -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="/consumer-dashboard.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black hover:bg-gray-50 transition duration-150">
+                    <i class="fas fa-compass mr-2"></i> Discover
+                </a>
+                <a href="/consumer-orders.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition duration-150">
+                    <i class="fas fa-shopping-basket mr-2"></i> My Orders
+                </a>
+                <a href="/manage-subscription.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition duration-150">
+                    <i class="fas fa-crown mr-2"></i> Subscription
+                </a>
+            </div>
+
+            <!-- Right Profile Section -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                        <a href="/consumer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                        </a>
+                        <a href="/consumer-orders.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                        </a>
+                        <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section with Animation -->
+        <section class="container mx-auto px-8 fade-in-section">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <!-- Text Content -->
+                <div class="md:w-1/2 slide-in-left">
+                   <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    Fresh From <br>
+                    Our <span class="text-orange-400">Harvest!</span>
+                    </h1>
+
+                  <h2 class="text-2xl md:text-3xl mb-4">
+                   Fresh Flavors Delivered Just for You
+                   </h2>
+
+                 <p class="text-gray-600 mb-6">
+                Straight from trusted local farms, our hand-picked, naturally grown produce is fresh, seasonal, chemical-free —helping you enjoy a healthier lifestyle with every bite.
+                </p>
+
+
+                    <button class="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 floating-button delayed-button">
+                        <i class="fas fa-shopping-cart mr-2"></i>Order Now
+                    </button>
+                </div>
+
+                <!-- Image -->
+                <div class="md:w-1/2 slide-in-right relative">
+                    <img src="/assets/fruit-plate.png" 
+                         alt="Fresh Fruits" 
+                         class="w-full h-auto object-contain mix-blend-multiply"
+                         style="filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
+                    
+                    <!-- Decorative Elements -->
+                    <div class="absolute top-0 right-0 -z-10 w-64 h-64 bg-green-100/30 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 -z-10 w-48 h-48 bg-orange-100/30 rounded-full blur-3xl"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORIES Section -->
+        <section class="container mx-auto px-8 py-16 fade-in-section">
+            <h2 class="text-4xl font-bold text-center mb-12">CATEGORIES</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Fruits Card -->
+                <a href="/fruit.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/fruit.png" alt="Fruits" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-orange-400">Handpicked Fruits</h3>
+                        <p class="text-gray-600 text-center">Fresh seasonal fruits from local farms</p>
+                    </div>
+                </a>
+
+                <!-- Vegetables Card -->
+                <a href="/vegetables.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/vegetable.png" alt="Vegetables" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-green-500">Garden-Fresh Vegetables</h3>
+                        <p class="text-gray-600 text-center">Fresh organic vegetables daily</p>
+                    </div>
+                </a>
+
+                <!-- Grains Card -->
+                <a href="/grains.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/wheat.png" alt="Grains" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-yellow-600">Nutritious Grains</h3>
+                        <p class="text-gray-600 text-center">Wholesome grains and cereals</p>
+                    </div>
+                </a>
+
+                <!-- Dairy Card -->
+                <a href="/dairy.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/dairy.png" alt="Dairy" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-blue-400">Fresh Farm Dairy</h3>
+                        <p class="text-gray-600 text-center">Fresh milk and dairy products</p>
+                    </div>
+                </a>
+
+                <!-- Eggs Card -->
+                <a href="/eggs.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/egg.webp" alt="Eggs" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-yellow-400">Free-Range Eggs</h3>
+                        <p class="text-gray-600 text-center">Farm fresh eggs</p>
+                    </div>
+                </a>
+
+                <!-- Coffee Card -->
+                <a href="/coffee.html" class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 slide-in-right">
+                    <div class="flex flex-col items-center group">
+                        <div class="w-48 h-48 mb-4 relative">
+                            <img src="/assets/coffee.png" alt="Coffee" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 group-hover:text-brown-600">Freshly Brewed Coffee</h3>
+                        <p class="text-gray-600 text-center">Premium coffee beans and products</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Brand Info Section -->
+        <section class="container mx-auto px-8 py-16 fade-in-section overflow-hidden">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <!-- Image Section with Splash - Made Smaller -->
+                <div class="md:w-2/5 slide-in-left">
+                    <img src="/assets/fruits-splash.png" 
+                         alt="Fruit Splash" 
+                         class="w-full h-auto max-w-md object-contain mx-auto"
+                         style="filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">
+                </div>
+
+                <!-- Text Content with Staggered Animation - Made Larger -->
+                <div class="md:w-3/5 space-y-8">
+                    <h2 class="text-5xl font-bold slide-in-up mb-6">
+                       Harvest Loop Vision
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <p class="text-gray-600 text-lg leading-relaxed slide-in-up animation-delay-200">
+                            At HarvestLoop, we believe in bringing nature's freshness to you. 
+                            Our commitment to quality and sustainability ensures that you receive the finest produce while supporting local farmers and sustainable agriculture practices.
+                        </p>
+                        
+                        <p class="text-gray-600 text-lg leading-relaxed slide-in-up animation-delay-400">
+                            We carefully select each product, ensuring it meets our strict quality standards. 
+                            From farm-fresh vegetables to organic fruits, every item is handled with care 
+                            to maintain its nutritional value and natural freshness.
+                        </p>
+
+                        <p class="text-gray-600 text-lg leading-relaxed slide-in-up animation-delay-600">
+                           Join us in promoting healthy living by supporting sustainable farming. 
+                           Taste the true freshness that comes straight from the farm to your table.
+                        </p>
+                    </div>
+
+                    <button class="bg-rose-500 text-white px-8 py-4 rounded-full hover:bg-rose-600 
+                                 transition duration-300 slide-in-up animation-delay-800 text-lg">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-8 h-8 rounded-full">
+                        <h3 class="text-2xl font-bold text-[#7dde83]">HarvestLoop</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Bringing fresh, organic produce from local farms directly to your doorstep. 
+                        Supporting sustainable agriculture and healthy living.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#categories" class="text-gray-400 hover:text-white transition">Categories</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition">Pricing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/fruit.html" class="text-gray-400 hover:text-white transition">Fruits</a></li>
+                        <li><a href="/vegetables.html" class="text-gray-400 hover:text-white transition">Vegetables</a></li>
+                        <li><a href="/grains.html" class="text-gray-400 hover:text-white transition">Grains</a></li>
+                        <li><a href="/dairy.html" class="text-gray-400 hover:text-white transition">Dairy</a></li>
+                        <li><a href="/eggs.html" class="text-gray-400 hover:text-white transition">Eggs</a></li>
+                        <li><a href="/coffee.html" class="text-gray-400 hover:text-white transition">Coffee</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-[#7dde83]"></i>
+                            <span class="text-gray-400">123 Farm Street, Green Valley, GV 12345</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone text-[#7dde83]"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-[#7dde83]"></i>
+                            <span class="text-gray-400">hello@harvestloop.com</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#7dde83]"></i>
+                            <span class="text-gray-400">Mon-Sat: 8AM-8PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 HarvestLoop. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+
+        /* Animation Classes */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease-out;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 1s ease-out;
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 1s ease-out;
+        }
+
+        .slide-in-left.is-visible,
+        .slide-in-right.is-visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.6s ease-out;
+        }
+
+        .slide-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes floatingButton {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .floating-button {
+            transition: all 0.3s ease;
+        }
+
+        .floating-button:hover {
+            animation: floatingButton 1s ease-in-out infinite;
+            box-shadow: 0 10px 20px rgba(229, 62, 62, 0.3);
+            transform-origin: center;
+        }
+
+        /* Add these new animation classes */
+        @keyframes fadeInButton {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delayed-button {
+            opacity: 0;
+            animation: fadeInButton 1s ease-out forwards;
+            animation-delay: 1s; /* Adjust this value to control the delay */
+        }
+
+        .animation-delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .animation-delay-400 {
+            animation-delay: 400ms;
+        }
+
+        .animation-delay-600 {
+            animation-delay: 600ms;
+        }
+
+        .animation-delay-800 {
+            animation-delay: 800ms;
+        }
+
+        .animation-delay-1000 {
+            animation-delay: 1000ms;
+        }
+    </style>
+
+    <!-- Purchase Popup -->
+    <div id="purchasePopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="popupTitle">Purchase Item</h2>
+                <button onclick="closePurchasePopup()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p class="text-gray-600 mb-4" id="popupPrice">Confirm the quantity you wish to purchase at the list price.</p>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Quantity (lb)</label>
+                <div class="flex items-center border rounded-lg">
+                    <button onclick="updateQuantity(-1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" id="quantityInput" class="w-full text-center border-0 focus:ring-0" value="1" min="1">
+                    <button onclick="updateQuantity(1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold mb-2">Purchase Summary</h3>
+                <div class="flex justify-between items-center">
+                    <span>Total Cost</span>
+                    <span class="text-xl font-bold text-green-600" id="totalCost">$3.99</span>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4">
+                By clicking 'Accept & Reveal Details', you agree to purchase this item. The farmer's contact details will be revealed to you to coordinate pickup/delivery.
+            </p>
+
+            <div class="flex gap-3">
+                <button onclick="closePurchasePopup()" class="flex-1 px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="acceptPurchase()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Accept & Reveal Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize profile dropdown
+            setupProfileDropdown();
+            
+            // Initialize purchase popup functionality
+            initializePurchasePopup();
+
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.2
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all elements with animation classes
+            document.querySelectorAll('.fade-in-section, .slide-in-left, .slide-in-right, .slide-in-up').forEach((element) => {
+                observer.observe(element);
+            });
+        });
+
+        // Profile Dropdown Functions
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!profileButton || !profileDropdown) {
+                console.log('Profile elements not found');
+                return;
+            }
+            
+            // Toggle dropdown on button click
+            profileButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout function
+        function handleLogout() {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear localStorage
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                
+                // Redirect to login page
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Purchase Popup Functions
+        function initializePurchasePopup() {
+            // Add click event listeners to all purchase buttons
+            document.querySelectorAll('.purchase-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    openPurchasePopup(
+                        button.dataset.itemName,
+                        parseFloat(button.dataset.price)
+                    );
+                });
+            });
+        }
+
+        function openPurchasePopup(itemName, price) {
+            const popup = document.getElementById('purchasePopup');
+            const titleEl = document.getElementById('popupTitle');
+            const priceEl = document.getElementById('popupPrice');
+            
+            titleEl.textContent = `Purchase ${itemName}`;
+            priceEl.textContent = `Confirm the quantity you wish to purchase at the list price of $${price.toFixed(2)} / lb.`;
+            
+            // Reset quantity to 1
+            document.getElementById('quantityInput').value = 1;
+            updateTotalCost();
+            
+            popup.classList.remove('hidden');
+        }
+
+        function closePurchasePopup() {
+            document.getElementById('purchasePopup').classList.add('hidden');
+        }
+
+        function updateQuantity(change) {
+            const input = document.getElementById('quantityInput');
+            const newValue = Math.max(1, parseInt(input.value) + change);
+            input.value = newValue;
+            updateTotalCost();
+        }
+
+        function updateTotalCost() {
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            const basePrice = 3.99; // This could be dynamic based on the item
+            const total = (quantity * basePrice).toFixed(2);
+            document.getElementById('totalCost').textContent = `$${total}`;
+        }
+
+        function acceptPurchase() {
+            // Here you would typically make an API call to process the purchase
+            alert('Purchase successful! Farmer contact details will be sent to your registered email.');
+            closePurchasePopup();
+        }
+    </script>
+
+</body>
+</html>

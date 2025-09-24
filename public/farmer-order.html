@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestLoop - Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+    /* Profile dropdown animation */
+    #profile-dropdown {
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      pointer-events: none;
+    }
+
+    #profile-dropdown:not(.hidden) {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Profile button hover effect */
+    #profile-button:hover {
+      color: #059669;
+    }
+    
+    /* Order card animations */
+    .order-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #608d58;
+    }
+
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Status colors */
+    .status-pending {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-accepted {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-purchased {
+        background-color: #10B981;
+        color: white;
+    }
+    
+    .status-declined, .status-cancelled {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+    
+    .status-expired {
+        background-color: #E5E7EB;
+        color: #4B5563;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Cancelled orders */
+    .order-card.cancelled {
+        opacity: 0.8;
+    }
+    </style>
+</head>
+<body class="bg-[#f6f0e9] text-gray-800 font-sans">
+
+<header class="bg-[#ddccb1]">
+  <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+
+    <!-- Logo & Name -->
+    <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/farmer-dashboard.html">
+        <img
+          src="/assets/Logo.png"
+          alt="Website Logo"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        HarvestLoop
+      </a>
+
+    <!-- Center Tabs -->
+    <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+      <a href="/farmer-dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+      <i class="fas fa-th mr-3"></i> Dashboard
+      </a>
+
+      <a href="/farmer-product.html" class="flex items-center px-3 py-1 text-sm text-sm text-gray-700 hover:text-black">
+      <i class="fas fa-seedling mr-3"></i> Products
+      </a>
+
+      <a href="/farmer-order.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+        <i class="fas fa-file-alt mr-3"></i> Orders
+      </a>
+    </div>
+
+    <!-- Right-Aligned Search and Profile -->
+    <div class="flex items-center space-x-4 z-10">
+
+      <!-- Profile -->
+      <div class="relative" id="profileContainer">
+        <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+          <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+          <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+          <a href="/farmer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+          </a>
+          <a href="/farmer-dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-th mr-3 w-4"></i> Dashboard
+          </a>
+          <a href="/farmer-product.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-seedling mr-3 w-4"></i> Products
+          </a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</header>
+
+  <main class="px-8 pt-28 pb-10">
+        <section class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-[#608d58]">Manage Orders</h1>
+                    <p class="text-sm text-gray-600">View and manage customer orders and deals</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Filter Dropdown -->
+                    <select id="statusFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <option value="">All Orders & Deals</option>
+                        <option value="pending">Pending (In Negotiation)</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="purchased">Purchased</option>
+                        <option value="declined">Declined</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                    <!-- Order Count -->
+                    <span id="orderCount" class="text-sm text-gray-500">Loading orders...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-8">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-500">Loading your orders...</span>
+        </div>
+
+        <!-- Orders Section -->
+        <section>
+            <!-- Orders Container -->
+            <div id="orders-container" class="space-y-6">
+                <!-- Orders will be dynamically loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <div class="text-gray-400 text-6xl mb-4">
+                    <i class="fas fa-shopping-basket"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Orders Found</h3>
+                <p class="text-gray-500 mb-6">You don't have any orders yet. Keep adding quality products to attract customers!</p>
+                <a href="/farmer-product.html" class="bg-[#608d58] hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Add New Product
+                </a>
+            </div>
+        </section>
+    </main>
+
+
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b">
+                <h2 class="text-xl font-bold text-[#608d58]">Order Details</h2>
+                <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div id="orderModalContent" class="p-6">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+  
+  <script src="/js/farmer-orders.js"></script>
+  </body>
+</html>

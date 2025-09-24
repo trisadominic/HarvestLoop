@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chart Test - No Auth</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Market Trends Chart Test</h1>
+    
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-4">Market Trends</h3>
+      <p class="text-sm text-gray-600 mb-4">Average prices for the last 7 days.</p>
+      
+      <!-- Dropdown Controls -->
+      <div class="flex gap-4 mb-6">
+        <select id="categorySelect" class="border rounded px-3 py-2">
+          <option value="Fruit">Fruit</option>
+          <option value="Vegetable">Vegetable</option>
+          <option value="Dairy">Dairy</option>
+        </select>
+        
+        <select id="productSelect" class="border rounded px-3 py-2">
+          <option value="Apple">Apple</option>
+        </select>
+        
+        <select id="monthSelect" class="border rounded px-3 py-2">
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+        </select>
+        
+        <button id="updateBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Update Chart</button>
+      </div>
+      
+      <!-- Chart Canvas -->
+      <div style="height: 300px;">
+        <canvas id="marketChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Categories and products mapping
+    const categories = {
+      Vegetable: ["Tomato", "Potato", "Onion", "Carrot", "Cabbage"], 
+      Fruit: ["Apple", "Banana", "Mango", "Orange", "Grapes"],
+      Dairy: ["Cow Milk", "Buffalo Milk", "Cheese", "Butter"]
+    };
+
+    let chart;
+    let currentProduct = "Apple";
+    let currentMonth = 1;
+
+    // Elements
+    const categorySelect = document.getElementById("categorySelect");
+    const productSelect = document.getElementById("productSelect");
+    const monthSelect = document.getElementById("monthSelect");
+    const updateBtn = document.getElementById("updateBtn");
+
+    // Populate product dropdown based on category
+    function populateProducts(category) {
+      productSelect.innerHTML = "";
+      if (categories[category]) {
+        categories[category].forEach(product => {
+          const option = document.createElement("option");
+          option.value = product;
+          option.textContent = product;
+          productSelect.appendChild(option);
+        });
+        currentProduct = categories[category][0];
+      }
+    }
+
+    // Event listeners
+    categorySelect.addEventListener("change", (e) => {
+      populateProducts(e.target.value);
+    });
+
+    productSelect.addEventListener("change", (e) => {
+      currentProduct = e.target.value;
+    });
+
+    monthSelect.addEventListener("change", (e) => {
+      currentMonth = parseInt(e.target.value);
+    });
+
+    updateBtn.addEventListener("click", () => {
+      updateChart(currentProduct, currentMonth);
+    });
+
+    // Fetch data function
+    async function fetchData(product, month) {
+      try {
+        console.log(`🔍 Fetching data for ${product}, month ${month}`);
+        const response = await fetch(`/api/data?product=${encodeURIComponent(product)}&month=${month}`);
+        if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
+        const data = await response.json();
+        console.log('📊 Fetched chart data:', data);
+        return data;
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // Return sample data if API fails
+        return generateSampleData(product);
+      }
+    }
+
+    // Generate sample data
+    function generateSampleData(product) {
+      console.log('🎲 Generating sample data for:', product);
+      const sampleData = [];
+      const currentDate = new Date();
+      const basePrice = getProductBasePrice(product);
+      
+      for (let i = 1; i <= 30; i++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+        const variation = (Math.random() - 0.5) * 20;
+        const avgPrice = Math.max(basePrice + variation, 5);
+        
+        sampleData.push({
+          Date: date.toISOString(),
+          avgPrice: Math.round(avgPrice * 100) / 100
+        });
+      }
+      
+      return sampleData;
+    }
+
+    // Get base price for products
+    function getProductBasePrice(product) {
+      const basePrices = {
+        'Apple': 80, 'Banana': 40, 'Mango': 120, 'Orange': 60, 'Grapes': 100,
+        'Tomato': 30, 'Potato': 25, 'Onion': 35, 'Carrot': 45, 'Cabbage': 20,
+        'Cow Milk': 50, 'Buffalo Milk': 60, 'Cheese': 400, 'Butter': 450
+      };
+      return basePrices[product] || 50;
+    }
+
+    // Update chart
+    async function updateChart(product = "Apple", month = 1) {
+      try {
+        console.log(`📈 Updating chart for ${product}, month ${month}`);
+        
+        const data = await fetchData(product, month);
+        
+        if (!data || data.length === 0) {
+          console.warn('⚠️ No data received, generating sample data');
+          const fallbackData = generateSampleData(product);
+          updateChartWithData(fallbackData, product);
+          return;
+        }
+        
+        updateChartWithData(data, product);
+        
+      } catch (error) {
+        console.error('❌ Error updating chart:', error);
+        const fallbackData = generateSampleData(product || 'Apple');
+        updateChartWithData(fallbackData, product || 'Apple');
+      }
+    }
+
+    // Update chart with data
+    function updateChartWithData(data, product) {
+      try {
+        const labels = data.map(item =>
+          new Date(item.Date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+        );
+        const prices = data.map(item => item.avgPrice);
+
+        if (chart) {
+          chart.destroy();
+        }
+        
+        const canvas = document.getElementById("marketChart");
+        if (!canvas) {
+          console.error('❌ Canvas element not found');
+          return;
+        }
+        
+        const ctx = canvas.getContext("2d");
+        
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{
+              label: `${product} Price`,
+              data: prices,
+              borderColor: "#22c55e",
+              borderWidth: 2,
+              tension: 0.3,
+              fill: false,
+              pointBackgroundColor: "#22c55e",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: true },
+              tooltip: {
+                callbacks: {
+                  label: (context) => `Price: ₹${context.parsed.y.toLocaleString("en-IN")}`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: {
+                  callback: (value) => `₹${value.toLocaleString("en-IN")}`
+                }
+              }
+            }
+          }
+        });
+        
+        console.log('✅ Chart updated successfully');
+      } catch (error) {
+        console.error('❌ Error creating chart:', error);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Page loaded, initializing...');
+      populateProducts("Fruit");
+      
+      setTimeout(() => {
+        updateChart(currentProduct, currentMonth);
+      }, 500);
+    });
+  </script>
+</body>
+</html>

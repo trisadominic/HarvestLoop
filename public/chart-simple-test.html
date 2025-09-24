@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Chart Test</h1>
+    
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold mb-4">Market Trends</h2>
+        <canvas id="testChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        console.log('🚀 Starting chart test...');
+        
+        // Test data
+        const testData = [
+            { Date: '2025-01-01', avgPrice: 80 },
+            { Date: '2025-01-02', avgPrice: 82 },
+            { Date: '2025-01-03', avgPrice: 78 },
+            { Date: '2025-01-04', avgPrice: 85 },
+            { Date: '2025-01-05', avgPrice: 79 },
+            { Date: '2025-01-06', avgPrice: 83 },
+            { Date: '2025-01-07', avgPrice: 81 }
+        ];
+        
+        function createChart() {
+            const ctx = document.getElementById('testChart').getContext('2d');
+            
+            const labels = testData.map(item => 
+                new Date(item.Date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+            );
+            const prices = testData.map(item => item.avgPrice);
+            
+            const chart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Apple Price',
+                        data: prices,
+                        borderColor: "#22c55e",
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: false,
+                        pointBackgroundColor: "#22c55e",
+                        pointBorderColor: "#fff",
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `Price: ₹${context.parsed.y.toLocaleString("en-IN")}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: (value) => `₹${value.toLocaleString("en-IN")}`
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('✅ Chart created successfully');
+        }
+        
+        // Create chart when page loads
+        document.addEventListener('DOMContentLoaded', createChart);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Fruits - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="/js/fruit.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white">
+        <div class="fixed top-0 left-0 w-full z-50 bg-white flex items-center justify-between px-8 py-4 shadow-sm">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/consumer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Navigation Menu -->
+            <nav class="flex items-center space-x-6">
+                <a href="/consumer-dashboard.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-compass mr-1"></i> Discover
+                </a>
+                <a href="/consumer-orders.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-shopping-basket mr-1"></i> My Orders
+                </a>
+                <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                     <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                </a>
+            </nav>
+
+            <!-- Profile Section -->
+            <div class="flex items-center relative">
+                <button id="profile-button" class="flex items-center focus:outline-none hover:opacity-80 transition">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                </button>
+
+                <!-- Profile Dropdown -->
+                <div id="profile-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                    <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                    <a href="/consumer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                    </a>
+                    <a href="/consumer-orders.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                    </a>
+                    <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                        <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                    </a>
+                </div>
+            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="container mx-auto px-8 py-12">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center gap-4 mb-6">
+                    <img src="/assets/fruits-icon.png" alt="Fruits Icon" class="w-12 h-12 object-contain fruit-icon" 
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23f97316\'><path d=\'M11 19v-5.5H5V19h6zm8 0v-5.5h-6V19h6zm-8-7.5V6H5v5.5h6zm8 0V6h-6v5.5h6z\'/></svg>'"/>
+                    <h1 class="text-5xl font-bold font-serif hero-text-shadow">Fresh <span class="hero-gradient">Fruits</span></h1>
+                </div>
+                <div class="relative w-full max-w-3xl mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-100 to-orange-100 opacity-30 rounded-xl"></div>
+                    <p class="text-gray-700 text-lg py-4 px-6 relative">
+                        Discover fresh, seasonal fruits from our trusted local farmers. Each piece is carefully selected 
+                        for optimal ripeness, flavor, and nutritional value. Support local agriculture while enjoying 
+                        nature's sweetest offerings.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="container mx-auto px-8 text-center py-8">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-500">Loading fresh fruits...</span>
+        </div>
+
+        <!-- Fruits Grid -->
+        <!-- Fruit Count Display -->
+        <div class="container mx-auto px-8 mb-4 text-right">
+            <span id="fruit-count" class="text-sm text-gray-600"></span>
+        </div>
+        <section class="container mx-auto px-8 pb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px]" id="fruit-grid">
+                <!-- Dynamic fruits will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="load-more-btn" class="bg-orange-400 hover:bg-orange-500 text-white px-8 py-3 rounded-full transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>Load More Fruits
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-8 h-8 rounded-full">
+                        <h3 class="text-2xl font-bold text-[#7dde83]">HarvestLoop</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Bringing fresh, organic produce from local farms directly to your doorstep. 
+                        Supporting sustainable agriculture and healthy living.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#categories" class="text-gray-400 hover:text-white transition">Categories</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition">Pricing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/fruits.html" class="text-orange-400 hover:text-orange-300 transition">Fruits</a></li>
+                        <li><a href="/vegetables.html" class="text-gray-400 hover:text-white transition">Vegetables</a></li>
+                        <li><a href="/grains.html" class="text-gray-400 hover:text-white transition">Grains</a></li>
+                        <li><a href="/dairy.html" class="text-gray-400 hover:text-white transition">Dairy</a></li>
+                        <li><a href="/eggs.html" class="text-gray-400 hover:text-white transition">Eggs</a></li>
+                        <li><a href="/coffee.html" class="text-gray-400 hover:text-white transition">Coffee</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-[#7dde83]"></i>
+                            <span class="text-gray-400">123 Farm Street, Green Valley, GV 12345</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone text-[#7dde83]"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-[#7dde83]"></i>
+                            <span class="text-gray-400">hello@harvestloop.com</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#7dde83]"></i>
+                            <span class="text-gray-400">Mon-Sat: 8AM-8PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 HarvestLoop. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Purchase Popup -->
+    <div id="purchasePopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closePurchasePopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2 id="popupTitle" class="text-2xl font-bold mb-4">Purchase Item</h2>
+            <p id="popupPrice" class="text-gray-600 mb-6"></p>
+            
+            <!-- Quantity Selector -->
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-gray-700">Quantity:</span>
+                <div class="flex items-center space-x-4">
+                    <button onclick="updateQuantity(-1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" id="quantityInput" value="1" min="1" 
+                           class="w-16 text-center border rounded-lg py-1" 
+                           onchange="const price = parseFloat(document.getElementById('popupPrice').textContent.match(/Rs\.([\d.]+)/)[1]); updateTotalCost(price)">
+                    <button onclick="updateQuantity(1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Total Cost -->
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-lg font-semibold">Total Cost:</span>
+                <span id="totalCost" class="text-2xl font-bold text-green-600">Rs.0</span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex space-x-4">
+                <button onclick="closePurchasePopup()" class="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button onclick="acceptPurchase()" class="flex-1 py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+                    Purchase & Reveal Contact
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup with Farmer Details -->
+    <div id="successPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closeSuccessPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="text-green-500 text-6xl mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Purchase Successful!</h2>
+                <p class="text-gray-600">You can now contact the farmer directly:</p>
+            </div>
+            
+            <!-- Farmer Details Card -->
+            <div class="bg-green-50 rounded-lg p-6 mb-6 border border-green-100">
+                <!-- Farm/Farmer Name -->
+                <div class="mb-4 pb-3 border-b border-green-200">
+                    <h3 class="text-xl font-semibold text-green-800 flex items-center">
+                        <i class="fas fa-tractor mr-2"></i>
+                        <span id="successFarmName">Loading...</span>
+                    </h3>
+                </div>
+                
+                <!-- Contact Details -->
+                <div class="space-y-3">
+                    <!-- Email -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-envelope text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email</p>
+                            <p id="successFarmerEmail" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-phone text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Phone</p>
+                            <p id="successFarmerPhone" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-map-marker-alt text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Farm Address</p>
+                            <p id="successFarmerAddress" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeSuccessPopup()" 
+                    class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-lg font-semibold">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- Farmer Details Popup -->
+    <div id="farmerModal" 
+        class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 farmer-modal-content">
+            <!-- Close Button -->
+            <button onclick="closeFarmerModal()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <!-- Loading State -->
+            <div id="farmerLoadingState" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                <p class="text-gray-600 mt-2">Loading farmer details...</p>
+            </div>
+            
+            <!-- Farmer Details Content -->
+            <div id="farmerContent" class="hidden p-6">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-green-600 mb-2" id="farmNameTitle">Green Valley Farms</h2>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span id="farmLocation">Napa Valley, CA</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <p class="text-gray-700 mb-6" id="farmDescription">
+                    A family-owned farm committed to sustainable and organic farming practices for over 40 years.
+                </p>
+                
+                <!-- Contact Information Section -->
+                <div id="contactSection" class="contact-info-box rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+                    
+                    <!-- Hidden contact details (shown after reveal) -->
+                    <div id="contactDetails" class="hidden space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Email:</span>
+                                <span id="farmerEmail" class="ml-2">contact@greenvalley.com</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Phone:</span>
+                                <span id="farmerPhone" class="ml-2">(707) 555-1234</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-gray-600 mr-3 w-5 mt-1"></i>
+                            <div>
+                                <span class="font-medium">Address:</span>
+                                <div class="ml-2">
+                                    <div id="farmerAddress">123 Organic Way</div>
+                                    <div id="farmerCityState">Napa, CA 94558</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reveal button (hidden after contact is revealed) -->
+                    <div id="revealButtonContainer" class="text-center">
+                        <button id="revealContactBtn" 
+                                onclick="revealFarmerContact()" 
+                                class="reveal-button text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center mx-auto">
+                            <i class="fas fa-eye mr-2"></i>
+                            Reveal Contact Info <span class="ml-2 text-green-100">(1 Credit)</span>
+                        </button>
+                        <p class="text-sm text-gray-500 mt-2">Uses 1 credit from your subscription</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="farmerErrorState" class="hidden text-center py-12 px-6">
+                <div class="text-red-500 text-4xl mb-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Unable to Load</h3>
+                <p class="text-gray-600 mb-4">We couldn't fetch the farmer details at this time.</p>
+                <button onclick="closeFarmerModal()" 
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Negotiation Popup Menu -->
+    <div id="negotiateModal" 
+        class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="relative bg-white p-6 rounded-lg shadow-xl max-w-xl w-full mx-4">
+            <!-- Close Button -->
+            <button onclick="closeNegotiateModal()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-2">
+                Negotiate for <span id="productName" class="font-bold">Product Name</span>
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">
+                Propose a new price or send a message to the farmer. 
+                The list price is <span id="listPriceValue">₹0 / unit</span>.
+            </p>
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                        <input type="number" id="quantity" value="1" min="1"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border">
+                    </div>
+                    <div class="flex-1">
+                        <label for="yourOffer" class="block text-sm font-medium text-gray-700">Your Offer (₹ / unit)</label>
+                        <input type="number" id="yourOffer" value="0" step="1"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border">
+                    </div>
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700">Message (Optional)</label>
+                    <textarea id="message" rows="3"
+                            placeholder="e.g. I'd like to buy in bulk, can you do a better price?"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm p-2 border"></textarea>
+                </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-md mb-4">
+                <h3 class="font-semibold text-gray-700 mb-2">Offer Summary</h3>
+                <div class="flex justify-between text-sm">
+                    <span>List Price Total</span>
+                    <span id="listTotal">₹0</span>
+                </div>
+                <div class="flex justify-between text-sm mt-1 text-green-600 font-semibold">
+                    <span>Your Offer Total</span>
+                    <span id="yourTotal">₹0</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">The farmer will be notified of your offer. You can see their response in your messages.</p>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeNegotiateModal()" 
+                        class="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium">
+                    Cancel
+                </button>
+                <button id="sendOfferBtn" onclick="sendNegotiateOffer()" class="px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 font-medium">
+                    Send Offer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Hero Section Styles */
+        .hero-gradient {
+            background: linear-gradient(135deg, #7dde83, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .fruit-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .fruit-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .hero-text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Smooth fade in for page load */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-section {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        /* Farmer modal animations */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .farmer-modal-content {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Farmer modal specific styles */
+        .farmer-modal-content {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .contact-info-box {
+            border: 1px solid #e5e7eb;
+            background: linear-gradient(to bottom, #f9fafb, #ffffff);
+        }
+
+        .reveal-button {
+            background: linear-gradient(to right, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .reveal-button:hover {
+            background: linear-gradient(to right, #059669, #047857);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+
+        .fruit-card {
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .fruit-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .fruit-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .fruit-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .fruit-card button {
+            transition: all 0.2s ease;
+        }
+
+        .fruit-card button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Staggered animation delays */
+        .fruit-card:nth-child(1) { transition-delay: 0.1s; }
+        .fruit-card:nth-child(2) { transition-delay: 0.2s; }
+        .fruit-card:nth-child(3) { transition-delay: 0.3s; }
+        .fruit-card:nth-child(4) { transition-delay: 0.4s; }
+        .fruit-card:nth-child(5) { transition-delay: 0.5s; }
+        .fruit-card:nth-child(6) { transition-delay: 0.6s; }
+        .fruit-card:nth-child(7) { transition-delay: 0.7s; }
+        .fruit-card:nth-child(8) { transition-delay: 0.8s; }
+
+        /* Button hover effects */
+        .fruit-card button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fruit-card button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .fruit-card button:hover:before {
+            left: 100%;
+        }
+
+        /* Success Popup Styles */
+        .farmer-info {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .farmer-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .farmer-info-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .farmer-info-value {
+            color: #212529;
+            font-weight: 600;
+        }
+        
+        /* Loading state */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Source badge styles */
+        .source-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 10;
+        }
+
+        .source-badge.dynamic {
+            background: linear-gradient(45deg, #10b981, #34d399);
+        }
+
+        .source-badge.static {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        }
+    </style>
+
+    <script>
+        // Global variables
+        let staticFruits = [];
+        let dynamicFruits = [];
+        let currentView = 'all'; // 'all', 'dynamic', 'static'
+
+        // Initialize the page
+        async function initializePage() {
+            const loadingState = document.getElementById('loading-state');
+            if (loadingState) {
+                loadingState.style.display = 'block';
+            }
+
+            try {
+                // First try to load dynamic fruits
+                const dynamicLoaded = await loadDynamicFruits();
+                
+                if (!dynamicLoaded) {
+                    console.log('Loading static fruits as fallback...');
+                    staticFruits = defaultStaticFruits;
+                }
+
+                // Display the fruits
+                displayFruits();
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                // Load static fruits as fallback
+                staticFruits = defaultStaticFruits;
+                displayFruits();
+            } finally {
+                if (loadingState) {
+                    loadingState.style.display = 'none';
+                }
+            }
+        }
+
+        // Call initialize when the page loads - DISABLED to prevent duplicate API calls
+        // document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Static fallback fruits data
+        const defaultStaticFruits = [
+            {
+                Product: "Fresh Red Apples",
+                Price: 80,
+                imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&h=400&fit=crop",
+                farmName: "Tropical Paradise Farm",
+                stockUnit: "piece",
+                stock: 100,
+                source: "static"
+            },
+            {
+                Product: "Juicy Oranges",
+                Price: 120,
+                imageUrl: "/assets/orange.jpg",
+                farmName: "Sunny Grove Farm",
+                stockUnit: "kg",
+                stock: 50,
+                source: "static"
+            },
+            {
+                Product: "Ripe Bananas",
+                Price: 60,
+                imageUrl: "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=300&fit=crop",
+                farmName: "Tropical Farms Co.",
+                stockUnit: "dozen",
+                stock: 75,
+                source: "static"
+            },
+            {
+                Product: "Alphonso Mangoes",
+                Price: 300,
+                imageUrl: "/assets/mango.jpg",
+                farmName: "Maharashtra Orchards",
+                stockUnit: "kg",
+                stock: 25,
+                source: "static"
+            },
+            {
+                Product: "Green Grapes",
+                Price: 250,
+                imageUrl: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=400&h=300&fit=crop",
+                farmName: "Vineyard Estates",
+                stockUnit: "kg",
+                stock: 40,
+                source: "static"
+            },
+            {
+                Product: "Fresh Strawberries",
+                Price: 400,
+                imageUrl: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&h=300&fit=crop",
+                farmName: "Berry Hills Farm",
+                stockUnit: "kg",
+                stock: 15,
+                source: "static"
+            },
+            {
+                Product: "Sweet Watermelon",
+                Price: 40,
+                imageUrl: "https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?w=400&h=300&fit=crop",
+                farmName: "Desert Fresh Farm",
+                stockUnit: "kg",
+                stock: 80,
+                source: "static"
+            }
+        ];
+
+        function createFruitCard(fruit, index = 0) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden fruit-card relative border border-gray-100';
+            card.style.transitionDelay = `${index * 0.1}s`;
+            
+            card.innerHTML = `
+                <div class="relative h-[220px] overflow-hidden rounded-t-2xl bg-gray-50">
+                    <div class="w-full h-full flex items-center justify-center p-4">
+                        <img src="${fruit.imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'}" 
+                             alt="${fruit.Product}" 
+                             class="w-full h-full object-contain hover:scale-105 transition-transform duration-300" 
+                             onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'" />
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">${fruit.Product}</h3>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-map-marker-alt text-green-500 text-xs"></i>
+                        <span class="text-xs text-gray-500">From ${fruit.farmName || 'Local Farm'}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-1">
+                            <span class="text-xl font-bold text-green-600">₹${fruit.Price}</span>
+                            <span class="text-sm text-gray-500">/${fruit.stockUnit || 'unit'}</span>
+                        </div>
+                        <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full">
+                            ${fruit.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="bg-[#8fbc8f] hover:bg-[#7dde83] text-white px-3 py-2 rounded-lg text-sm transition duration-300 flex items-center justify-center" 
+                                onclick="handlePurchase('${fruit.name}', ${fruit.price}, '${fruit._id}')">
+                            <i class="fas fa-shopping-cart mr-1.5"></i>Purchase
+                        </button>
+                        <button onclick="openNegotiateModal('${fruit.Product}', '₹${fruit.Price.toFixed(2)} / ${fruit.stockUnit || 'unit'}')" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-handshake mr-1.5"></i>Negotiate
+                        </button>
+                        <button onclick="handleFarmerProfile('${fruit.farmName || 'Unknown'}')"
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-user mr-1.5"></i>Farmer
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function updateFruitCount() {
+            const countElement = document.getElementById('fruit-count');
+            let displayedFruits = [];
+            
+                if (currentView === 'all') {
+                    displayedFruits = [...staticFruits, ...dynamicFruits];
+                } else if (currentView === 'dynamic') {
+                displayedFruits = dynamicFruits;
+            } else {
+                displayedFruits = staticFruits;
+            }
+            
+            const staticCount = currentView !== 'dynamic' ? staticFruits.length : 0;
+            const dynamicCount = currentView !== 'static' ? dynamicFruits.length : 0;
+            
+            countElement.innerHTML = `
+                Showing ${displayedFruits.length} fruits
+                ${currentView === 'all' ? `(${staticCount} static + ${dynamicCount} dynamic)` : ''}
+            `;
+                const countEl = document.getElementById('fruitCount');
+                if (countEl) {
+                    countEl.innerHTML = dynamicFruits.length > 0 ? dynamicFruits.length : staticFruits.length;
+                }
+        }
+
+        function displayFruits() {
+            const container = document.getElementById('fruit-grid');
+            // Ensure container has correct grid classes
+            if (container) {
+                container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+            }
+            const loadingState = document.getElementById('loading-state');
+            
+            // Hide loading state
+            if (loadingState) {
+                loadingState.style.display = 'none';
+            }
+            
+            // Clear existing content
+            container.innerHTML = '';
+            
+            // Combine dynamic and static fruits based on current view
+            let fruitsToDisplay = [];
+            if (currentView === 'all') {
+                fruitsToDisplay = [...dynamicFruits, ...staticFruits];
+            } else if (currentView === 'dynamic') {
+                fruitsToDisplay = dynamicFruits;
+            } else {
+                fruitsToDisplay = staticFruits;
+            }
+            
+            if (fruitsToDisplay.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="text-gray-500 text-lg">No fruits available at the moment.</div>
+                        <div class="text-gray-400 mt-2">Please check back later or contact support.</div>
+                    </div>`;
+                return;
+            }
+
+            console.log('Displaying fruits:', fruitsToDisplay); // Debug log
+            fruitsToDisplay.forEach((fruit, index) => {
+                console.log('Creating card for fruit:', fruit);
+                const card = document.createElement('div');
+                card.className = 'fruit-card col-span-1';
+                
+                card.innerHTML = `
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                        <div class="h-48 bg-gray-50 flex items-center justify-center p-4">
+                            <img src="${fruit.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSIjZjk3MzE2Ij48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0MCIvPjx0ZXh0IHg9IjUwIiB5PSI2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iNDAiPvCfjaY8L3RleHQ+PC9zdmc+'}" 
+                                 alt="${fruit.name || 'Fruit'}" 
+                                 class="max-h-full w-auto object-contain"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display:none;" class="text-6xl">🍎</div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-1">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">${fruit.name || 'Unknown Fruit'}</h3>
+                            
+                            <div class="space-y-3 mb-4 flex-1">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-600">Farm:</span>
+                                    <span class="font-medium">${fruit.farmName || 'Local Farm'}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-600">Stock:</span>
+                                    <span class="font-medium">${fruit.stock || 0} ${fruit.unit || 'kg'}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-2xl font-bold text-green-600">₹${fruit.price || 0}</span>
+                                    <span class="text-sm text-gray-500">per ${fruit.unit || 'kg'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-3 mt-auto">
+                                <button onclick="handlePurchase('${fruit.name}', ${fruit.price}, '${fruit._id}')"
+                                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition-colors">
+                                    <i class="fas fa-shopping-cart mr-1.5"></i>Buy
+                                </button>
+                                <button onclick="openNegotiateModal('${fruit.name}', '₹${fruit.price}/${fruit.unit}')"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition-colors">
+                                    <i class="fas fa-handshake mr-1.5"></i>Deal
+                                </button>
+                                <button onclick="handleFarmerProfile('${fruit.farmName}')"
+                                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition-colors">
+                                    <i class="fas fa-user mr-1.5"></i>Farm
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                container.appendChild(card);
+            });
+            
+            // Trigger animations with a slight delay for each card
+            document.querySelectorAll('.fruit-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.remove('opacity-0', 'translate-y-4');
+                }, index * 100);
+            });
+
+            if (document.querySelectorAll('.fruit-card').length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-600 text-lg">No fruits available at the moment.</p>
+                        <p class="text-gray-400 mt-2">Please check back later for fresh arrivals.</p>
+                    </div>
+                `;
+            }
+            
+            updateFruitCount();
+        }
+
+        async function loadDynamicFruits() {
+            try {
+                console.log('Loading dynamic fruits from API...');
+                const apiUrl = '/api/products/fruit';
+                const token = localStorage.getItem('token');
+                console.log('Making request to:', window.location.origin + apiUrl);
+                const response = await fetch(apiUrl, {
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.warn('API responded with status: ' + response.status);
+                    try {
+                        const errorData = await response.json();
+                        console.error('API error response:', errorData);
+                        return false;
+                    } catch (e) {
+                        const errorText = await response.text();
+                        console.error('API error response:', errorText);
+                        return false;
+                    }
+                    // Don't show alert, we'll display a nice message in the UI through displayFruits()
+                }
+                
+                let fruits;
+                try {
+                    fruits = await response.json();
+                } catch (jsonErr) {
+                    console.error('Failed to parse API response as JSON:', jsonErr);
+                    alert('Failed to parse fruits data.');
+                    return false;
+                }
+                console.log('Fetched fruits from API:', fruits);
+                console.log('API Response:', fruits);
+                console.log('First fruit example:', fruits[0]);
+                console.log('Response Status:', response.status);
+                
+                if (Array.isArray(fruits) && fruits.length > 0) {
+                    console.log('Raw fruits data:', fruits);
+                    dynamicFruits = fruits.map(function(fruit) {
+                        return {
+                            name: fruit.name,
+                            price: fruit.price,
+                            image: fruit.image,
+                            farmName: fruit.farmName,
+                            stock: fruit.stock,
+                            unit: fruit.unit || 'kg',
+                            _id: fruit._id
+                        };
+                    });
+                    console.log('Processed fruits:', dynamicFruits);
+                    return true;
+                } else {
+                    console.warn('No dynamic fruits found for user. Falling back to static fruits.');
+                    dynamicFruits = [];
+                    // Fallback: show static fruits
+                    staticFruits = defaultStaticFruits;
+                    displayFruits();
+                    return false;
+                }
+            } catch (err) {
+                console.error('Error loading fruits:', err);
+                return false;
+            }
+        }
+
+        async function loadAllFruits() {
+            const loadingState = document.getElementById('loading-state');
+            loadingState.style.display = 'block';
+            
+            try {
+                // Load dynamic fruits
+                const dynamicLoaded = await loadDynamicFruits();
+                
+                // If no dynamic fruits, use static ones
+                if (!dynamicLoaded) {
+                    staticFruits = defaultStaticFruits;
+                }
+                
+                // Display fruits
+                displayFruits();
+            } catch (error) {
+                console.error('Error loading fruits:', error);
+                // If everything fails, show static fruits
+                staticFruits = defaultStaticFruits;
+                displayFruits();
+            } finally {
+                // Always hide loading state
+                loadingState.style.display = 'none';
+            }
+        }
+
+        // Modal functions
+        function openNegotiateModal(productName, listPrice) {
+            document.getElementById('productName').textContent = productName;
+            document.getElementById('listPriceValue').textContent = listPrice;
+            const numericPrice = parseFloat(listPrice.replace(/[^\d.]/g, '')) || 0;
+            document.getElementById('quantity').value = 1;
+            document.getElementById('yourOffer').value = numericPrice;
+            updateOfferTotals();
+            document.getElementById('negotiateModal').classList.remove('hidden');
+        }
+
+        function closeNegotiateModal() {
+            document.getElementById('negotiateModal').classList.add('hidden');
+        }
+
+        function updateOfferTotals() {
+            const qty = parseFloat(document.getElementById('quantity').value) || 1;
+            const offer = parseFloat(document.getElementById('yourOffer').value) || 0;
+            const listPrice = parseFloat(document.getElementById('listPriceValue').textContent.replace(/[^\d.]/g, '')) || 0;
+            document.getElementById('listTotal').textContent = 'Rs.' + (qty * listPrice).toFixed(2);
+            document.getElementById('yourTotal').textContent = 'Rs.' + (qty * offer).toFixed(2);
+        }
+
+        // Purchase Popup Functions
+        function handlePurchase(productName, price, productId, farmerEmail, farmerPhone, farmerAddress) {
+            console.log('Handling purchase with farmer details:', { farmerEmail, farmerPhone, farmerAddress });
+            openPurchasePopup(productName, price, productId, farmerEmail, farmerPhone, farmerAddress);
+        }
+
+        function openPurchasePopup(itemName, price, productId, farmerName, farmerEmail, farmerPhone, farmName, farmAddress) {
+            const popup = document.getElementById('purchasePopup');
+            const titleEl = document.getElementById('popupTitle');
+            const priceEl = document.getElementById('popupPrice');
+            
+            titleEl.textContent = 'Purchase ' + itemName;
+            priceEl.textContent = 'Confirm the quantity you wish to purchase at the list price of Rs.' + price.toFixed(2) + ' / kg.';
+            
+            // Store all needed data as attributes
+            popup.setAttribute('data-product-id', productId);
+            popup.setAttribute('data-farmer-name', farmerName);
+            popup.setAttribute('data-farmer-email', farmerEmail);
+            popup.setAttribute('data-farmer-phone', farmerPhone);
+            popup.setAttribute('data-farm-name', farmName);
+            popup.setAttribute('data-farm-address', farmAddress);
+            
+            // Reset quantity to 1
+            document.getElementById('quantityInput').value = 1;
+            updateTotalCost(price);
+            
+            popup.classList.remove('hidden');
+            popup.style.display = 'flex';
+        }
+
+        function closePurchasePopup() {
+            document.getElementById('purchasePopup').classList.add('hidden');
+        }
+
+        function updateQuantity(change) {
+            const input = document.getElementById('quantityInput');
+            const newValue = Math.max(1, parseInt(input.value) + change);
+            input.value = newValue;
+            const priceMatch = document.getElementById('popupPrice').textContent.match(/Rs\.(\d+\.?\d*)/);
+            const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+            updateTotalCost(price);
+        }
+
+        function updateTotalCost(price) {
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            const total = (quantity * price).toFixed(2);
+            document.getElementById('totalCost').textContent = 'Rs.' + total;
+        }
+
+        function acceptPurchase() {
+            const productName = document.getElementById('popupTitle').textContent.replace('Purchase ', '');
+            const quantity = document.getElementById('quantityInput').value;
+            const total = document.getElementById('totalCost').textContent;
+            const popup = document.getElementById('purchasePopup');
+            const productId = popup.getAttribute('data-product-id');
+            const farmerEmail = popup.getAttribute('data-farmer-email');
+            const farmerPhone = popup.getAttribute('data-farmer-phone');
+            const farmerAddress = popup.getAttribute('data-farmer-address');
+            
+            // Show the success popup with farmer details
+            const successPopup = document.getElementById('successPopup');
+            successPopup.classList.remove('hidden');
+            
+            // Update farmer info elements
+            const emailElement = successPopup.querySelector('.farmer-email');
+            const phoneElement = successPopup.querySelector('.farmer-phone');
+            const addressElement = successPopup.querySelector('.farmer-address');
+            
+            // Set the actual farmer details
+            emailElement.textContent = farmerEmail || 'Not available';
+            phoneElement.textContent = farmerPhone || 'Not available';
+            addressElement.textContent = farmerAddress || 'Not available';
+            
+            console.log('Processing purchase for product:', productId);
+            
+            // First get the farmer details for this product
+            console.log('Rendering fruits:', fruitsToDisplay);
+            if (fruitsToDisplay.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="text-gray-500 text-lg">No fruits available at the moment.</div>
+                        <div class="text-gray-400 mt-2">Please check back later or contact support.</div>
+                    </div>`;
+                return;
+            }
+                if (!productData || !productData.farmer) {
+                    throw new Error('Could not get farmer details');
+                }
+
+                // ...existing code...
+        }
+
+        function closeFarmerProfile() {
+            const popup = document.getElementById('farmerProfilePopup');
+            popup.classList.add('hidden');
+            popup.style.display = 'none';
+        }
+
+        function closeSuccessPopup() {
+            document.getElementById('successPopup').classList.add('hidden');
+        }
+
+        function revealFarmerContact(btn, name, email, phone) {
+            // Find the contact-info div in the same card
+            const card = btn.closest('.fruit-card');
+            const contactDiv = card.querySelector('.contact-info');
+            if (contactDiv) {
+                contactDiv.classList.remove('hidden');
+                contactDiv.querySelector('.farmer-name').textContent = name || 'N/A';
+                contactDiv.querySelector('.farmer-email').textContent = email || 'N/A';
+                contactDiv.querySelector('.farmer-phone').textContent = phone || 'N/A';
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i>Contact Info Revealed';
+            btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
+
+        // View switching functions
+        function showAllFruits() {
+            currentView = 'all';
+            setActiveButton(document.getElementById('show-all-btn'));
+            displayFruits();
+        }
+
+        function showDynamicFruits() {
+            currentView = 'dynamic';
+            setActiveButton(document.getElementById('show-dynamic-btn'));
+            displayFruits();
+        }
+
+        function showStaticFruits() {
+            currentView = 'static';
+            setActiveButton(document.getElementById('show-static-btn'));
+            displayFruits();
+        }
+
+        // Purchase Popup Functions
+        async function handlePurchase(productName, price, productId) {
+            try {
+                // Fetch product and farmer details from our purchase endpoint
+                const response = await fetch(`/api/purchase/${productId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product details');
+                }
+
+                const data = await response.json();
+                console.log('Purchase details:', data);
+
+                // Open purchase popup with all the details
+                openPurchasePopup(
+                    data.product.productName,
+                    data.product.price,
+                    productId,
+                    data.farmer.name,
+                    data.farmer.email,
+                    data.farmer.phone,
+                    data.farmer.farmName,
+                    data.farmer.farmAddress
+                );
+            } catch (error) {
+                console.error('Error in purchase flow:', error);
+                alert('Failed to get product details. Please try again.');
+            }
+        }
+
+        function openPurchasePopup(itemName, price, productId, farmerName, farmerEmail, farmerPhone, farmName, farmAddress) {
+            const popup = document.getElementById('purchasePopup');
+            const titleEl = document.getElementById('popupTitle');
+            const priceEl = document.getElementById('popupPrice');
+            
+            titleEl.textContent = 'Purchase ' + itemName;
+            priceEl.textContent = 'Confirm the quantity you wish to purchase at the list price of Rs.' + price.toFixed(2) + ' / kg.';
+            
+            // Reset quantity to 1
+            document.getElementById('quantityInput').value = 1;
+            updateTotalCost(price);
+            
+            // Show the popup
+            popup.classList.remove('hidden');
+            popup.style.display = 'flex';
+        }
+
+        function closePurchasePopup() {
+            const popup = document.getElementById('purchasePopup');
+            popup.classList.add('hidden');
+            popup.style.display = 'none';
+        }
+
+        function updateQuantity(change) {
+            const input = document.getElementById('quantityInput');
+            const newValue = Math.max(1, parseInt(input.value) + change);
+            input.value = newValue;
+            const priceText = document.getElementById('popupPrice').textContent;
+            const price = parseFloat(priceText.match(/₹(\d+\.?\d*)/)[1]);
+            updateTotalCost(price);
+        }
+
+        function updateTotalCost(price) {
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            const total = (quantity * price).toFixed(2);
+            document.getElementById('totalCost').textContent = 'Rs.' + total;
+        }
+
+        function acceptPurchase() {
+            const popup = document.getElementById('purchasePopup');
+            const productId = popup.getAttribute('data-product-id');
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            const total = document.getElementById('totalCost').textContent;
+            
+            // Get all farmer details from the popup's data attributes
+            const farmerDetails = {
+                farmerName: popup.getAttribute('data-farmer-name'),
+                farmerEmail: popup.getAttribute('data-farmer-email'),
+                farmerPhone: popup.getAttribute('data-farmer-phone'),
+                farmName: popup.getAttribute('data-farm-name'),
+                farmAddress: popup.getAttribute('data-farm-address')
+            };
+            
+            // Close purchase popup
+            closePurchasePopup();
+            
+            // Show success popup with farmer details
+            showSuccessPopup(farmerDetails);
+        }
+
+        function showSuccessPopup(farmerDetails) {
+            const successPopup = document.getElementById('successPopup');
+            
+            // Update success popup with farmer details
+            document.getElementById('successFarmName').innerHTML = `
+                <i class="fas fa-tractor text-green-600 mr-2"></i>
+                ${farmerDetails.farmName || farmerDetails.farmerName || 'Local Farm'}
+            `;
+            
+            // Update contact details with proper icons and formatting
+            document.getElementById('successFarmerEmail').innerHTML = farmerDetails.farmerEmail ? 
+                `<a href="mailto:${farmerDetails.farmerEmail}" class="text-blue-600 hover:underline">
+                    ${farmerDetails.farmerEmail}
+                </a>` : 'Not available';
+                
+            document.getElementById('successFarmerPhone').innerHTML = farmerDetails.farmerPhone ? 
+                `<a href="tel:${farmerDetails.farmerPhone}" class="text-blue-600 hover:underline">
+                    ${farmerDetails.farmerPhone}
+                </a>` : 'Not available';
+                
+            document.getElementById('successFarmerAddress').textContent = 
+                farmerDetails.farmAddress || 'Not available';
+            
+            // Show the popup
+            successPopup.classList.remove('hidden');
+            successPopup.style.display = 'flex';
+            
+            // You might want to send the purchase to your backend here
+            // fetch('/api/orders', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         productId,
+            //         quantity,
+            //         total: parseFloat(total.replace('Rs.', ''))
+            //     })
+            // });
+        }
+
+        function closeSuccessPopup() {
+            const popup = document.getElementById('successPopup');
+            popup.classList.add('hidden');
+            popup.style.display = 'none';
+        }
+
+        // Initialize page - DISABLED to prevent duplicate API calls (fruit.js handles this)
+        /*
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            
+            // Profile dropdown functionality
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', () => {
+                    profileDropdown.classList.toggle('hidden');
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Initial load of fruits
+            loadAllFruits();
+
+            // Modal event listeners
+            document.getElementById('quantity').addEventListener('input', updateOfferTotals);
+            document.getElementById('yourOffer').addEventListener('input', updateOfferTotals);
+            document.getElementById('negotiateModal').addEventListener('click', e => {
+                if (e.target === e.currentTarget) closeNegotiateModal();
+            });
+
+            // Purchase popup event listener for clicking outside
+            document.getElementById('purchasePopup').addEventListener('click', e => {
+                if (e.target === e.currentTarget) closePurchasePopup();
+            });
+
+            // Success popup event listener for clicking outside
+            document.getElementById('successPopup').addEventListener('click', e => {
+                if (e.target === e.currentTarget) closeSuccessPopup();
+            });
+
+            // Farmer profile popup event listener for clicking outside
+            document.getElementById('farmerProfilePopup').addEventListener('click', e => {
+                if (e.target === e.currentTarget) closeFarmerProfile();
+            });
+
+            // Load more button
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    alert('Loading more fruits... This feature will load additional fruit varieties.');
+                });
+            }
+
+            // Make all cards visible immediately
+            document.querySelectorAll('.fruit-card').forEach((card) => {
+                card.style.opacity = '1';
+                card.style.transform = 'none';
+            });
+
+            // Load all fruits on page load
+            loadAllFruits();
+            
+            // Refresh dynamic fruits every 60 seconds
+            setInterval(async () => {
+                console.log('Refreshing dynamic fruits...');
+                await loadDynamicFruits();
+                if (currentView === 'all' || currentView === 'dynamic') {
+                    displayFruits();
+                }
+            }, 60000);
+        });
+        */
+    </script>
+
+    <!-- Farmer Profile Popup -->
+    <div id="farmerProfilePopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md mx-4">
+            <div class="p-6 relative">
+                <!-- Close Button -->
+                <button onclick="closeFarmerProfile()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+                <!-- Farm Name and Location -->
+                <div class="mb-6 text-center">
+                    <h2 id="farmName" class="text-2xl font-bold mb-2">Green Valley Farms</h2>
+                    <div class="flex items-center justify-center text-gray-600 text-sm">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span id="farmLocation">Napa Valley, CA</span>
+                    </div>
+                </div>
+
+                <!-- Contact Information Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Contact Information</h3>
+                    <div id="hiddenContact" class="filter blur-sm space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-gray-400 w-4"></i>
+                            <div class="text-sm">
+                                <div class="text-gray-500">Email</div>
+                                <div>contact@greenvalley.com</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-phone text-gray-400 w-4"></i>
+                            <div class="text-sm">
+                                <div class="text-gray-500">Phone</div>
+                                <div>(707) 555-1234</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-map-marker-alt text-gray-400 w-4"></i>
+                            <div class="text-sm">
+                                <div class="text-gray-500">Address</div>
+                                <div>123 Organic Way<br>Napa, CA 94558</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reveal Contact Button -->
+                    <button onclick="revealFarmerContact()" class="w-full bg-green-500 hover:bg-green-600 text-white py-2.5 px-4 rounded-lg transition duration-300 flex items-center justify-center text-sm">
+                        <i class="fas fa-eye mr-2"></i>
+                        Reveal Contact Info (1 Credit)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="successPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 relative max-w-md w-full mx-auto">
+        <h2 class="text-2xl font-bold text-green-600 mb-4">Purchase Accepted!</h2>
+        
+        <p class="text-gray-600 mb-6">
+            Your order has been confirmed. Please contact the farmer directly to coordinate payment and pickup/delivery.
+        </p>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Farmer Contact Information</h3>
+            
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Name:</span>
+                    <span class="farmer-name font-medium"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="farmer-email font-medium"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Phone:</span>
+                    <span class="farmer-phone font-medium"></span>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="closeSuccessPopup()" 
+                class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">
+            Close
+        </button>
+    </div>
+    </div>
+
+    <!-- Purchase Popup -->
+    <div id="purchasePopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="popupTitle">Purchase Item</h2>
+                <button onclick="closePurchasePopup()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p class="text-gray-600 mb-4" id="popupPrice">Confirm the quantity you wish to purchase at the list price.</p>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Quantity (kg)</label>
+                <div class="flex items-center border rounded-lg">
+                    <button onclick="updateQuantity(-1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" id="quantityInput" class="w-full text-center border-0 focus:ring-0" value="1" min="1">
+                    <button onclick="updateQuantity(1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold mb-2">Purchase Summary</h3>
+                <div class="flex justify-between items-center">
+                    <span>Total Cost</span>
+                    <span class="text-xl font-bold text-green-600" id="totalCost">₹0.00</span>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4">
+                By clicking 'Accept & Reveal Details', you agree to purchase this item. The farmer's contact details will be revealed to you to coordinate pickup/delivery.
+            </p>
+
+            <div class="flex gap-3">
+                <button onclick="closePurchasePopup()" class="flex-1 px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="acceptPurchase()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Accept & Reveal Details
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

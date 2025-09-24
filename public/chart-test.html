@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Chart API Test</h1>
+    <div style="width: 600px; height: 400px;">
+        <canvas id="testChart"></canvas>
+    </div>
+    
+    <div>
+        <button onclick="testAPI()">Test API</button>
+        <button onclick="testChart()">Test Chart</button>
+    </div>
+    
+    <div id="output"></div>
+    
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/data?product=Apple&month=1');
+                const data = await response.json();
+                document.getElementById('output').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                console.log('API Response:', data);
+            } catch (error) {
+                console.error('API Error:', error);
+                document.getElementById('output').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testChart() {
+            try {
+                const ctx = document.getElementById('testChart').getContext('2d');
+                const response = await fetch('/api/data?product=Apple&month=1');
+                const data = await response.json();
+                
+                const labels = data.map(item =>
+                    new Date(item.Date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+                );
+                const prices = data.map(item => item.avgPrice);
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Apple Price',
+                            data: prices,
+                            borderColor: '#22c55e',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+                
+                console.log('Chart created successfully');
+            } catch (error) {
+                console.error('Chart Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HarvestLoop Plans</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    .hover-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 128, 0, 0.1);
+    }
+  </style>
+<!-- Removed duplicate/broken head tag -->
+<body class="bg-[#fefcf6] text-gray-800 font-sans">
+
+  <!-- Top Navbar -->
+  <nav class="fixed top-0 left-0 w-full bg-[#fefcf6] z-50 px-6 py-4 flex items-center">
+    <a href="/" class="flex items-center gap-2">
+      <img src="/assets/Logo.png" alt="Logo" class="w-10 h-10 rounded-full object-cover" />
+      <span class="text-2xl font-bold text-[#7dde83] font-serif">HarvestLoop</span>
+    </a>
+  </nav>
+
+  <!-- Spacer -->
+  <div class="h-20"></div>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 py-12">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Choose Your Plan</h1>
+      <p class="text-lg text-gray-600">Unlock access to more farmers and premium features with our subscription plans.</p>
+    </div>
+
+    <!-- Subscription Plans Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Basic Plan -->
+      <div class="bg-white p-8 rounded-xl shadow-md hover-card">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold mb-2">Basic Plan</h2>
+          <p class="text-gray-600 mb-4">Start your farm discovery journey</p>
+          <div class="text-4xl font-bold">₹199</div>
+          <div class="text-gray-500">for 1 month</div>
+        </div>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Access to 10 farmer details
+          </li>
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Basic support
+          </li>
+        </ul>
+        <button 
+          data-plan="basic" 
+          data-duration="1" 
+          data-amount="199"
+          class="w-full bg-[#7dde83] text-white py-3 rounded-lg hover:bg-[#6bc472] transition">
+          Choose Basic
+        </button>
+      </div>
+
+      <!-- Premium Plan -->
+      <div class="bg-white p-8 rounded-xl shadow-md hover-card border-2 border-[#7dde83] relative">
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+          <span class="bg-[#7dde83] text-white px-4 py-1 rounded-full text-sm">POPULAR</span>
+        </div>
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold mb-2">Premium Plan</h2>
+          <p class="text-gray-600 mb-4">Perfect for serious buyers</p>
+          <div class="text-4xl font-bold">₹399</div>
+          <div class="text-gray-500">for 3 months</div>
+          <div class="text-green-600 text-sm mt-1">Save ₹198 (33% off)</div>
+        </div>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Access to 30 farmer details
+          </li>
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Priority support
+          </li>
+        </ul>
+        <button 
+          data-plan="premium" 
+          data-duration="3" 
+          data-amount="399"
+          class="w-full bg-[#7dde83] text-white py-3 rounded-lg hover:bg-[#6bc472] transition">
+          Choose Premium
+        </button>
+      </div>
+
+      <!-- VIP Plan -->
+      <div class="bg-white p-8 rounded-xl shadow-md hover-card">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold mb-2">VIP Plan</h2>
+          <p class="text-gray-600 mb-4">Complete access for businesses</p>
+          <div class="text-4xl font-bold">₹999</div>
+          <div class="text-gray-500">for 12 months</div>
+          <div class="text-green-600 text-sm mt-1">Save ₹1,389 (58% off)</div>
+        </div>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Access to 100 farmer details
+          </li>
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            24/7 Priority support
+          </li>
+          <li class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Bulk purchase discounts
+          </li>
+        </ul>
+        <button 
+          id="choose-vip-btn"
+          data-plan="vip" 
+          data-duration="12" 
+          data-amount="999"
+          class="w-full bg-[#7dde83] text-white py-3 rounded-lg hover:bg-[#6bc472] transition">
+          Choose VIP
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ...existing code... -->
+  <script>
+    const planDetails = {
+      basic: { name: 'Basic', farmers: 10, duration: 1, amount: 199 },
+      premium: { name: 'Premium', farmers: 30, duration: 3, amount: 399 },
+      vip: { name: 'VIP', farmers: 100, duration: 12, amount: 999 }
+    };
+
+    function handleSubscription(planKey) {
+      const plan = planDetails[planKey];
+      const pendingData = sessionStorage.getItem('pendingSignup');
+      if (!pendingData) {
+        alert("❌ Please sign up first");
+        window.location.href = '/signup.html';
+        return;
+      }
+      const userData = JSON.parse(pendingData);
+      const options = {
+        key: 'rzp_test_c8gkrmeaQh7UAx',
+        amount: plan.amount * 100,
+        currency: 'INR',
+        name: 'HarvestLoop',
+        description: `${plan.name} Plan - ${plan.duration} month${plan.duration > 1 ? 's' : ''} access`,
+        handler: async function (response) {
+          try {
+            const payload = {
+              ...userData,
+              subscription: {
+                txid: response.razorpay_payment_id,
+                amount: plan.amount,
+                planName: plan.name,
+                duration: plan.duration,
+                farmerAccess: plan.farmers
+              }
+            };
+            // First verify the payment
+            const verifyRes = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            if (!verifyRes.ok) {
+              throw new Error('Payment verification failed');
+            }
+            // Register the user via /signup
+            const res = await fetch('/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (res.ok) {
+              // Clean up all stored data
+              sessionStorage.removeItem('pendingSignup');
+              window.location.href = `receipt.html?txid=${response.razorpay_payment_id}&plan=${plan.name}&amount=${plan.amount}&duration=${plan.duration}&farmers=${plan.farmers}`;
+            } else {
+              alert("❌ Registration failed: " + result.message);
+            }
+          } catch (err) {
+            console.error(err);
+            alert("⚠️ Error during registration.");
+          }
+        },
+        prefill: {
+          name: userData.username,
+          email: userData.email,
+          contact: userData.phone
+        },
+        theme: {
+          color: "#7dde83"
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    // Attach event listeners to all plan buttons after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('button[data-plan]').forEach(btn => {
+        btn.onclick = function() {
+          const planKey = btn.getAttribute('data-plan');
+          handleSubscription(planKey);
+        };
+      });
+    });
+  </script>
+</body>
+</html>

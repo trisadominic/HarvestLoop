@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Profile - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bg: "#f8f6ef",        // background color matching farmer theme
+              card: "#f9fcf5",      // brighter card background
+              accent: "#15803d",    // accent green
+              muted: "#6b7280"      // muted text
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #15803d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success/Error messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .alert.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body class="bg-bg text-gray-800 font-serif min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/farmer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Center Tabs -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="/farmer-dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+
+                <a href="/farmer-product.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition">
+                    <i class="fas fa-seedling mr-3"></i> Products
+                </a>
+
+                <a href="/farmer-order.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition">
+                    <i class="fas fa-file-alt mr-3"></i> Orders
+                </a>
+            </div>
+
+            <!-- Right Profile Section -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                        <a href="/farmer-profile.html" class="flex items-center px-4 py-2 text-sm bg-gray-50 text-gray-700 transition">
+                            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                        </a>
+                        <a href="/farmer-dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-th mr-3 w-4"></i> Dashboard
+                        </a>
+                        <a href="/farmer-product.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-seedling mr-3 w-4"></i> Products
+                        </a>
+                        <a href="/farmer-order.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-file-alt mr-3 w-4"></i> Orders
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-24 min-h-screen flex flex-col items-center justify-center p-6">
+        <div class="w-full max-w-4xl">
+
+            <!-- Alert Messages -->
+            <div id="alertContainer"></div>
+
+            <!-- Page Title + Edit -->
+            <div class="w-full flex items-center justify-between mb-6">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-accent">My Profile</h1>
+                <button id="editBtn" class="px-4 py-2 bg-card border border-gray-300 rounded-md shadow-sm text-sm text-accent hover:bg-gray-50 transition">
+                    <i class="fas fa-edit mr-2"></i> Edit Profile
+                </button>
+            </div>
+
+            <!-- Profile Card -->
+            <section class="bg-card rounded-lg shadow-lg border border-card w-full">
+                <div class="p-6 md:p-8">
+                    <!-- Header block -->
+                    <div class="md:flex md:items-center md:gap-6 pb-6">
+                        <div class="mt-4 md:mt-0">
+                            <h2 id="farmerNameDisplay" class="text-2xl font-bold text-accent">Loading...</h2>
+                            <p id="farmNameDisplay" class="text-sm text-muted mt-1"><i class="fas fa-leaf mr-2"></i>Loading...</p>
+                            <p id="memberSinceDisplay" class="text-sm text-muted mt-1"><i class="fas fa-calendar mr-2"></i>Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact info -->
+                    <div class="border-t border-gray-300 grid md:grid-cols-2 gap-6 pt-6 pb-6">
+                        <div>
+                            <h3 class="flex items-center gap-2 text-accent font-semibold mb-4">
+                                <i class="fas fa-envelope text-lg"></i> Contact Information
+                            </h3>
+                            <div class="text-sm text-gray-700 space-y-3">
+                                <div>
+                                    <div class="text-xs text-muted">Email Address</div>
+                                    <div id="emailDisplay" class="font-medium">Loading...</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-muted">Mobile Number</div>
+                                    <div id="mobileDisplay" class="font-medium">Loading...</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-muted">Years of Experience</div>
+                                    <div id="experienceDisplay" class="font-medium">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="flex items-center gap-2 text-accent font-semibold mb-4">
+                                <i class="fas fa-seedling text-lg"></i> Farm Information
+                            </h3>
+                            <div class="text-sm text-gray-700 space-y-3">
+                                <div>
+                                    <div class="text-xs text-muted">Farm Size</div>
+                                    <div id="farmSizeDisplay" class="font-medium">Loading...</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-muted">Product Types</div>
+                                    <div id="productTypesDisplay" class="font-medium">Loading...</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-muted">Farm Rating</div>
+                                    <div id="ratingDisplay" class="font-medium">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Farm Description and Address -->
+                    <div class="border-t border-gray-300 grid md:grid-cols-2 gap-6 pt-6">
+                        <div>
+                            <h3 class="flex items-center gap-2 text-accent font-semibold mb-4">
+                                <i class="fas fa-info-circle text-lg"></i> Farm Description
+                            </h3>
+                            <div id="farmDescriptionDisplay" class="text-sm text-gray-700">Loading...</div>
+                        </div>
+
+                        <div>
+                            <h3 class="flex items-center gap-2 text-accent font-semibold mb-4">
+                                <i class="fas fa-map-marker-alt text-lg"></i> Farm Address
+                            </h3>
+                            <div id="farmAddressDisplay" class="text-sm text-gray-700">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-card rounded-lg shadow-lg w-full max-w-4xl p-6 relative max-h-[90vh] overflow-y-auto">
+            
+            <!-- Close + Save -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-accent">Edit Profile</h2>
+                <div class="flex gap-2">
+                    <button id="closeModal" class="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm hover:bg-gray-50 transition">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                    <button id="saveProfile" class="px-4 py-2 bg-accent text-white rounded-md text-sm hover:bg-green-700 transition">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                        <span id="saveLoader" class="loading hidden ml-2"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editable Form -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Farm Details -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-accent border-b pb-2">Farm Details</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Farm Name</label>
+                        <input type="text" id="farmNameEdit" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Farm Description</label>
+                        <textarea id="farmDescriptionEdit" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Farm Address</label>
+                        <textarea id="farmAddressEdit" rows="3" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Farm Size (acres)</label>
+                        <input type="number" id="farmSizeEdit" step="0.1" min="0" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Product Types</label>
+                        <div class="flex gap-2 flex-wrap mb-2" id="productTypesEditContainer">
+                            <!-- Product types will be loaded here -->
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="productTypeSelect" class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-accent">
+                                <option value="">Select a product type</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Grains">Grains</option>
+                                <option value="Dairy">Dairy</option>
+                                <option value="Eggs">Eggs</option>
+                                <option value="Coffee">Coffee</option>
+                                <option value="Herbs">Herbs</option>
+                                <option value="Nuts">Nuts</option>
+                            </select>
+                            <button type="button" onclick="addProductType()" class="px-4 py-2 bg-accent text-white rounded-md text-sm hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-accent border-b pb-2">Personal Information</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Full Name</label>
+                        <input type="text" id="fullNameEdit" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Email Address</label>
+                        <input type="email" id="emailEdit" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Mobile Number</label>
+                        <input type="tel" id="mobileEdit" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-muted mb-2">Years of Experience</label>
+                        <input type="number" id="experienceEdit" min="0" class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-accent focus:border-accent" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let currentFarmerData = {};
+        let productTypes = [];
+
+        // Profile Dropdown Functions
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!profileButton || !profileDropdown) {
+                console.log('Profile elements not found');
+                return;
+            }
+            
+            profileButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Alert functions
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.id = alertId;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button onclick="hideAlert('${alertId}')" class="ml-4 text-lg">&times;</button>
+                </div>
+            `;
+            
+            alertContainer.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                hideAlert(alertId);
+            }, 5000);
+        }
+
+        function hideAlert(alertId) {
+            const alert = document.getElementById(alertId);
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            }
+        }
+
+        // Product type management
+        function addProductType() {
+            const select = document.getElementById('productTypeSelect');
+            const value = select.value.trim();
+            
+            if (value && !productTypes.includes(value)) {
+                productTypes.push(value);
+                renderProductTypesEdit();
+                select.value = '';
+            }
+        }
+
+        function removeProductType(type) {
+            productTypes = productTypes.filter(t => t !== type);
+            renderProductTypesEdit();
+        }
+
+        function renderProductTypesEdit() {
+            const container = document.getElementById('productTypesEditContainer');
+            container.innerHTML = productTypes.map(type => 
+                `<span class="px-3 py-1 bg-green-100 text-green-800 border border-green-200 rounded-full text-xs font-medium flex items-center gap-2">
+                    ${type}
+                    <button onclick="removeProductType('${type}')" class="text-green-600 hover:text-red-600 text-sm">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </span>`
+            ).join('');
+        }
+
+        // Load farmer profile data
+        async function loadFarmerProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                
+                if (!token || !userId) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                console.log('🚜 Loading farmer profile for user:', userId);
+
+                const response = await fetch(`/api/farmers/profile/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const farmerData = await response.json();
+                    console.log('✅ Farmer data loaded:', farmerData);
+                    currentFarmerData = farmerData;
+                    populateProfile(farmerData);
+                } else {
+                    console.error('Failed to load farmer profile');
+                    showAlert('Failed to load profile data', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading farmer profile:', error);
+                showAlert('Error loading profile data', 'error');
+            }
+        }
+
+        // Populate profile display
+        function populateProfile(data) {
+            // Header information
+            document.getElementById('farmerNameDisplay').textContent = data.fullName || data.username || 'Unknown Farmer';
+            document.getElementById('farmNameDisplay').innerHTML = `<i class="fas fa-leaf mr-2"></i>${data.farmName || 'Farm name not provided'}`;
+            
+            if (data.createdAt) {
+                const memberSince = new Date(data.createdAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                });
+                document.getElementById('memberSinceDisplay').innerHTML = `<i class="fas fa-calendar mr-2"></i>Member since ${memberSince}`;
+            }
+
+            // Contact information
+            document.getElementById('emailDisplay').textContent = data.email || 'Not provided';
+            // Try to get mobile number from either mobile or phone field
+            document.getElementById('mobileDisplay').textContent = data.mobile || data.phone || 'Not provided';
+            document.getElementById('experienceDisplay').textContent = data.experience ? `${data.experience} years` : 'Not specified';
+
+            // Farm information
+            document.getElementById('farmSizeDisplay').textContent = data.farmSize ? `${data.farmSize} acres` : 'Not specified';
+            
+            // Check for product types in multiple possible fields
+            let products = [];
+            if (data.productTypes && data.productTypes.length > 0) {
+                products = data.productTypes;
+            } else if (data.farmProducts && data.farmProducts.length > 0) {
+                products = data.farmProducts;
+            }
+            
+            const productTypesText = products.length > 0 
+                ? products.join(', ') 
+                : 'Not specified';
+            document.getElementById('productTypesDisplay').textContent = productTypesText;
+            
+            const ratingText = data.rating ? `${data.rating}/5 ⭐ (${data.reviewCount || 0} reviews)` : 'No ratings yet';
+            document.getElementById('ratingDisplay').textContent = ratingText;
+
+            // Farm description and address
+            document.getElementById('farmDescriptionDisplay').textContent = data.farmDescription || 'No description provided';
+            document.getElementById('farmAddressDisplay').textContent = data.farmAddress || 'Address not provided';
+
+            // Store product types for editing
+            productTypes = data.productTypes || [];
+        }
+
+        // Populate edit form
+        function populateEditForm(data) {
+            document.getElementById('farmNameEdit').value = data.farmName || '';
+            document.getElementById('farmDescriptionEdit').value = data.farmDescription || '';
+            document.getElementById('farmAddressEdit').value = data.farmAddress || '';
+            document.getElementById('farmSizeEdit').value = data.farmSize || '';
+            document.getElementById('fullNameEdit').value = data.fullName || '';
+            document.getElementById('emailEdit').value = data.email || '';
+            document.getElementById('mobileEdit').value = data.mobile || data.phone || '';
+            document.getElementById('experienceEdit').value = data.experience || '';
+            
+            // Get product types from either productTypes or farmProducts
+            if (data.productTypes && data.productTypes.length > 0) {
+                productTypes = data.productTypes;
+            } else if (data.farmProducts && data.farmProducts.length > 0) {
+                productTypes = data.farmProducts;
+            } else {
+                productTypes = [];
+            }
+            
+            renderProductTypesEdit();
+        }
+
+        // Save profile data
+        async function saveProfile() {
+            const saveLoader = document.getElementById('saveLoader');
+            saveLoader.classList.remove('hidden');
+
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+
+                const profileData = {
+                    farmName: document.getElementById('farmNameEdit').value.trim(),
+                    farmDescription: document.getElementById('farmDescriptionEdit').value.trim(),
+                    farmAddress: document.getElementById('farmAddressEdit').value.trim(),
+                    fullName: document.getElementById('fullNameEdit').value.trim(),
+                    mobile: document.getElementById('mobileEdit').value.trim(),
+                    email: document.getElementById('emailEdit').value.trim(),
+                    experience: parseInt(document.getElementById('experienceEdit').value) || 0,
+                    farmSize: parseFloat(document.getElementById('farmSizeEdit').value) || 0,
+                    productTypes: productTypes
+                };
+
+                console.log('💾 Saving profile data:', profileData);
+
+                const response = await fetch(`/api/farmers/profile/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    const updatedData = await response.json();
+                    console.log('✅ Profile saved successfully:', updatedData);
+                    currentFarmerData = updatedData;
+                    populateProfile(updatedData);
+                    closeEditModal();
+                    showAlert('Profile updated successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    console.error('❌ Failed to save profile:', error);
+                    showAlert(error.message || 'Failed to save profile', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error saving profile:', error);
+                showAlert('Error saving profile', 'error');
+            } finally {
+                saveLoader.classList.add('hidden');
+            }
+        }
+
+        // Modal functions
+        function openEditModal() {
+            populateEditForm(currentFarmerData);
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('editBtn').addEventListener('click', openEditModal);
+        document.getElementById('closeModal').addEventListener('click', closeEditModal);
+        document.getElementById('saveProfile').addEventListener('click', saveProfile);
+
+        // Close modal when clicking outside
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupProfileDropdown();
+            loadFarmerProfile();
+        });
+    </script>
+
+</body>
+</html>
+        <div class="border-t border-gray-300 grid md:grid-cols-2 gap-6 pt-6 pb-6">
+          <div>
+            <h3 class="flex items-center gap-2 text-accent font-semibold">
+              <span class="text-lg">✉</span> Contact Information
+            </h3>
+            <div class="mt-4 text-sm text-gray-700">
+              <div class="mb-3">
+                <div class="text-xs text-muted">Email Address</div>
+                <div class="font-medium">john.doe@supermart.com</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:text-right">
+            <div class="mt-6 md:mt-4 text-sm">
+              <div class="text-xs text-muted">Phone Number</div>
+              <div class="font-medium">(123) 456-7890</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Addresses -->
+        <div class="border-t border-gray-300 grid md:grid-cols-2 gap-6 pt-6">
+          <div>
+            <h3 class="flex items-center gap-2 text-accent font-semibold">
+              <span class="text-lg">📦</span> Addresses
+            </h3>
+            <h4 class="text-accent font-semibold mt-4">📍 Shipping Address</h4>
+            <div class="mt-3 text-sm text-gray-700">
+              123 Supply Chain Rd<br>
+              Distribution Center, TX 75001<br>
+              USA
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-accent font-semibold">🏷 Billing Address</h4>
+            <div class="mt-3 text-sm text-gray-700">
+              456 Finance Avenue<br>
+              Corporate Towers, NY 10001<br>
+              USA
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div class="bg-card rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+        
+        <!-- Close + Save -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-accent">Edit Profile</h2>
+          <div class="flex gap-2">
+            <button id="closeModal" class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm">✖ Cancel</button>
+            <button class="px-4 py-1 bg-accent text-white rounded-md text-sm">💾 Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Editable Form -->
+        <div class="space-y-6">
+          <!-- Name -->
+          <div>
+            <label class="block text-sm font-medium text-muted">Name</label>
+            <input type="text" value="John Doe" class="mt-1 w-full rounded-md border border-gray-300 bg-bg px-3 py-2 text-sm" />
+          </div>
+
+          <!-- Contact -->
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-muted">Email Address</label>
+              <input type="email" value="john.doe@supermart.com" class="mt-1 w-full rounded-md border border-gray-300 bg-bg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted">Phone Number</label>
+              <input type="text" value="(123) 456-7890" class="mt-1 w-full rounded-md border border-gray-300 bg-bg px-3 py-2 text-sm" />
+            </div>
+          </div>
+
+          <!-- Addresses -->
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-muted">Shipping Address</label>
+              <textarea class="mt-1 w-full rounded-md border border-gray-300 bg-bg px-3 py-2 text-sm">123 Supply Chain Rd, Distribution Center, TX 75001, USA</textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted">Billing Address</label>
+              <textarea class="mt-1 w-full rounded-md border border-gray-300 bg-bg px-3 py-2 text-sm">456 Finance Avenue, Corporate Towers, NY 10001, USA</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script>
+      const editBtn = document.getElementById("editBtn");
+      const modal = document.getElementById("editModal");
+      const closeModal = document.getElementById("closeModal");
+
+      editBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+      closeModal.addEventListener("click", () => modal.classList.add("hidden"));
+    </script>
+  </body>
+</html>

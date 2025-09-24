@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Consumer Messages</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white shadow-sm py-4 fixed w-full z-40">
+    <!-- ... (similar to your other headers) ... -->
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+      <div class="flex items-center gap-3"><img src="/public/assets/Logo.png" class="w-8 h-8 rounded-full"> <span class="font-bold text-[#7dde83] text-xl">HarvestLoop</span></div>
+      <div> <a href="/public/consumer-dashboard.html" class="text-gray-600 hover:text-orange-400">Dashboard</a> </div>
+    </div>
+  </header>
+  <main class="pt-28 max-w-6xl mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex">
+      <!-- Conversations Sidebar -->
+      <div class="w-1/3 border-r border-gray-200">
+        <div class="p-4 font-bold text-lg">Conversations</div>
+        <div id="conv-list"></div>
+      </div>
+      <!-- Conversation Area -->
+      <div class="w-2/3 flex flex-col">
+        <div class="flex-1 p-4 space-y-4 overflow-y-auto" id="chat-box" style="min-height:350px"></div>
+        <div class="p-3 bg-gray-100 flex gap-2">
+          <input id="reply-msg" type="text" placeholder="Type your message..." class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none">
+          <button id="send-reply" class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    // --- Load and Render Negotiations ---
+    let negotiations = JSON.parse(localStorage.getItem('negotiations')) || [];
+    // Group by product so each product has a conversation
+    let group = {};
+    negotiations.forEach(msg => {
+      let key = msg.product;
+      if(!group[key]) group[key]=[];
+      group[key].push(msg);
+    });
+    // Populate conversations
+    let convList = document.getElementById('conv-list');
+    convList.innerHTML = Object.keys(group).map(product =>
+      `<div 
+        onclick="openConv('${product.replace(/'/g, "\\'")}')" 
+        class='p-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100'>
+        <div class="font-semibold">${product}</div>
+        <div class="text-xs text-gray-400">Last: ${group[product][group[product].length-1].date}</div>
+      </div>`
+    ).join('');
+    // Simple: Set first as active
+    let selected = Object.keys(group) || '';
+    function openConv(product) {
+      selected = product;
+      renderChat();
+    }
+    // Chat rendering
+    function renderChat() {
+      let msgs = group[selected] || [];
+      let chat = document.getElementById('chat-box');
+      chat.innerHTML = msgs.map(msg => {
+        if(msg.sender === 'consumer') {
+          return `<div class="flex justify-end"><div class="bg-orange-100 p-3 rounded-lg mb-2 max-w-xs"><b>Offer:</b> ₹${msg.offer} for ${msg.quantity} | <i>${msg.message}</i><div class="text-xs text-gray-500 mt-1">${msg.date}</div></div></div>`;
+        } else {
+          return `<div class="flex justify-start"><div class="bg-white border p-3 rounded-lg mb-2 max-w-xs">${msg.message}<div class="text-xs text-gray-400 mt-1">${msg.date}</div></div></div>`;
+        }
+      }).join('');
+    }
+    renderChat();
+    // Conversation switch
+    window.openConv = openConv;
+    // Reply logic
+    document.getElementById('send-reply').onclick = function() {
+      let txt = document.getElementById('reply-msg').value.trim();
+      if(!txt || !selected) return;
+      // Add as consumer
+      negotiations.push({product: selected, message: txt, date: new Date().toLocaleString(), sender: 'consumer'});
+      localStorage.setItem('negotiations', JSON.stringify(negotiations));
+      location.reload(); // For demo; or call renderChat()
+    }
+  </script>
+</body>
+</html>

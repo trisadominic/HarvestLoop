@@ -1,0 +1,941 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FarmConnect Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Profile dropdown animation */
+    #profile-dropdown {
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      pointer-events: none;
+    }
+
+    #profile-dropdown:not(.hidden) {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Profile button hover effect */
+    #profile-button:hover {
+      color: #059669;
+    }
+  </style>
+
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+ <!-- Header Section -->
+<header class="bg-[#ddccb1]">
+  <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+
+    <!-- Logo & Name -->
+    <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/farmer-dashboard.html">
+        <img
+          src="/assets/Logo.png"
+          alt="Website Logo"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        HarvestLoop
+      </a>
+
+    <!-- Center Tabs -->
+    <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+      <a href="/farmer-dashboard.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+      <i class="fas fa-th mr-3"></i> Dashboard
+      </a>
+
+      <a href="/farmer-product.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+      <i class="fas fa-seedling mr-3"></i> Products
+      </a>
+
+      <a href="/farmer-order.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+        <i class="fas fa-file-alt mr-3"></i> Orders
+      </a>
+    </div>
+
+    <!-- Right-Aligned Search and Profile -->
+    <div class="flex items-center space-x-4 z-10">
+
+      <!-- Profile -->
+      <div class="relative" id="profileContainer">
+        <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+          <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+          <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+          <a href="/farmer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+          </a>
+          <a href="/farmer-product.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-seedling mr-3 w-4"></i> Products
+          </a>
+          <a href="/farmer-order.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+            <i class="fas fa-file-alt mr-3 w-4"></i> Orders
+          </a>
+          <div class="border-t border-gray-100 my-1"></div>
+          <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</header>
+
+
+    
+ <div class="relative pt-[88px]">
+    <!-- Dashboard Body -->
+    <div class="p-6">
+        <h1 class="text-2xl font-bold text-[#3d6339] mb-2">Welcome back, Farmer!</h1>
+        <p class="mb-6">Today is <span id="date" class="font-medium text-green-800"></span></p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+
+        <!-- Total Revenue -->
+        <div class="bg-white p-4 rounded shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold mb-2">Total Revenue</h2>
+            <div class="text-3xl">💰</div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div id="totalRevenue" class="text-2xl font-bold text-green-700">₹0</div>
+          </div>
+          <small class="text-gray-500">+20.1% from last month</small>
+        </div>
+
+        <!-- Total Purchased Items -->
+        <div class="bg-white p-4 rounded shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold mb-2">Total Purchased</h2>
+            <div class="text-3xl">🛒</div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div id="purchasedItems" class="text-2xl font-bold text-green-700">0</div>
+          </div>
+          <small id="purchasedItemsGrowth" class="text-gray-500">Items sold to date</small>
+        </div>
+
+        <!-- Active Products -->
+        <div class="bg-white p-4 rounded shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold mb-2">Active Products</h2>
+            <div class="text-3xl">🥦</div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div id="activeProducts" class="text-2xl font-bold text-green-700">0</div>
+          </div>
+          <small class="text-gray-500">+2 since last week</small>
+        </div>
+
+      </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+            <h3 class="text-xl font-semibold mb-1">Recent Activity</h3>
+            <p class="text-sm text-gray-600 mb-4">A log of recent events on your farm profile.</p>
+
+            <div id="recentActivityContainer" class="space-y-4">
+              <p class="mb-2"><span class="font-bold">Loading...</span> Fetching recent activity.</p>
+            </div>
+          </div>
+
+          <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+  <h3 class="text-xl font-semibold mb-1">Market Trends</h3>
+  <p class="text-sm text-gray-600 mb-4">Average prices for the last 7 days.</p>
+
+  <!-- Category Dropdown -->
+  <div class="relative inline-block w-48 mb-6">
+    <button id="categoryBtn"
+      class="w-full flex justify-between items-center bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+      <span id="selectedCategory">Vegetable</span>
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+    <div id="categoryMenu" class="hidden absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
+      <ul>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Vegetable</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Fruit</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Wheat</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Dairy</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Eggs</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">Coffee</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Product Dropdown -->
+  <div class="relative inline-block w-48 mb-6 ml-4">
+    <button id="productBtn"
+      class="w-full flex justify-between items-center bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+      <span id="selectedProduct">Tomato</span>
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+    <div id="productMenu" class="hidden absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
+      <ul id="productList">
+        <!-- Products will be injected dynamically -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Month Dropdown -->
+  <div class="relative inline-block w-48 mb-6 ml-4">
+    <button id="monthBtn"
+      class="w-full flex justify-between items-center bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300">
+      <span id="selectedMonth">January</span>
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+    <div id="monthMenu" class="hidden absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10">
+      <ul>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">January</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">February</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">March</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">April</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">May</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">June</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">July</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">August</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">September</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">October</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">November</li>
+        <li class="px-3 py-2 hover:bg-gray-100 cursor-pointer">December</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <canvas id="marketChart" height="120"></canvas>
+</div>
+
+
+      </div>
+  </div>
+
+  <!-- Script -->
+<script>
+     // Simple JavaScript for interaction
+
+     // --- Get authentication token ---
+     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+     console.log('🔐 Auth token from storage:', token ? 'Found token' : 'No token');
+     
+     // Check if user is authenticated
+     if (!token) {
+         console.error('❌ No authentication token found, redirecting to login');
+         window.location.href = '/login.html';
+     } else {
+         console.log('✅ Authentication token found, continuing to load dashboard');
+         // For debugging - try to decode token payload to check role/user info
+         try {
+             const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+             console.log('🔐 Token payload:', tokenPayload);
+         } catch (e) {
+             console.error('❌ Failed to decode token:', e);
+         }
+     }
+
+     // Fetch and update dashboard stats
+     async function updateDashboardStats() {
+       // Total Revenue
+       try {
+         const res = await fetch('/api/farmer/revenue', {
+           headers: {
+             'Authorization': `Bearer ${token}`,
+             'Content-Type': 'application/json'
+           }
+         });
+         const data = await res.json();
+         document.getElementById('totalRevenue').textContent = '₹' + (data.revenue || 0).toLocaleString('en-IN');
+       } catch (error) {
+         console.error('Error fetching revenue:', error);
+       }
+       // Active Products
+       try {
+         const res = await fetch('/api/farmer/active-products', {
+           headers: {
+             'Authorization': `Bearer ${token}`,
+             'Content-Type': 'application/json'
+           }
+         });
+         const data = await res.json();
+         document.getElementById('activeProducts').textContent = data.count || 0;
+       } catch (error) {
+         console.error('Error fetching active products:', error);
+       }
+     }
+     // Fetch and update new orders count
+     async function updateNewOrders() {
+       try {
+         const res = await fetch('/api/farmer/new-orders', {
+           headers: {
+             'Authorization': `Bearer ${token}`,
+             'Content-Type': 'application/json'
+           }
+         });
+         const data = await res.json();
+         document.getElementById('newOrders').textContent = data.count || 0;
+       } catch (error) {
+         console.error('Error fetching new orders:', error);
+       }
+     }
+
+     // Fetch and update purchased items count
+     async function updatePurchasedItems() {
+       try {
+         const res = await fetch('/api/farmer/purchased-items', {
+           headers: {
+             'Authorization': `Bearer ${token}`,
+             'Content-Type': 'application/json'
+           }
+         });
+         const data = await res.json();
+         document.getElementById('purchasedItems').textContent = data.count || 0;
+         document.getElementById('purchasedItemsGrowth').textContent = data.growthText || 'Items sold to date';
+       } catch (error) {
+         console.error('Error fetching purchased items:', error);
+       }
+     }
+
+     // Fetch and update recent activity
+     async function updateRecentActivity() {
+       try {
+         console.log('🚀 Fetching recent activity...');
+         console.log('🔐 Using token:', token ? `Bearer ${token.substring(0, 10)}...` : 'No token');
+         
+         const res = await fetch('/api/farmer/recent-activity', {
+           headers: {
+             'Authorization': `Bearer ${token}`,
+             'Content-Type': 'application/json'
+           }
+         });
+         
+         console.log('📡 API response status:', res.status);
+         if (!res.ok) {
+           console.error('❌ API error:', res.status, res.statusText);
+           throw new Error(`API error: ${res.status} ${res.statusText}`);
+         }
+         
+         const data = await res.json();
+         console.log('📦 Recent activity data:', data);
+         
+         const activityContainer = document.getElementById('recentActivityContainer');
+         if (activityContainer) {
+           if (data.activity && data.activity.length > 0) {
+             console.log('Found activity items:', data.activity.length);
+             let html = '';
+             data.activity.forEach(item => {
+               const time = new Date(item.timestamp).toLocaleString();
+               
+               // Choose icon and color based on activity type
+               let iconPath = '';
+               let bgColor = '';
+               let iconColor = '';
+               
+               if (item.type === 'order') {
+                 // Shopping bag icon for orders
+                 iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>`;
+                 bgColor = 'bg-blue-100';
+                 iconColor = 'text-blue-600';
+               } else if (item.type === 'product') {
+                 // Product/box icon for product additions
+                 iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>`;
+                 bgColor = 'bg-green-100';
+                 iconColor = 'text-green-600';
+               } else {
+                 // Default notification icon
+                 iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>`;
+                 bgColor = 'bg-yellow-100';
+                 iconColor = 'text-yellow-600';
+               }
+               
+               html += `
+                 <div class="flex items-start space-x-3 mb-4 bg-${item.type === 'product' ? 'green' : 'blue'}-50 p-3 rounded-lg">
+                   <div class="w-8 h-8 rounded-full ${bgColor} flex items-center justify-center">
+                     <svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       ${iconPath}
+                     </svg>
+                   </div>
+                   <div class="flex-1">
+                     <p class="text-sm">
+                       <span class="font-bold">${item.message}</span>
+                     </p>
+                     <p class="text-xs text-gray-500 mt-1">${time}</p>
+                   </div>
+                 </div>`;
+             });
+             activityContainer.innerHTML = html;
+           } else {
+             // Add a default message with button to create product
+             activityContainer.innerHTML = `
+               <div class="text-center py-4">
+                 <p class="text-gray-500 mb-3">No recent activity found.</p>
+                 <a href="/farmer-product.html" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                   Add Your First Product
+                 </a>
+               </div>`;
+           }
+         }
+       } catch (error) {
+         console.error('Error fetching recent activity:', error);
+         const activityContainer = document.getElementById('recentActivityContainer');
+         if (activityContainer) {
+           activityContainer.innerHTML = '<p class="text-red-500">Error loading activity.</p>';
+         }
+       }
+     }
+     
+     // Set today's date function
+     function setTodayDate() {
+       console.log('📆 Setting today\'s date');
+       const dateElement = document.getElementById('date');
+       if (dateElement) {
+         const today = new Date();
+         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+         const formattedDate = today.toLocaleDateString('en-US', options);
+         dateElement.textContent = formattedDate;
+         console.log('📆 Date set to:', formattedDate);
+       } else {
+         console.error('❌ Date element not found');
+       }
+     }
+     
+     // Call date setting function immediately
+     setTodayDate();
+    
+     
+     // Set today's date function
+     function setTodayDate() {
+       console.log('📆 Setting today\'s date');
+       const dateElement = document.getElementById('date');
+       if (dateElement) {
+         const today = new Date();
+         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+         const formattedDate = today.toLocaleDateString('en-US', options);
+         dateElement.textContent = formattedDate;
+         console.log('📆 Date set to:', formattedDate);
+       } else {
+         console.error('❌ Date element not found');
+       }
+     }
+     
+     // Call date setting function immediately
+     setTodayDate();
+    
+     
+     // Set today's date function
+     function setTodayDate() {
+       console.log('📆 Setting today\'s date');
+       const dateElement = document.getElementById('date');
+       if (dateElement) {
+         const today = new Date();
+         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+         const formattedDate = today.toLocaleDateString('en-US', options);
+         dateElement.textContent = formattedDate;
+         console.log('📆 Date set to:', formattedDate);
+       } else {
+         console.error('❌ Date element not found');
+       }
+     }
+     
+     // Call date setting function immediately
+     setTodayDate();
+    
+
+     // Standalone function to set the date
+     function setTodayDate() {
+       console.log('� Setting today\'s date');
+       const dateElement = document.getElementById('date');
+       if (dateElement) {
+         const today = new Date();
+         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+         const formattedDate = today.toLocaleDateString('en-US', options);
+         dateElement.textContent = formattedDate;
+         console.log('📆 Date set to:', formattedDate);
+       } else {
+         console.error('❌ Date element not found');
+       }
+     }
+     
+     // Call it immediately, don't wait for DOMContentLoaded
+     setTodayDate();
+     
+     document.addEventListener('DOMContentLoaded', () => {
+       console.log('🚀 Page loaded, starting initialization...');
+       
+       // Set today's date again to be sure
+       setTodayDate();
+       
+       // Check authentication first
+       if (!token) {
+         console.warn('❌ No authentication token found - showing demo data');
+         setTodayDate();
+         // Still show chart with sample data for demo purposes
+         // Set default selections in the UI
+         setTimeout(() => {
+           if (selectedCategory) selectedCategory.textContent = "Fruit";
+           if (selectedProduct) selectedProduct.textContent = "Apple";
+           if (selectedMonth) selectedMonth.textContent = "January";
+           
+           // Populate the product dropdown for the default category
+           if (productMenu && categories["Fruit"]) {
+             // Clear the previous list
+             productMenu.innerHTML = '<ul class="w-full"></ul>';
+             const productUl = productMenu.querySelector('ul');
+             
+             categories["Fruit"].forEach(prod => {
+               const li = document.createElement("li");
+               li.textContent = prod;
+               li.className = "px-3 py-2 hover:bg-gray-100 cursor-pointer";
+               li.style.listStyleType = "none"; // Remove bullet points
+               li.addEventListener("click", (e) => {
+                 e.stopPropagation();
+                 selectedProduct.textContent = prod;
+                 currentProduct = prod;
+                 console.log(`🍎 Product selected: ${prod}`);
+                 
+                 if (currentMonth) {
+                   updateChart(currentProduct, currentMonth);
+                 }
+                 productMenu.classList.add("hidden");
+               });
+               productUl.appendChild(li);
+             });
+           }
+           
+           console.log('🚀 Default selections set:', { currentProduct, currentMonth });
+         }, 100);
+         
+         // Initialize the market trend chart with sample data
+         setTimeout(() => {
+           console.log('🚀 Initializing demo chart...');
+           const canvas = document.getElementById('marketChart');
+           if (canvas) {
+             console.log('✅ Canvas element found:', canvas);
+             updateChart(currentProduct, currentMonth);
+           } else {
+             console.error('❌ Canvas element not found');
+           }
+         }, 1000);
+         return;
+       }
+       
+       updateDashboardStats();
+       updatePurchasedItems();
+       updateRecentActivity();
+       
+       // Set default selections in the UI
+       setTimeout(() => {
+         if (selectedCategory) selectedCategory.textContent = "Fruit";
+         if (selectedProduct) selectedProduct.textContent = "Apple";
+         if (selectedMonth) selectedMonth.textContent = "January";
+         
+         // Populate the product dropdown for the default category
+         if (productMenu && categories["Fruit"]) {
+           // Clear the previous list
+           productMenu.innerHTML = '<ul class="w-full"></ul>';
+           const productUl = productMenu.querySelector('ul');
+           
+           categories["Fruit"].forEach(prod => {
+             const li = document.createElement("li");
+             li.textContent = prod;
+             li.className = "px-3 py-2 hover:bg-gray-100 cursor-pointer";
+             li.style.listStyleType = "none"; // Remove bullet points
+             li.addEventListener("click", (e) => {
+               e.stopPropagation();
+               selectedProduct.textContent = prod;
+               currentProduct = prod;
+               console.log(`🍎 Product selected: ${prod}`);
+               
+               if (currentMonth) {
+                 updateChart(currentProduct, currentMonth);
+               }
+               productMenu.classList.add("hidden");
+             });
+             productUl.appendChild(li);
+           });
+         }
+         
+         console.log('🚀 Default selections set:', { currentProduct, currentMonth });
+       }, 100);
+       
+       // Initialize the market trend chart
+       setTimeout(() => {
+         console.log('🚀 Initializing market trend chart...');
+         const canvas = document.getElementById('marketChart');
+         if (canvas) {
+           console.log('✅ Canvas element found:', canvas);
+           console.log('🔧 Canvas dimensions:', canvas.width, 'x', canvas.height);
+           console.log('📊 Starting chart with:', { currentProduct, currentMonth });
+           updateChart(currentProduct, currentMonth);
+         } else {
+           console.error('❌ Canvas element not found');
+         }
+       }, 1000); // Small delay to ensure DOM is fully ready
+       
+       // Add click event to conversation items
+       const conversationItems = document.querySelectorAll('.cursor-pointer');
+       conversationItems.forEach(item => {
+           item.addEventListener('click', function() {
+               // Remove any existing active class
+               conversationItems.forEach(i => i.classList.remove('bg-blue-50'));
+               // Add active class to clicked item
+               this.classList.add('bg-blue-50');
+           });
+       });
+     });
+
+  // Profile dropdown functions
+  function setupProfileDropdown() {
+    const profileButton = document.getElementById('profile-button');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    
+    if (!profileButton || !profileDropdown) {
+      console.log('Profile elements not found');
+      return;
+    }
+    
+    // Toggle dropdown on button click
+    profileButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      profileDropdown.classList.toggle('hidden');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.add('hidden');
+      }
+    });
+    
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        profileDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  // Logout function
+  function handleLogout() {
+    // Show confirmation dialog
+    if (confirm('Are you sure you want to logout?')) {
+      // Clear localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('username');
+      
+      // Redirect to login page
+      window.location.href = '/login.html';
+    }
+  }
+
+  // Initialize profile dropdown on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    setupProfileDropdown();
+  });
+
+  // ================== CATEGORY & PRODUCT DROPDOWNS ==================
+
+  // Categories and products mapping
+  const categories = {
+    Vegetable: ["Tomato" , "Potato" , "Onion" , "Carrot" , "Cabbage"], 
+    Fruit: ["Apple", "Banana", "Mango", "Orange", "Grapes"],
+    Wheat: ["Wheat"],
+    Dairy: ["Cow Milk", "Buffalo Milk","Cheese", "Butter"],
+    Eggs: ["Eggs"],
+    Coffee: ["Coffee Beans", "Instant Coffee"]
+  };
+
+  // Elements
+  const categoryBtn = document.getElementById("categoryBtn");
+  const categoryMenu = document.getElementById("categoryMenu");
+  const selectedCategory = document.getElementById("selectedCategory");
+
+  const productBtn = document.getElementById("productBtn");
+  const productMenu = document.getElementById("productMenu");
+  const selectedProduct = document.getElementById("selectedProduct");
+
+  // Toggle category dropdown
+  categoryBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    categoryMenu.classList.toggle("hidden");
+    productMenu.classList.add("hidden"); // Close product menu when opening category
+  });
+
+  // Handle category selection
+  document.querySelectorAll("#categoryMenu li").forEach(item => {
+    item.addEventListener("click", () => {
+      const category = item.textContent.trim();
+      selectedCategory.textContent = category;
+      console.log(`📂 Category selected: ${category}`);
+
+      // Reset product selection
+      selectedProduct.textContent = "Select Product";
+      productMenu.innerHTML = "";
+      
+      // Clear current product to avoid showing stale data
+      currentProduct = null;
+
+      // Populate product dropdown
+      if (categories[category]) {
+        // Clear the previous list
+        productMenu.innerHTML = '<ul class="w-full"></ul>';
+        const productUl = productMenu.querySelector('ul');
+        
+        categories[category].forEach(prod => {
+          const li = document.createElement("li");
+          li.textContent = prod;
+          li.className = "px-3 py-2 hover:bg-gray-100 cursor-pointer";
+          li.style.listStyleType = "none"; // Remove bullet points
+          li.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectedProduct.textContent = prod;
+            currentProduct = prod;
+            console.log(`🍎 Product selected: ${prod}`);
+            
+            // Update chart immediately
+            if (currentMonth) {
+              updateChart(currentProduct, currentMonth);
+            }
+            productMenu.classList.add("hidden");
+          });
+          productUl.appendChild(li);
+        });
+        console.log(`📦 Added ${categories[category].length} products to dropdown`);
+      }
+
+      // Close category menu
+      categoryMenu.classList.add("hidden");
+    });
+  });
+
+  // Toggle product dropdown
+  productBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    productMenu.classList.toggle("hidden");
+    categoryMenu.classList.add("hidden"); // Close category menu when opening product
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!categoryBtn.contains(e.target) && !categoryMenu.contains(e.target)) {
+      categoryMenu.classList.add("hidden");
+    }
+    if (!productBtn.contains(e.target) && !productMenu.contains(e.target)) {
+      productMenu.classList.add("hidden");
+    }
+    if (!monthBtn.contains(e.target) && !monthMenu.contains(e.target)) {
+      monthMenu.classList.add("hidden");
+    }
+  });
+
+  // ================== MONTH DROPDOWN (UNCHANGED) ==================
+  const monthBtn = document.getElementById("monthBtn");
+  const monthMenu = document.getElementById("monthMenu");
+  const selectedMonth = document.getElementById("selectedMonth");
+  const monthOptions = document.querySelectorAll("#monthMenu li");
+
+  monthBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    monthMenu.classList.toggle("hidden");
+    categoryMenu.classList.add("hidden"); // Close other menus
+    productMenu.classList.add("hidden");
+  });
+
+  monthOptions.forEach((item, index) => {
+    item.addEventListener("click", () => {
+      const monthText = item.textContent.trim();
+      selectedMonth.textContent = monthText;
+      
+      // Close menu
+      monthMenu.classList.add("hidden");
+
+      // Convert month name to number (1-12)
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+                         "July", "August", "September", "October", "November", "December"];
+      currentMonth = monthNames.indexOf(monthText) + 1;
+      
+      console.log(`📅 Month changed to: ${monthText} (${currentMonth})`);
+      
+      // Update chart with new month
+      if (currentProduct && currentMonth) {
+        updateChart(currentProduct, currentMonth);
+      }
+    });
+  });
+
+  // ================== CHART.JS ==================
+  let chart;
+
+  async function fetchData(product, month) {
+    try {
+      console.log(`🔍 Fetching data for ${product}, month ${month}`);
+      const response = await fetch(`/api/data?product=${encodeURIComponent(product)}&month=${month}`);
+      if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
+      const data = await response.json();
+      console.log('📊 Fetched chart data:', data);
+      return data;
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      // Return sample data if API fails
+      return generateSampleData(product, month);
+    }
+  }
+
+  function generateSampleData(product, month = 1) {
+    const sampleData = [];
+    const currentYear = new Date().getFullYear();
+    const basePrice = getProductBasePrice(product);
+    
+    // Get the number of days in the selected month
+    const daysInMonth = new Date(currentYear, month, 0).getDate();
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(currentYear, month - 1, i); // month - 1 because JS months are 0-indexed
+      const variation = (Math.random() - 0.5) * 20;
+      const avgPrice = Math.max(basePrice + variation, 5);
+      
+      sampleData.push({
+        Date: date.toISOString(),
+        avgPrice: Math.round(avgPrice * 100) / 100
+      });
+    }
+    
+    return sampleData;
+  }
+
+  function getProductBasePrice(product) {
+    const basePrices = {
+      'Apple': 80, 'Banana': 40, 'Mango': 120, 'Orange': 60, 'Grapes': 100,
+      'Tomato': 30, 'Potato': 25, 'Onion': 35, 'Carrot': 45, 'Cabbage': 20,
+      'Wheat': 25, 'Cow Milk': 50, 'Buffalo Milk': 60, 'Cheese': 400,
+      'Butter': 450, 'Eggs': 6, 'Coffee Beans': 600, 'Instant Coffee': 300
+    };
+    return basePrices[product] || 50;
+  }
+
+  async function updateChart(product = "Apple", month = 1) {
+    try {
+      console.log(`📈 Updating chart for ${product}, month ${month}`);
+      
+      // Validate inputs
+      if (!product || !month) {
+        console.warn('⚠️ Missing product or month, using defaults');
+        product = product || 'Apple';
+        month = month || 1;
+      }
+      
+      const data = await fetchData(product, month);
+      
+      if (!data || data.length === 0) {
+        console.warn('⚠️ No data received, generating sample data');
+        const fallbackData = generateSampleData(product, month);
+        updateChartWithData(fallbackData, product);
+        return;
+      }
+      
+      updateChartWithData(data, product);
+      
+    } catch (error) {
+      console.error('❌ Error updating chart:', error);
+      // Show fallback data even if there's an error
+      const fallbackData = generateSampleData(product || 'Apple', month || 1);
+      updateChartWithData(fallbackData, product || 'Apple');
+    }
+  }
+
+  function updateChartWithData(data, product) {
+    try {
+      const labels = data.map(item =>
+        new Date(item.Date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+      );
+      const prices = data.map(item => item.avgPrice);
+
+      if (chart) {
+        chart.destroy();
+      }
+      
+      const canvas = document.getElementById("marketChart");
+      if (!canvas) {
+        console.error('❌ Canvas element not found');
+        return;
+      }
+      
+      const ctx = canvas.getContext("2d");
+      
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: `${product} Price`,
+            data: prices,
+            borderColor: "#22c55e",
+            borderWidth: 2,
+            tension: 0.3,
+            fill: false,
+            pointBackgroundColor: "#22c55e",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => `Price: ₹${context.parsed.y.toLocaleString("en-IN")}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: (value) => `₹${value.toLocaleString("en-IN")}`
+              }
+            }
+          }
+        }
+      });
+      
+      console.log('✅ Chart updated successfully');
+    } catch (error) {
+      console.error('❌ Error creating chart:', error);
+    }
+  }
+
+  // ================== DEFAULT STATE ==================
+  let currentProduct = "Apple";
+  let currentMonth = 1; // January
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Debug</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Market Trend Chart Debug</h1>
+    
+    <div>
+        <button onclick="setTestToken()">Set Test Token</button>
+        <button onclick="testDirectAPI()">Test API Direct</button>
+        <button onclick="testChart()">Create Chart</button>
+        <button onclick="clearAll()">Clear All</button>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <label>Product: 
+            <select id="productSelect">
+                <option value="Apple">Apple</option>
+                <option value="Banana">Banana</option>
+                <option value="Tomato">Tomato</option>
+                <option value="Potato">Potato</option>
+            </select>
+        </label>
+        <label>Month: 
+            <input type="number" id="monthInput" value="1" min="1" max="12">
+        </label>
+    </div>
+    
+    <div id="output" style="background: #f0f0f0; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto;"></div>
+    
+    <div style="width: 800px; height: 400px; border: 1px solid #ccc;">
+        <canvas id="debugChart"></canvas>
+    </div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+        
+        function setTestToken() {
+            localStorage.setItem('token', 'test-token-12345');
+            log('✅ Test token set in localStorage');
+        }
+        
+        async function testDirectAPI() {
+            const product = document.getElementById('productSelect').value;
+            const month = document.getElementById('monthInput').value;
+            
+            try {
+                log(`🔍 Testing API for ${product}, month ${month}`);
+                const response = await fetch(`/api/data?product=${encodeURIComponent(product)}&month=${month}`);
+                
+                log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log(`📊 Received ${data.length} data points`);
+                log(`📊 Sample data: ${JSON.stringify(data.slice(0, 2), null, 2)}`);
+                
+                return data;
+            } catch (error) {
+                log(`❌ API Error: ${error.message}`);
+                return null;
+            }
+        }
+        
+        async function testChart() {
+            const data = await testDirectAPI();
+            if (!data) return;
+            
+            try {
+                log('📈 Creating chart...');
+                const ctx = document.getElementById('debugChart').getContext('2d');
+                
+                // Clear any existing chart
+                if (window.debugChartInstance) {
+                    window.debugChartInstance.destroy();
+                }
+                
+                const labels = data.map(item =>
+                    new Date(item.Date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })
+                );
+                const prices = data.map(item => item.avgPrice);
+                
+                log(`📊 Labels: ${labels.length}, Prices: ${prices.length}`);
+                log(`📊 Price range: ${Math.min(...prices)} - ${Math.max(...prices)}`);
+                
+                window.debugChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${document.getElementById('productSelect').value} Price`,
+                            data: prices,
+                            borderColor: '#22c55e',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointBackgroundColor: '#22c55e',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `Price: ₹${context.parsed.y.toLocaleString("en-IN")}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: (value) => `₹${value.toLocaleString("en-IN")}`
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                log('✅ Chart created successfully!');
+            } catch (error) {
+                log(`❌ Chart Error: ${error.message}`);
+            }
+        }
+        
+        function clearAll() {
+            document.getElementById('output').innerHTML = '';
+            if (window.debugChartInstance) {
+                window.debugChartInstance.destroy();
+                window.debugChartInstance = null;
+            }
+            log('🧹 Cleared all');
+        }
+        
+        // Auto-run on load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Debug page loaded');
+            setTestToken();
+        });
+    </script>
+</body>
+</html>

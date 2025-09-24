@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestLoop Mobile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7f9;
+            color: #333;
+        }
+        .container {
+            max-width: 100%;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4ded80;
+            color: #1a472a;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .card h2 {
+            color: #2e7d32;
+            margin-top: 0;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+            font-size: 20px;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .button {
+            background-color: #4ded80;
+            color: #1a472a;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            flex: 1 0 40%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .button:hover, .button:active {
+            background-color: #3cb567;
+            transform: translateY(-2px);
+        }
+        .status {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>HarvestLoop Mobile</h1>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>User Access</h2>
+            <div class="button-container">
+                <a href="/login.html" class="button">Login</a>
+                <a href="/register.html" class="button">Register</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Farmer Tools</h2>
+            <div class="button-container">
+                <a href="/farmer-dashboard.html" class="button">Dashboard</a>
+                <a href="/farmer-profile.html" class="button">Profile</a>
+                <a href="/farmer-product.html" class="button">Products</a>
+                <a href="/farmer-order.html" class="button">Orders</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Consumer Options</h2>
+            <div class="button-container">
+                <a href="/consumer-dashboard.html" class="button">Dashboard</a>
+                <a href="/consumer-profile.html" class="button">Profile</a>
+                <a href="/consumer-orders.html" class="button">Orders</a>
+                <a href="/consumer-message" class="button">Messages</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Browse Products</h2>
+            <div class="button-container">
+                <a href="/fruit.html" class="button">Fruits</a>
+                <a href="/dairy.html" class="button">Dairy</a>
+                <a href="/coffee.html" class="button">Coffee</a>
+                <a href="/eggs.html" class="button">Eggs</a>
+                <a href="/grains.html" class="button">Grains</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Server Status</h2>
+            <p class="status">Server: <span id="server-status">Checking...</span></p>
+            <p class="status">Last checked: <span id="last-check">Just now</span></p>
+            <button id="check-button" class="button">Check Connection</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 HarvestLoop - Connecting Farmers & Consumers</p>
+    </div>
+    
+    <script>
+        // Check server status
+        async function checkServerStatus() {
+            const statusElement = document.getElementById('server-status');
+            const lastCheckElement = document.getElementById('last-check');
+            const checkButton = document.getElementById('check-button');
+            
+            statusElement.textContent = 'Checking...';
+            checkButton.disabled = true;
+            
+            try {
+                const response = await fetch('/api/ping', {
+                    cache: 'no-store',
+                    headers: {
+                        'pragma': 'no-cache',
+                        'cache-control': 'no-cache'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusElement.textContent = '✅ Online';
+                    statusElement.style.color = '#2e7d32';
+                } else {
+                    statusElement.textContent = '❌ Error';
+                    statusElement.style.color = '#d32f2f';
+                }
+            } catch (error) {
+                statusElement.textContent = '❌ Offline';
+                statusElement.style.color = '#d32f2f';
+            }
+            
+            lastCheckElement.textContent = new Date().toLocaleTimeString();
+            checkButton.disabled = false;
+        }
+        
+        // Initial check
+        checkServerStatus();
+        
+        // Set up button
+        document.getElementById('check-button').addEventListener('click', checkServerStatus);
+        
+        // Periodic check
+        setInterval(checkServerStatus, 60000); // Check every minute
+    </script>
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Vegetables - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="/js/vegetables.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white">
+        <div class="fixed top-0 left-0 w-full z-50 bg-white flex items-center justify-between px-8 py-4 shadow-sm">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/consumer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Navigation Menu -->
+            <nav class="flex items-center space-x-6">
+                <a href="/consumer-dashboard.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-compass mr-1"></i> Discover
+                </a>
+                <a href="/consumer-orders.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-shopping-basket mr-1"></i> My Orders
+                </a>
+                <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                     <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                </a>
+            </nav>
+
+            <!-- Profile Section -->
+            <div class="flex items-center relative">
+                <button id="profile-button" class="flex items-center focus:outline-none hover:opacity-80 transition">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                </button>
+
+                <!-- Profile Dropdown -->
+                <div id="profile-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                    <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                    <a href="/consumer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                    </a>
+                    <a href="/consumer-orders.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                    </a>
+                    <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                        <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="container mx-auto px-8 py-12">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center gap-4 mb-6">
+                    <i class="fas fa-carrot text-green-500 text-5xl"></i>
+                    <h1 class="text-5xl font-bold font-serif hero-text-shadow">Garden-Fresh <span class="text-green-500">Vegetables</span></h1>
+                </div>
+                <div class="relative w-full max-w-3xl mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-100 to-lime-100 opacity-30 rounded-xl"></div>
+                    <p class="text-gray-700 text-lg py-4 px-6 relative">
+                        Discover crisp, nutritious vegetables from our trusted local farmers. Each vegetable is carefully 
+                        grown with organic methods, harvested at peak freshness, and delivered straight from the garden 
+                        to your table for maximum flavor and nutritional value.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="container mx-auto px-8 text-center py-8">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-500">Loading fresh vegetables...</span>
+        </div>
+
+        <!-- Vegetables Grid -->
+        <div class="container mx-auto px-8 mb-4 text-right">
+            <span id="vegetable-count" class="text-sm text-gray-600"></span>
+        </div>
+        <section class="container mx-auto px-8 pb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px]" id="vegetable-grid">
+                <!-- Dynamic vegetables will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="load-more-btn" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>Load More Vegetables
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-8 h-8 rounded-full">
+                        <h3 class="text-2xl font-bold text-[#7dde83]">HarvestLoop</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Bringing fresh, organic produce from local farms directly to your doorstep. 
+                        Supporting sustainable agriculture and healthy living.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="/consumer-dashboard.html" class="text-gray-400 hover:text-white transition">Categories</a></li>
+                        <li><a href="/about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/fruit.html" class="text-gray-400 hover:text-white transition">Fruits</a></li>
+                        <li><a href="/vegetables.html" class="text-gray-400 hover:text-white transition">Vegetables</a></li>
+                        <li><a href="/grains.html" class="text-gray-400 hover:text-white transition">Grains</a></li>
+                        <li><a href="/dairy.html" class="text-gray-400 hover:text-white transition">Dairy</a></li>
+                        <li><a href="/eggs.html" class="text-gray-400 hover:text-white transition">Eggs</a></li>
+                        <li><a href="/coffee.html" class="text-gray-400 hover:text-white transition">Coffee</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-[#7dde83]"></i>
+                            <span class="text-gray-400">123 Farm Street, Green Valley, GV 12345</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone text-[#7dde83]"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-[#7dde83]"></i>
+                            <span class="text-gray-400">hello@harvestloop.com</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#7dde83]"></i>
+                            <span class="text-gray-400">Mon-Sat: 8AM-8PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 HarvestLoop. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Purchase Popup -->
+    <div id="purchasePopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closePurchasePopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2 id="popupTitle" class="text-2xl font-bold mb-4">Purchase Item</h2>
+            <p id="popupPrice" class="text-gray-600 mb-6"></p>
+            
+            <!-- Quantity Selector -->
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-gray-700">Quantity:</span>
+                <div class="flex items-center space-x-4">
+                    <button onclick="updateQuantity(-1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input type="number" id="quantityInput" value="1" min="1" 
+                           class="w-16 text-center border rounded-lg py-1" 
+                           onchange="const price = parseFloat(document.getElementById('popupPrice').textContent.match(/Rs\.([\d.]+)/)[1]); updateTotalCost(price)">
+                    <button onclick="updateQuantity(1)" class="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Total Cost -->
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-lg font-semibold">Total Cost:</span>
+                <span id="totalCost" class="text-2xl font-bold text-green-600">Rs.0</span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex space-x-4">
+                <button onclick="closePurchasePopup()" class="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button onclick="acceptPurchase()" class="flex-1 py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+                    Purchase & Reveal Contact
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup with Farmer Details -->
+    <div id="successPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closeSuccessPopup()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="text-green-500 text-6xl mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Purchase Successful!</h2>
+                <p class="text-gray-600">You can now contact the farmer directly:</p>
+            </div>
+            
+            <!-- Farmer Details Card -->
+            <div class="bg-green-50 rounded-lg p-6 mb-6 border border-green-100">
+                <!-- Farm/Farmer Name -->
+                <div class="mb-4 pb-3 border-b border-green-200">
+                    <h3 class="text-xl font-semibold text-green-800 flex items-center">
+                        <i class="fas fa-tractor mr-2"></i>
+                        <span id="successFarmName">Loading...</span>
+                    </h3>
+                </div>
+                
+                <!-- Contact Details -->
+                <div class="space-y-3">
+                    <!-- Email -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-envelope text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email</p>
+                            <p id="successFarmerEmail" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-phone text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Phone</p>
+                            <p id="successFarmerPhone" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-map-marker-alt text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Farm Address</p>
+                            <p id="successFarmerAddress" class="text-gray-800">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeSuccessPopup()" 
+                    class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-lg font-semibold">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- Farmer Details Popup -->
+    <div id="farmerModal" 
+        class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 farmer-modal-content">
+            <!-- Close Button -->
+            <button onclick="closeFarmerModal()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <!-- Loading State -->
+            <div id="farmerLoadingState" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                <p class="text-gray-600 mt-2">Loading farmer details...</p>
+            </div>
+            
+            <!-- Farmer Details Content -->
+            <div id="farmerContent" class="hidden p-6">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-green-600 mb-2" id="farmNameTitle">Green Valley Farms</h2>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span id="farmLocation">Napa Valley, CA</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <p class="text-gray-700 mb-6" id="farmDescription">
+                    A family-owned farm committed to sustainable and organic farming practices for over 40 years.
+                </p>
+                
+                <!-- Contact Information Section -->
+                <div id="contactSection" class="contact-info-box rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+                    
+                    <!-- Hidden contact details (shown after reveal) -->
+                    <div id="contactDetails" class="hidden space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Email:</span>
+                                <span id="farmerEmail" class="ml-2">contact@greenvalley.com</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Phone:</span>
+                                <span id="farmerPhone" class="ml-2">(707) 555-1234</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-gray-600 mr-3 w-5 mt-1"></i>
+                            <div>
+                                <span class="font-medium">Address:</span>
+                                <div class="ml-2">
+                                    <div id="farmerAddress">123 Organic Way</div>
+                                    <div id="farmerCityState">Napa, CA 94558</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reveal button (hidden after contact is revealed) -->
+                    <div id="revealButtonContainer" class="text-center">
+                        <button id="revealContactBtn" 
+                                onclick="revealFarmerContact()" 
+                                class="reveal-button text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center mx-auto">
+                            <i class="fas fa-eye mr-2"></i>
+                            Reveal Contact Info <span class="ml-2 text-green-100">(1 Credit)</span>
+                        </button>
+                        <p class="text-sm text-gray-500 mt-2">Uses 1 credit from your subscription</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="farmerErrorState" class="hidden text-center py-12 px-6">
+                <div class="text-red-500 text-4xl mb-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Unable to Load</h3>
+                <p class="text-gray-600 mb-4">We couldn't fetch the farmer details at this time.</p>
+                <button onclick="closeFarmerModal()" 
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Popup will be created dynamically by JavaScript -->
+
+    <style>
+        /* Hero Section Styles */
+        .hero-gradient {
+            background: linear-gradient(135deg, #7dde83, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .vegetable-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .vegetable-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .hero-text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Smooth fade in for page load */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-section {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        /* Farmer modal animations */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .farmer-modal-content {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Farmer modal specific styles */
+        .farmer-modal-content {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .contact-info-box {
+            border: 1px solid #e5e7eb;
+            background: linear-gradient(to bottom, #f9fafb, #ffffff);
+        }
+
+        .reveal-button {
+            background: linear-gradient(to right, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .reveal-button:hover {
+            background: linear-gradient(to right, #059669, #047857);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+
+        .vegetable-card {
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .vegetable-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .vegetable-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .vegetable-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .vegetable-card button {
+            transition: all 0.2s ease;
+        }
+
+        .vegetable-card button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Staggered animation delays */
+        .vegetable-card:nth-child(1) { transition-delay: 0.1s; }
+        .vegetable-card:nth-child(2) { transition-delay: 0.2s; }
+        .vegetable-card:nth-child(3) { transition-delay: 0.3s; }
+        .vegetable-card:nth-child(4) { transition-delay: 0.4s; }
+        .vegetable-card:nth-child(5) { transition-delay: 0.5s; }
+        .vegetable-card:nth-child(6) { transition-delay: 0.6s; }
+        .vegetable-card:nth-child(7) { transition-delay: 0.7s; }
+        .vegetable-card:nth-child(8) { transition-delay: 0.8s; }
+
+        /* Button hover effects */
+        .vegetable-card button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vegetable-card button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .vegetable-card button:hover:before {
+            left: 100%;
+        }
+
+        /* Success Popup Styles */
+        .farmer-info {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .farmer-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .farmer-info-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .farmer-info-value {
+            color: #212529;
+            font-weight: 600;
+        }
+        
+        /* Loading state */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Source badge styles */
+        .source-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 10;
+        }
+
+        .source-badge.dynamic {
+            background: linear-gradient(45deg, #10b981, #34d399);
+        }
+
+        .source-badge.static {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        }
+    </style>
+
+    <script>
+        // Simple helper functions that work with vegetables.js
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                window.location.href = '/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

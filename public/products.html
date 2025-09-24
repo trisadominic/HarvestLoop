@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#f6f0e9] min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <a href="/" class="flex items-center">
+                        <img src="/assets/Logo.png" alt="HarvestLoop" class="h-8 w-8 mr-2">
+                        <span class="text-xl font-bold text-[#7dde83]">HarvestLoop</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <input type="text" id="search" 
+                            class="w-64 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-green-500"
+                            placeholder="Search products...">
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <select id="category-filter" 
+                        class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-green-500">
+                        <option value="">All Categories</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Grains">Grains</option>
+                    </select>
+
+                    <!-- Notifications -->
+                    <button id="notifications-btn" class="relative p-2">
+                        <i class="fas fa-bell text-gray-600"></i>
+                        <span id="notification-badge" 
+                            class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">
+                            0
+                        </span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative" id="user-menu">
+                        <button class="flex items-center gap-2 focus:outline-none">
+                            <img id="user-avatar" class="h-8 w-8 rounded-full bg-gray-200" 
+                                src="/assets/default-avatar.png" alt="User">
+                            <span id="username" class="text-sm font-medium"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 pt-24 pb-12">
+        <!-- Subscription Status -->
+        <div id="subscription-banner" class="mb-8"></div>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Products will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Load More Button -->
+        <div class="text-center mt-8">
+            <button id="load-more" 
+                class="bg-[#7dde83] text-white px-6 py-2 rounded-lg hover:bg-[#6bc472] transition-colors">
+                Load More
+            </button>
+        </div>
+    </main>
+
+    <!-- Notification Panel (hidden by default) -->
+    <div id="notifications-panel" 
+        class="fixed right-4 top-20 w-96 bg-white rounded-lg shadow-xl hidden transform transition-transform duration-200 z-50">
+        <div class="p-4 border-b">
+            <h3 class="font-semibold">Notifications</h3>
+        </div>
+        <div id="notifications-list" class="max-h-[400px] overflow-y-auto">
+            <!-- Notifications will be inserted here -->
+        </div>
+    </div>
+
+    <!-- User Menu Panel (hidden by default) -->
+    <div id="user-menu-panel" 
+        class="fixed right-4 top-20 w-48 bg-white rounded-lg shadow-xl hidden transform transition-transform duration-200 z-50">
+        <div class="py-2">
+            <a href="/consumer-dashboard.html" class="block px-4 py-2 hover:bg-gray-100">
+                Dashboard
+            </a>
+            <a href="/subscription.html" class="block px-4 py-2 hover:bg-gray-100">
+                Subscription
+            </a>
+            <a href="#" id="logout-btn" class="block px-4 py-2 hover:bg-gray-100 text-red-600">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Custom Elements Templates -->
+    <template id="product-card-template">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <img class="w-full h-48 object-cover" src="" alt="">
+            <div class="p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-lg font-semibold"></h3>
+                    <span class="text-green-600 font-bold"></span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4"></p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500"></span>
+                    <div class="flex gap-2">
+                        <button class="purchase-btn bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">
+                            Purchase
+                        </button>
+                        <button class="deal-btn bg-amber-500 text-white px-3 py-1 rounded-md hover:bg-amber-600">
+                            Deal
+                        </button>
+                        <button class="farmer-btn bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
+                            Farmer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="/js/products.js"></script>
+    <script>
+        // Initialize user session
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Set user info
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('username').textContent = user.username;
+                if (user.avatar) {
+                    document.getElementById('user-avatar').src = user.avatar;
+                }
+            }
+
+            // Initialize notifications
+            checkNotifications();
+            setInterval(checkNotifications, 30000);
+        });
+    </script>
+</body>
+</html>

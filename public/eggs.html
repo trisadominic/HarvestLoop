@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free-Range Eggs - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="/js/eggs.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white">
+        <div class="fixed top-0 left-0 w-full z-50 bg-white flex items-center justify-between px-8 py-4 shadow-sm">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/consumer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Navigation Menu -->
+            <nav class="flex items-center space-x-6">
+                <a href="/consumer-dashboard.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-compass mr-1"></i> Discover
+                </a>
+                <a href="/consumer-orders.html" class="text-gray-700 hover:text-black transition">
+                    <i class="fas fa-shopping-basket mr-1"></i> My Orders
+                </a>
+                <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                     <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                </a>
+            </nav>
+
+            <!-- Profile Section -->
+            <div class="flex items-center relative">
+                <button id="profile-button" class="flex items-center focus:outline-none hover:opacity-80 transition">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                </button>
+
+                <!-- Profile Dropdown -->
+                <div id="profile-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                    <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                    <a href="/consumer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                    </a>
+                    <a href="/consumer-orders.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                    </a>
+                    <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                        <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                    </a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                        <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="container mx-auto px-8 py-12">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center gap-4 mb-6">
+                    <i class="fas fa-egg text-yellow-500 text-5xl"></i>
+                    <h1 class="text-5xl font-bold font-serif hero-text-shadow">Free-Range <span class="text-yellow-500">Eggs</span></h1>
+                </div>
+                <div class="relative w-full max-w-3xl mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-100 to-orange-100 opacity-30 rounded-xl"></div>
+                    <p class="text-gray-700 text-lg py-4 px-6 relative">
+                        Discover farm-fresh eggs from our trusted local farmers who raise happy, free-range chickens. 
+                        Each egg is naturally produced by hens that roam freely, resulting in richer flavor, 
+                        vibrant yolks, and superior nutritional value compared to conventional eggs.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="container mx-auto px-8 text-center py-8">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-500">Loading fresh eggs...</span>
+        </div>
+
+        <!-- Eggs Grid -->
+        <div class="container mx-auto px-8 mb-4 text-right">
+            <span id="egg-count" class="text-sm text-gray-600"></span>
+        </div>
+        <section class="container mx-auto px-8 pb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px]" id="egg-grid">
+                <!-- Dynamic eggs will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="load-more-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full transition duration-300">
+                    <i class="fas fa-plus mr-2"></i>Load More Eggs
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-8 h-8 rounded-full">
+                        <h3 class="text-2xl font-bold text-[#7dde83]">HarvestLoop</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Bringing fresh, organic produce from local farms directly to your doorstep. 
+                        Supporting sustainable agriculture and healthy living.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[#7dde83] transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="/consumer-dashboard.html" class="text-gray-400 hover:text-white transition">Categories</a></li>
+                        <li><a href="/about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/fruit.html" class="text-gray-400 hover:text-white transition">Fruits</a></li>
+                        <li><a href="/vegetables.html" class="text-gray-400 hover:text-white transition">Vegetables</a></li>
+                        <li><a href="/grains.html" class="text-gray-400 hover:text-white transition">Grains</a></li>
+                        <li><a href="/dairy.html" class="text-gray-400 hover:text-white transition">Dairy</a></li>
+                        <li><a href="/eggs.html" class="text-gray-400 hover:text-white transition">Eggs</a></li>
+                        <li><a href="/coffee.html" class="text-gray-400 hover:text-white transition">Coffee</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-[#7dde83]"></i>
+                            <span class="text-gray-400">123 Farm Street, Green Valley, GV 12345</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone text-[#7dde83]"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-[#7dde83]"></i>
+                            <span class="text-gray-400">hello@harvestloop.com</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#7dde83]"></i>
+                            <span class="text-gray-400">Mon-Sat: 8AM-8PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 HarvestLoop. All rights reserved.
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #eab308;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .egg-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .egg-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+
+    <!-- Farmer Details Popup -->
+    <div id="farmerModal" 
+        class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 farmer-modal-content">
+            <!-- Close Button -->
+            <button onclick="closeFarmerModal()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <!-- Loading State -->
+            <div id="farmerLoadingState" class="text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                <p class="text-gray-600 mt-2">Loading farmer details...</p>
+            </div>
+            
+            <!-- Farmer Details Content -->
+            <div id="farmerContent" class="hidden p-6">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-green-600 mb-2" id="farmNameTitle">Green Valley Farms</h2>
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span id="farmLocation">Location Loading...</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <p class="text-gray-700 mb-6" id="farmDescription">
+                    A dedicated farm committed to providing fresh, quality produce.
+                </p>
+                
+                <!-- Contact Information Section -->
+                <div id="contactSection" class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+                    
+                    <!-- Hidden contact details (shown after reveal) -->
+                    <div id="contactDetails" class="hidden space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Email:</span>
+                                <span id="farmerEmail" class="ml-2">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-gray-600 mr-3 w-5"></i>
+                            <div>
+                                <span class="font-medium">Phone:</span>
+                                <span id="farmerPhone" class="ml-2">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-gray-600 mr-3 w-5 mt-1"></i>
+                            <div>
+                                <span class="font-medium">Address:</span>
+                                <div class="ml-2">
+                                    <div id="farmerAddress">Loading...</div>
+                                    <div id="farmerCityState">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reveal button (hidden after contact is revealed) -->
+                    <div id="revealButtonContainer" class="text-center">
+                        <button id="revealContactBtn" 
+                                onclick="revealFarmerContact()" 
+                                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center mx-auto">
+                            <i class="fas fa-eye mr-2"></i>
+                            Reveal Contact Info <span class="ml-2 text-green-100">(1 Credit)</span>
+                        </button>
+                        <p class="text-sm text-gray-500 mt-2">Uses 1 credit from your subscription</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="farmerErrorState" class="hidden text-center py-12 px-6">
+                <div class="text-red-500 text-4xl mb-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Unable to Load</h3>
+                <p class="text-gray-600 mb-4">We couldn't fetch the farmer details at this time.</p>
+                <button onclick="closeFarmerModal()" 
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Popup will be created dynamically by JavaScript -->
+
+    <style>
+        /* Farmer modal animations */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .farmer-modal-content {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HarvestLoop Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/signup.js" defer></script>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen font-serif flex flex-col">
+
+  <!-- Top Bar -->
+  <nav class="w-full flex items-center justify-between px-8 py-5">
+     <a href="home.html" class="flex items-center gap-3">
+      <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-10 h-10 rounded-full object-cover border border-[#bfd4bd]" />
+      <span class="text-[#7dde83] font-extrabold text-2xl">HarvestLoop</span>
+     </a>
+    <a href="login.html" class="text-black font-medium inline-block px-3 py-1 rounded hover:bg-amber-500 hover:text-white transition duration-300">Login</a>
+  </nav>
+
+  <main class="flex-grow flex items-center justify-center px-6">
+    <form id="signupForm" class="bg-[#f3f1ea] max-w-xl w-full rounded-xl shadow-2xl p-10 space-y-6">
+      <h2 class="text-center text-2xl font-bold mb-3 text-black">Create an Account</h2>
+      <p class="text-center text-gray-600 mb-6">Join HarvestLoop and connect with your community.</p>
+
+      <!-- Role -->
+      <fieldset class="flex gap-8 items-center mb-4">
+        <legend class="text-sm text-gray-700 mb-1">I am a...</legend>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="role" value="Consumer" class="accent-[#7dde83]" checked />
+          <span class="text-sm text-gray-700">Consumer</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="role" value="Farmer" class="accent-[#7dde83]" />
+          <span class="text-sm text-gray-700">Farmer</span>
+        </label>
+      </fieldset>
+
+      <!-- Full Name and Mobile Number -->
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label for="name" class="block text-sm text-gray-700 mb-1">Full Name</label>
+          <input id="name" name="name" type="text" placeholder="e.g., John Appleseed" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" required />
+          <div id="name-error" class="text-red-500 text-xs mt-1 hidden">Full name should contain only letters and spaces</div>
+        </div>
+        <div>
+          <label for="phone" class="block text-sm text-gray-700 mb-1">Mobile Number</label>
+          <input id="phone" name="phone" type="tel" placeholder="Enter 10-digit mobile number" maxlength="10" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" required />
+          <div id="phone-error" class="text-red-500 text-xs mt-1 hidden">Mobile number must be 10 digits and cannot start with 0</div>
+        </div>
+      </div>
+
+      <!-- Email Address -->
+      <div>
+        <label for="email" class="block text-sm text-gray-700 mb-1">Email Address</label>
+        <input id="email" name="email" type="email" placeholder="name@example.com" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" required />
+        <div id="email-error" class="text-red-500 text-xs mt-1 hidden">Please enter a valid email address</div>
+      </div>
+
+      <!-- Password and Confirm -->
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label for="password" class="block text-sm text-gray-700 mb-1">Password</label>
+          <input id="password" name="password" type="password" placeholder="Create a strong password" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" required />
+          <div id="password-error" class="text-red-500 text-xs mt-1 hidden">Password requirements not met</div>
+          <div id="password-strength" class="text-xs mt-1 hidden">
+            <div class="text-gray-600">Password must contain:</div>
+            <ul class="text-xs mt-1 space-y-1">
+              <li id="length-check" class="text-red-500">• At least 8 characters</li>
+              <li id="uppercase-check" class="text-red-500">• One uppercase letter</li>
+              <li id="lowercase-check" class="text-red-500">• One lowercase letter</li>
+              <li id="number-check" class="text-red-500">• One number</li>
+              <li id="special-check" class="text-red-500">• One special character (!@#$%^&*)</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <label for="confirm-password" class="block text-sm text-gray-700 mb-1">Confirm Password</label>
+          <input id="confirm-password" name="confirm-password" type="password" placeholder="Confirm your password" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" required />
+          <div id="confirm-password-error" class="text-red-500 text-xs mt-1 hidden">Passwords do not match</div>
+        </div>
+      </div>
+
+      
+  <!-- Farm Name -->
+  <!-- Farmer-only fields -->
+<div id="farmer-fields" class="space-y-6">
+
+  <!-- Farm Name -->
+  <div>
+    <label for="farm-name" class="block text-sm text-gray-700 mb-1">Farm Name</label>
+    <input id="farm-name" name="farm-name" type="text" placeholder="e.g., Green Valley Farms"
+      class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" />
+  </div>
+
+  <!-- Farm Address -->
+  <div>
+    <label for="farm-address" class="block text-sm text-gray-700 mb-1">Farm Address</label>
+    <textarea id="farm-address" name="farm-address" rows="3" placeholder="Full address with district/state"
+      class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]"></textarea>
+  </div>
+
+  <!-- Type of Products -->
+  <div>
+    <span class="block text-sm text-gray-700 mb-2">Type of Products</span>
+    <div class="flex flex-wrap gap-x-6 gap-y-3">
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Vegetables</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Fruits</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Grains</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Dairy</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Eggs</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="accent-[#7dde83]" />
+        <span>Coffee</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+
+<!-- Delivery Address -->
+ <!-- Consumer-only fields -->
+<div id="consumer-fields" class="space-y-6">
+  <!-- Delivery Address -->
+  <div>
+    <label for="delivery-address" class="block text-sm text-gray-700 mb-1">Delivery Address</label>
+    <textarea id="delivery-address" name="delivery-address" rows="3" placeholder="Full address with district/state"
+      class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]"></textarea>
+  </div>
+
+  <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label for="pincode" class="block text-sm text-gray-700 mb-1">PIN Code</label>
+          <input id="pincode" name="pincode" type="text" placeholder="Enter 6-digit PIN code" maxlength="6" class="w-full rounded-md border border-gray-300 bg-[#f3f1ea] px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83]" />
+          <div id="pincode-error" class="text-red-500 text-xs mt-1 hidden">PIN code must be exactly 6 digits</div>
+        </div>
+      </div>
+
+  <!-- I'm interested in (optional) -->
+  <div>
+    <span class="block text-sm text-gray-700 mb-2">I'm interested in (optional)</span>
+    <div class="flex flex-wrap gap-x-6 gap-y-3">
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Vegetables</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Fruits</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Grains</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Dairy</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Eggs</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+        <input type="checkbox" class="interest-checkbox accent-[#7dde83]" />
+        <span>Coffee</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+
+      <!-- Terms checkbox -->
+      <div>
+        <label class="flex items-center gap-2 cursor-pointer text-sm">
+          <input type="checkbox" class="accent-[#7dde83]" required />
+          I agree to the 
+          <a href="terms-services.html" class="text-[#7dde83] underline hover:text-[#65c96d]">
+            Terms of Service
+          </a>
+        </label>
+      </div>
+
+
+      <!-- Submit button -->
+      <button type="submit" class="w-full bg-[#7dde83] hover:bg-[#65c96d] text-[#13622f] font-bold py-3 rounded-md transition">Create Account</button>
+
+      <!-- Login link -->
+      <p class="text-center text-gray-600 text-sm">
+        Already have an account?
+        <a href="login.html" class="text-[#7dde83] underline hover:text-[#65c96d]">Login</a>
+      </p>
+    </form>
+  </main>
+<script>
+  const consumerRadio = document.querySelector('input[value="Consumer"]');
+  const farmerRadio = document.querySelector('input[value="Farmer"]');
+  const farmerFields = document.getElementById('farmer-fields');
+  const consumerFields = document.getElementById('consumer-fields');
+
+  function toggleRoleFields() {
+    if (consumerRadio.checked) {
+      consumerFields.classList.remove('hidden');
+      farmerFields.classList.add('hidden');
+    } else {
+      consumerFields.classList.add('hidden');
+      farmerFields.classList.remove('hidden');
+    }
+  }
+
+  consumerRadio.addEventListener('change', toggleRoleFields);
+  farmerRadio.addEventListener('change', toggleRoleFields);
+  toggleRoleFields(); // Initial call
+
+  // Validation helper functions
+  function showError(fieldId, errorId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(errorId);
+    field.classList.remove('border-gray-300', 'focus:ring-[#7dde83]');
+    field.classList.add('border-red-500', 'focus:ring-red-500');
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+  }
+
+  function hideError(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(errorId);
+    field.classList.remove('border-red-500', 'focus:ring-red-500');
+    field.classList.add('border-gray-300', 'focus:ring-[#7dde83]');
+    errorDiv.classList.add('hidden');
+  }
+
+  function validatePassword(password) {
+    const requirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+
+    // Update visual indicators
+    document.getElementById('length-check').className = requirements.length ? 'text-green-500' : 'text-red-500';
+    document.getElementById('uppercase-check').className = requirements.uppercase ? 'text-green-500' : 'text-red-500';
+    document.getElementById('lowercase-check').className = requirements.lowercase ? 'text-green-500' : 'text-red-500';
+    document.getElementById('number-check').className = requirements.number ? 'text-green-500' : 'text-red-500';
+    document.getElementById('special-check').className = requirements.special ? 'text-green-500' : 'text-red-500';
+
+    return Object.values(requirements).every(req => req);
+  }
+
+  // Real-time validation
+  document.getElementById('name').addEventListener('input', function() {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const trimmedValue = this.value.trim();
+    
+    if (trimmedValue === '') {
+      hideError('name', 'name-error');
+    } else if (!nameRegex.test(trimmedValue)) {
+      showError('name', 'name-error', 'Full name should contain only letters and spaces');
+    } else {
+      hideError('name', 'name-error');
+    }
+  });
+
+  document.getElementById('phone').addEventListener('input', function() {
+    // Remove any non-digit characters
+    let value = this.value.replace(/\D/g, '');
+    
+    // Prevent starting with 0
+    if (value.startsWith('0')) {
+      value = value.substring(1);
+    }
+    
+    // Limit to 10 digits
+    if (value.length > 10) {
+      value = value.substring(0, 10);
+    }
+    
+    // Update the input value
+    this.value = value;
+    
+    // Validate the number
+    if (value.length === 0) {
+      hideError('phone', 'phone-error');
+    } else if (value.length < 10) {
+      showError('phone', 'phone-error', 'Mobile number must be exactly 10 digits');
+    } else if (value.startsWith('0')) {
+      showError('phone', 'phone-error', 'Mobile number cannot start with 0');
+    } else {
+      hideError('phone', 'phone-error');
+    }
+  });
+
+  // Prevent non-digit characters and starting with 0 on keypress
+  document.getElementById('phone').addEventListener('keypress', function(e) {
+    const char = String.fromCharCode(e.which);
+    
+    // Allow only digits
+    if (!/[0-9]/.test(char)) {
+      e.preventDefault();
+      return false;
+    }
+    
+    // Prevent starting with 0
+    if (this.value.length === 0 && char === '0') {
+      e.preventDefault();
+      return false;
+    }
+    
+    // Prevent more than 10 digits
+    if (this.value.length >= 10) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Handle paste events
+  document.getElementById('phone').addEventListener('paste', function(e) {
+    e.preventDefault();
+    let paste = (e.clipboardData || window.clipboardData).getData('text');
+    
+    // Remove non-digits
+    paste = paste.replace(/\D/g, '');
+    
+    // Remove leading zeros
+    paste = paste.replace(/^0+/, '');
+    
+    // Limit to 10 digits
+    if (paste.length > 10) {
+      paste = paste.substring(0, 10);
+    }
+    
+    this.value = paste;
+    
+    // Trigger validation
+    const event = new Event('input', { bubbles: true });
+    this.dispatchEvent(event);
+  });
+
+  document.getElementById('email').addEventListener('input', function() {
+    // More flexible email validation - allows domains like .co, .com, .org, etc.
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (this.value.trim() === '') {
+      hideError('email', 'email-error');
+    } else if (!emailRegex.test(this.value)) {
+      showError('email', 'email-error', 'Please enter a valid email address');
+    } else {
+      hideError('email', 'email-error');
+    }
+  });
+
+  document.getElementById('password').addEventListener('input', function() {
+    const strengthDiv = document.getElementById('password-strength');
+    if (this.value.trim() === '') {
+      hideError('password', 'password-error');
+      strengthDiv.classList.add('hidden');
+    } else {
+      strengthDiv.classList.remove('hidden');
+      const isValid = validatePassword(this.value);
+      if (!isValid) {
+        showError('password', 'password-error', 'Password requirements not met');
+      } else {
+        hideError('password', 'password-error');
+      }
+    }
+    
+    // Also validate confirm password if it has a value
+    const confirmPassword = document.getElementById('confirm-password');
+    if (confirmPassword.value.trim() !== '') {
+      if (this.value !== confirmPassword.value) {
+        showError('confirm-password', 'confirm-password-error', 'Passwords do not match');
+      } else {
+        hideError('confirm-password', 'confirm-password-error');
+      }
+    }
+  });
+
+  document.getElementById('confirm-password').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    if (this.value.trim() === '') {
+      hideError('confirm-password', 'confirm-password-error');
+    } else if (this.value !== password) {
+      showError('confirm-password', 'confirm-password-error', 'Passwords do not match');
+    } else {
+      hideError('confirm-password', 'confirm-password-error');
+    }
+  });
+
+  document.getElementById('pincode').addEventListener('input', function() {
+    // Remove any non-digit characters
+    let value = this.value.replace(/\D/g, '');
+    
+    // Limit to 6 digits
+    if (value.length > 6) {
+      value = value.substring(0, 6);
+    }
+    
+    // Update the input value
+    this.value = value;
+    
+    // Validate the PIN code
+    if (value.length === 0) {
+      hideError('pincode', 'pincode-error');
+    } else if (value.length < 6) {
+      showError('pincode', 'pincode-error', 'PIN code must be exactly 6 digits');
+    } else {
+      hideError('pincode', 'pincode-error');
+    }
+  });
+
+  // Prevent non-digit characters on keypress for PIN code
+  document.getElementById('pincode').addEventListener('keypress', function(e) {
+    const char = String.fromCharCode(e.which);
+    
+    // Allow only digits
+    if (!/[0-9]/.test(char)) {
+      e.preventDefault();
+      return false;
+    }
+    
+    // Prevent more than 6 digits
+    if (this.value.length >= 6) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Handle paste events for PIN code
+  document.getElementById('pincode').addEventListener('paste', function(e) {
+    e.preventDefault();
+    let paste = (e.clipboardData || window.clipboardData).getData('text');
+    
+    // Remove non-digits
+    paste = paste.replace(/\D/g, '');
+    
+    // Limit to 6 digits
+    if (paste.length > 6) {
+      paste = paste.substring(0, 6);
+    }
+    
+    this.value = paste;
+    
+    // Trigger validation
+    const event = new Event('input', { bubbles: true });
+    this.dispatchEvent(event);
+  });
+
+  // ✅ VALIDATION FUNCTION
+  function validateForm(data) {
+    let isValid = true;
+
+    // Full Name: only alphabets + space
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const trimmedName = data.name ? data.name.trim() : '';
+    if (!trimmedName || !nameRegex.test(trimmedName)) {
+      showError('name', 'name-error', 'Full name should contain only letters and spaces');
+      isValid = false;
+    }
+
+    // Phone Number: must be exactly 10 digits and not start with 0
+    const phoneRegex = /^[1-9][0-9]{9}$/;
+    if (!phoneRegex.test(data.phone)) {
+      showError('phone', 'phone-error', 'Mobile number must be exactly 10 digits and cannot start with 0');
+      isValid = false;
+    }
+
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(data.email)) {
+      showError('email', 'email-error', 'Please enter a valid email address');
+      isValid = false;
+    }
+
+    // Password validation
+    if (!validatePassword(data.password)) {
+      showError('password', 'password-error', 'Password requirements not met');
+      isValid = false;
+    }
+
+    // Password confirmation
+    const confirmPassword = document.getElementById("confirm-password").value;
+    if (data.password !== confirmPassword) {
+      showError('confirm-password', 'confirm-password-error', 'Passwords do not match');
+      isValid = false;
+    }
+
+    // PIN Code: must be 6 digits (if consumer and provided)
+    if (data.role === "Consumer" && data.pincode) {
+      const pinRegex = /^[0-9]{6}$/;
+      if (!pinRegex.test(data.pincode)) {
+        showError('pincode', 'pincode-error', 'PIN code must be exactly 6 digits');
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  }
+</script>
+
+
+</body>
+</html>

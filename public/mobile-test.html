@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Connection Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c7744;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4ded80;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #3dc069;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4ded80;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>HarvestLoop Mobile Connection Test</h1>
+        <p>This page helps confirm your mobile device can connect to the server</p>
+    </div>
+
+    <div class="card">
+        <h2>Connection Status</h2>
+        <div id="connectionStatus" class="info">
+            <div class="loader"></div>
+            Testing connection...
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <button onclick="testBasicConnection()">Test Connection</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>API Status</h2>
+        <div id="apiStatus" class="info">
+            <div class="loader"></div>
+            Testing API connection...
+        </div>
+        
+        <div id="apiResponse" class="hidden">
+            <h3>API Response:</h3>
+            <pre id="apiResponseData" style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto;"></pre>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <button onclick="testApiConnection()">Test API Connection</button>
+            <button onclick="testOrdersApi()">Test Orders API</button>
+            <button onclick="testProductsApi()">Test Products API</button>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Device Information</h2>
+        <table>
+            <tr>
+                <th>Device Type</th>
+                <td id="deviceType">Detecting...</td>
+            </tr>
+            <tr>
+                <th>Browser</th>
+                <td id="browserInfo">Detecting...</td>
+            </tr>
+            <tr>
+                <th>Server URL</th>
+                <td id="serverUrl"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Troubleshooting Tips</h2>
+        <ul>
+            <li>Ensure both devices are on the <strong>same WiFi network</strong></li>
+            <li>Check your computer's <strong>firewall settings</strong> and allow Node.js</li>
+            <li>Some public WiFi networks <strong>block device-to-device communication</strong></li>
+            <li>Make sure you're using the complete URL with <strong>http://</strong> prefix</li>
+            <li>If using a VPN on either device, try <strong>disabling it temporarily</strong></li>
+        </ul>
+    </div>
+
+    <script>
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            detectEnvironment();
+            testBasicConnection();
+            testApiConnection();
+        });
+
+        // Detect device and browser information
+        function detectEnvironment() {
+            // Detect device type
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            document.getElementById('deviceType').textContent = isMobile ? 'Mobile Device' : 'Desktop/Laptop';
+            
+            // Detect browser
+            const ua = navigator.userAgent;
+            let browserName = "Unknown";
+            
+            if (ua.indexOf("Firefox") > -1) {
+                browserName = "Firefox";
+            } else if (ua.indexOf("SamsungBrowser") > -1) {
+                browserName = "Samsung Browser";
+            } else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) {
+                browserName = "Opera";
+            } else if (ua.indexOf("Trident") > -1) {
+                browserName = "Internet Explorer";
+            } else if (ua.indexOf("Edge") > -1) {
+                browserName = "Edge";
+            } else if (ua.indexOf("Chrome") > -1) {
+                browserName = "Chrome";
+            } else if (ua.indexOf("Safari") > -1) {
+                browserName = "Safari";
+            }
+            
+            document.getElementById('browserInfo').textContent = browserName;
+            
+            // Show server URL
+            document.getElementById('serverUrl').textContent = window.location.origin;
+        }
+
+        // Basic connection test
+        function testBasicConnection() {
+            const connectionStatus = document.getElementById('connectionStatus');
+            connectionStatus.className = 'info';
+            connectionStatus.innerHTML = '<div class="loader"></div> Testing connection...';
+            
+            fetch('/ping')
+                .then(response => {
+                    if (response.ok) {
+                        connectionStatus.className = 'success';
+                        connectionStatus.innerHTML = '✅ Connected to server successfully!';
+                    } else {
+                        connectionStatus.className = 'error';
+                        connectionStatus.innerHTML = `❌ Server responded with status: ${response.status}`;
+                    }
+                })
+                .catch(error => {
+                    connectionStatus.className = 'error';
+                    connectionStatus.innerHTML = `❌ Connection failed: ${error.message}`;
+                });
+        }
+
+        // API connection test
+        function testApiConnection() {
+            const apiStatus = document.getElementById('apiStatus');
+            const apiResponse = document.getElementById('apiResponse');
+            const apiResponseData = document.getElementById('apiResponseData');
+            
+            apiStatus.className = 'info';
+            apiStatus.innerHTML = '<div class="loader"></div> Testing API connection...';
+            apiResponse.className = 'hidden';
+            
+            fetch('/api/ping')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    apiStatus.className = 'success';
+                    apiStatus.innerHTML = '✅ API connection successful!';
+                    
+                    apiResponseData.textContent = JSON.stringify(data, null, 2);
+                    apiResponse.className = '';
+                })
+                .catch(error => {
+                    apiStatus.className = 'error';
+                    apiStatus.innerHTML = `❌ API connection failed: ${error.message}`;
+                });
+        }
+        
+        // Test orders API
+        function testOrdersApi() {
+            const apiStatus = document.getElementById('apiStatus');
+            const apiResponse = document.getElementById('apiResponse');
+            const apiResponseData = document.getElementById('apiResponseData');
+            
+            apiStatus.className = 'info';
+            apiStatus.innerHTML = '<div class="loader"></div> Testing Orders API...';
+            apiResponse.className = 'hidden';
+            
+            // Create a demo token for authentication
+            const demoToken = 'demo-token';
+            
+            fetch('/api/orders/my-orders?role=farmer', {
+                headers: {
+                    'Authorization': `Bearer ${demoToken}`
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    apiStatus.className = 'success';
+                    apiStatus.innerHTML = '✅ Orders API connection successful!';
+                    
+                    apiResponseData.textContent = JSON.stringify(data, null, 2);
+                    apiResponse.className = '';
+                })
+                .catch(error => {
+                    apiStatus.className = 'error';
+                    apiStatus.innerHTML = `❌ Orders API connection failed: ${error.message}`;
+                    
+                    apiResponseData.textContent = `Error: ${error.message}\n\nThis may happen if you're not using the complete-mobile-server.js script.`;
+                    apiResponse.className = '';
+                });
+        }
+        
+        // Test products API
+        function testProductsApi() {
+            const apiStatus = document.getElementById('apiStatus');
+            const apiResponse = document.getElementById('apiResponse');
+            const apiResponseData = document.getElementById('apiResponseData');
+            
+            apiStatus.className = 'info';
+            apiStatus.innerHTML = '<div class="loader"></div> Testing Products API...';
+            apiResponse.className = 'hidden';
+            
+            fetch('/api/products')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    apiStatus.className = 'success';
+                    apiStatus.innerHTML = '✅ Products API connection successful!';
+                    
+                    apiResponseData.textContent = JSON.stringify(data, null, 2);
+                    apiResponse.className = '';
+                })
+                .catch(error => {
+                    apiStatus.className = 'error';
+                    apiStatus.innerHTML = `❌ Products API connection failed: ${error.message}`;
+                    
+                    apiResponseData.textContent = `Error: ${error.message}\n\nThis may happen if you're not using the complete-mobile-server.js script.`;
+                    apiResponse.className = '';
+                });
+        }
+    </script>
+</body>
+</html>

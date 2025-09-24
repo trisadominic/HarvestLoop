@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>HarvestLoop - Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        mark {
+            background-color: #ffeb3b;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        .action-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%; 
+            right: 0;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+            z-index: 100;
+            border: 1px solid #e5e7eb;
+            transform: translateY(5px); 
+        }
+        .dropdown-visible {
+            display: block;
+        }
+        .action-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .action-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f8f6ef] text-gray-800 font-serif min-h-screen">
+
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/farmer-dashboard.html">
+                <img
+                    src="/assets/Logo.png"
+                    alt="Website Logo"
+                    class="w-10 h-10 rounded-full object-cover"
+                />
+                HarvestLoop
+            </a>
+
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="/farmer-dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+
+                <a href="/farmer-product.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-seedling mr-3"></i> Products
+                </a>
+
+                <a href="/farmer-order.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-file-alt mr-3"></i> Orders
+                </a>
+            </div>
+
+            <div class="flex items-center space-x-4 z-10">
+
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                        <a href="/farmer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                        </a>
+                        <a href="/farmer-dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-th mr-3 w-4"></i> Dashboard
+                        </a>
+                        <a href="/farmer-order.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-file-alt mr-3 w-4"></i> Orders
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-8 pt-28 pb-10">
+        <section class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-[#608d58]">Your Products</h1>
+                    <p class="text-sm text-gray-600">Manage your product listings and inventory.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearAndOpenAddProductModal()"
+                        class="bg-[#608d58] hover:bg-green-700 text-white px-4 py-2.5 rounded-lg flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Products
+                    </button>
+                </div>
+
+                <!-- Add Product Modal -->
+                <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+                    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-base font-semibold text-gray-900">Add New Product</h2>
+                            <button onclick="closeAddProductModal()" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Fill in the details below to add a new product.
+                        </p>
+
+                        <form id="addProductForm">
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Type of Product</label>
+                                <div class="grid grid-cols-3 gap-1 text-sm">
+                                    <label class="flex items-center"><input type="radio" name="category" value="Vegetables" class="mr-1" required> Vegetable</label>
+                                    <label class="flex items-center"><input type="radio" name="category" value="Fruits" class="mr-1" required> Fruit</label>
+                                    <label class="flex items-center"><input type="radio" name="category" value="Grains" class="mr-1" required> Grains</label>
+                                    <label class="flex items-center"><input type="radio" name="category" value="Dairy" class="mr-1" required> Dairy</label>
+                                    <label class="flex items-center"><input type="radio" name="category" value="Eggs" class="mr-1" required> Eggs</label>
+                                    <label class="flex items-center"><input type="radio" name="category" value="Coffee" class="mr-1" required> Coffee</label>
+                                </div>
+                                <div id="categoryError" class="text-red-500 text-xs mt-1 hidden">Please select a product category</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                                <input
+                                    id="productNameInput"
+                                    type="text"
+                                    pattern="^[a-zA-Z\s]+$"
+                                    title="Product name should contain only letters and spaces"
+                                    placeholder="e.g., Organic Gala Apples"
+                                    required
+                                    class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                />
+                                <div id="productNameError" class="text-red-500 text-xs mt-1 hidden">Product name should contain only letters and spaces</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Product Description</label>
+                                <textarea
+                                    id="productDescriptionInput"
+                                    rows="3"
+                                    placeholder="Crisp and juicy organic gala apples, fresh from the orchard."
+                                    required
+                                    minlength="10"
+                                    maxlength="500"
+                                    title="Product description should be between 10-500 characters"
+                                    class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                ></textarea>
+                                <div id="productDescriptionError" class="text-red-500 text-xs mt-1 hidden">Description must be between 10-500 characters</div>
+                                <div class="text-gray-500 text-xs mt-1">Character count: <span id="descriptionCount">0</span>/500</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                                <input
+                                    id="productImageInput"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif"
+                                    title="Only JPEG, PNG, and GIF image formats are allowed"
+                                    class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                />
+                                <div id="productImageError" class="text-red-500 text-xs mt-1 hidden">Please select a valid image file (JPEG, PNG, GIF)</div>
+                                <div class="text-gray-500 text-xs mt-1">Accepted formats: JPEG, PNG, GIF (Max 5MB)</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Price (₹)</label>
+                                <input
+                                    id="currentPriceInput"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    max="999999"
+                                    placeholder="0.00"
+                                    required
+                                    title="Please enter a valid price (numbers and decimals only)"
+                                    class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                />
+                                <div id="currentPriceError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid price (minimum ₹0.01)</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                                <div class="flex gap-1">
+                                    <input
+                                        id="stockInput"
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        max="999999"
+                                        placeholder="0.00"
+                                        required
+                                        title="Please enter a valid stock quantity (numbers only)"
+                                        class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                    />
+                                    <select
+                                        id="stockUnit"
+                                        required
+                                        class="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                    >
+                                        <option value="kg">kg</option>
+                                        <option value="g">g</option>
+                                        <option value="piece">piece</option>
+                                        <option value="dozen">dozen</option>
+                                        <option value="liter">liter</option>
+                                        <option value="ml">ml</option>
+                                        <option value="box">box</option>
+                                        <option value="pack">pack</option>
+                                    </select>
+                                </div>
+                                <div id="stockError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid stock quantity (minimum 0.01)</div>
+                            </div>
+
+
+                            <div class="mb-4">
+                                <button
+                                    id="priceSuggestButton"
+                                    type="button"
+                                    class="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                                >
+                                    <span>🤖</span> Get AI Price Suggestion
+                                </button>
+                                <div id="aiSuggestionResult" class="mt-2 hidden">
+                                    <div class="bg-green-50 border border-green-200 rounded-md p-2">
+                                        <p class="text-xs text-green-800">
+                                            <span class="font-medium">✓ Price updated:</span>
+                                            ₹<span id="suggestedPriceValue">0.00</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    AI analyzes market data for optimal pricing
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onclick="closeAddProductModal()"
+                                    class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                                >
+                                    Add Product
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Edit Product Modal -->
+                <div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+                    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-900">Edit Product</h2>
+                            <button onclick="document.getElementById('editProductModal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+                        </div>
+                        <p class="text-gray-600 mb-6">Update the details for your product.</p>
+
+                        <form id="editProductForm">
+                            <input type="hidden" id="editProductId">
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                                <input
+                                    id="editProductName"
+                                    type="text"
+                                    placeholder="e.g., Organic Apples"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                                />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Product Description</label>
+                                <textarea
+                                    id="editProductDescription"
+                                    rows="3"
+                                    placeholder="Crisp and juicy organic gala apples, fresh from the orchard."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                                ></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Price (₹)</label>
+                                    <input
+                                        id="editProductPrice"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                                    <div class="flex gap-1">
+                                        <input
+                                            id="editProductStock"
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="0"
+                                            class="w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                        />
+                                        <select
+                                            id="editStockUnit"
+                                            class="border border-gray-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring focus:ring-green-400"
+                                        >
+                                            <option value="kg">kg</option>
+                                            <option value="g">g</option>
+                                            <option value="piece">piece</option>
+                                            <option value="dozen">dozen</option>
+                                            <option value="liter">liter</option>
+                                            <option value="ml">ml</option>
+                                            <option value="box">box</option>
+                                            <option value="pack">pack</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-sm font-medium text-gray-700">Market Trends</label>
+                                    </div>
+                                    <p id="marketTrends" class="text-sm text-gray-600">Stable demand, slight increase in organic products</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <button
+                                    id="editPriceSuggestButton"
+                                    type="button"
+                                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                                >
+                                    <i class="fas fa-robot"></i> Use AI to Suggest a Price
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    Our AI will analyze your product info and market trends to recommend an optimal price.
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onclick="document.getElementById('editProductModal').classList.add('hidden')"
+                                    class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-lg shadow-md">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-[#608d58] text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Price</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Stock</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <div id="dropdownContainer" class="fixed inset-0 z-40 pointer-events-none"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 DOM loaded, starting initialization...');
+            
+            // Check authentication immediately
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            console.log('🔑 Auth check - Token:', token ? `Present (${token.substring(0, 20)}...)` : 'Missing');
+            console.log('🔑 Auth check - UserId:', userId ? `Present (${userId})` : 'Missing');
+            
+            // Debug: Show all localStorage contents
+            console.log('📦 LocalStorage contents:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                console.log(`  ${key}: ${value ? value.substring(0, 50) + '...' : 'null'}`);
+            }
+            
+            if (!token) {
+                console.log('❌ No token found, redirecting to login...');
+                alert('Please login first');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const dropdownContainer = document.getElementById('dropdownContainer');
+            let activeDropdown = null;
+            let currentEditProduct = null;
+
+            function createProductRow(product) {
+                if (!product) {
+                    console.error('❌ Product is null or undefined');
+                    return null;
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 relative';
+                
+                // Ensure we have a valid product ID
+                const productId = product._id || product.id;
+                if (!productId) {
+                    console.error('❌ Product missing ID:', product);
+                    return null;
+                }
+                
+                row.setAttribute('data-product-id', productId);
+                console.log('✅ Creating row with product ID:', productId);
+
+                const statusText = (product.quantity > 0) ? 'In Stock' : 'Out of Stock';
+                const statusColor = (product.quantity > 0) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                
+                // Format price to 2 decimal places
+                const formattedPrice = parseFloat(product.price || 0).toFixed(2);
+                const formattedQuantity = parseFloat(product.quantity || 0).toFixed(2);
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium">${product.name || 'Unknown Product'}</td>
+                    <td class="px-6 py-4"><span class="${statusColor} text-xs px-2 py-1 rounded-full">${statusText}</span></td>
+                    <td class="px-6 py-4">₹${formattedPrice}</td>
+                    <td class="px-6 py-4">${formattedQuantity}</td>
+                    <td class="px-6 py-4 text-left relative">
+                        <button class="action-btn text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </td>
+                `;
+                return row;
+            }
+
+            function createDropdownMenu(productId) {
+                const dropdown = document.createElement('div');
+                dropdown.className = 'action-dropdown pointer-events-auto';
+                dropdown.innerHTML = `
+                    <div class="px-4 py-2 border-b font-semibold text-gray-700">Actions</div>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="editProduct('${productId}', event)"><i class="fas fa-edit mr-2"></i>Edit</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="duplicateProduct('${productId}', event)"><i class="fas fa-copy mr-2"></i>Duplicate</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100" onclick="removeProduct('${productId}', event)"><i class="fas fa-trash mr-2"></i>Remove</a>
+                `;
+                return dropdown;
+            }
+
+            async function fetchAndRenderProducts() {
+                console.log('🔍 fetchAndRenderProducts called');
+                const tableBody = document.getElementById('productTableBody');
+                tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading products...</td></tr>';
+                
+                const token = localStorage.getItem('token');
+                console.log('🔑 Token from localStorage:', token ? 'Found' : 'Missing');
+
+                if (!token) {
+                    console.error('❌ Auth token not found in localStorage');
+                    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">User not logged in. <a href="/login.html" class="text-blue-600 underline">Please login first</a>.</td></tr>';
+                    return;
+                }
+
+                try {
+                    console.log('📡 Making request to /api/products/my-products');
+                    console.log('📡 Using token:', token ? `${token.substring(0, 20)}...` : 'null');
+                    
+                    const response = await fetch('/api/products/my-products', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    console.log('📡 Response status:', response.status, response.ok);
+                    console.log('📡 Response headers:', [...response.headers.entries()]);
+                    
+                    // Get response text first to debug what we're actually receiving
+                    const responseText = await response.text();
+                    console.log('📡 Raw response:', responseText.substring(0, 200) + '...');
+                    
+                    if (!response.ok) {
+                        console.error('❌ API Error - Status:', response.status);
+                        console.error('❌ API Error - Response:', responseText);
+                        
+                        if (response.status === 401) {
+                            console.error('❌ Authentication failed - redirecting to login');
+                            localStorage.removeItem('token');
+                            window.location.href = '/login.html';
+                            return;
+                        }
+                        
+                        throw new Error(`HTTP error! status: ${response.status} - ${responseText.substring(0, 100)}`);
+                    }
+                    
+                    // Try to parse as JSON
+                    let products;
+                    try {
+                        products = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('❌ JSON Parse Error:', parseError);
+                        console.error('❌ Response was:', responseText);
+                        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+                    }
+                    
+                    console.log('📦 Fetched products:', products);
+                    console.log('📦 Number of products:', products.length);
+
+                    // Filter only active products
+                    const activeProducts = products.filter(p => p.active === true);
+                    if (activeProducts && activeProducts.length > 0) {
+                        console.log('✅ Rendering', activeProducts.length, 'active products');
+                        tableBody.innerHTML = '';
+                        activeProducts.forEach((product, index) => {
+                            console.log(`📝 Processing product ${index + 1}:`, product);
+                            const row = createProductRow(product);
+                            if (row) {
+                                tableBody.appendChild(row);
+                                console.log(`➕ Added row ${index + 1} for product:`, product.name);
+                            } else {
+                                console.error('❌ Failed to create row for product:', product);
+                            }
+                        });
+                        console.log(`🎉 Successfully rendered ${activeProducts.length} active products`);
+                    } else {
+                        console.log('📭 No active products found');
+                        tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No active products found. Click "Add Products" to add your first product.</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching products:', error);
+                    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Failed to load products: ${error.message}. Please try refreshing the page.</td></tr>`;
+                }
+            }
+
+            // Event listener for dropdown actions
+            document.getElementById('productTableBody').addEventListener('click', function(event) {
+                const clickedBtn = event.target.closest('.action-btn');
+
+                if (clickedBtn) {
+                    event.stopPropagation();
+                    const row = clickedBtn.closest('tr');
+                    const productId = row.getAttribute('data-product-id');
+
+                    // Close any active dropdown
+                    if (activeDropdown) {
+                        activeDropdown.remove();
+                        activeDropdown = null;
+                    }
+
+                    // Create new dropdown and append to the container
+                    const newDropdown = createDropdownMenu(productId);
+                    dropdownContainer.appendChild(newDropdown);
+                    activeDropdown = newDropdown;
+
+                    // Position the dropdown
+                    const rect = clickedBtn.getBoundingClientRect();
+                    newDropdown.style.top = `${rect.bottom + window.scrollY}px`;
+                    newDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    newDropdown.classList.add('dropdown-visible');
+
+                } else if (activeDropdown && !event.target.closest('.action-dropdown')) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+            });
+
+            // Global click handler to close dropdown
+            document.addEventListener('click', function(event) {
+                if (activeDropdown && !event.target.closest('.action-btn') && !event.target.closest('.action-dropdown')) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+            });
+
+            // Close dropdown on scroll
+            window.addEventListener('scroll', function() {
+                if (activeDropdown) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+            });
+
+            // Edit Product Function
+            async function editProduct(productId, event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Close dropdown
+                if (activeDropdown) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/products/my-products', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const products = await response.json();
+                    
+                    if (response.ok) {
+                        const product = products.find(p => p._id === productId);
+                        if (product) {
+                            // Fill the edit form with product data
+                            document.getElementById('editProductId').value = product._id;
+                            document.getElementById('editProductName').value = product.name;
+                            document.getElementById('editProductDescription').value = product.description || 'High quality fresh produce';
+                            document.getElementById('editProductPrice').value = product.price;
+                            document.getElementById('editProductStock').value = product.quantity;
+                            document.getElementById('editStockUnit').value = product.stockUnit || 'kg';
+                            
+                            currentEditProduct = product;
+                            
+                            // Show the edit modal
+                            document.getElementById('editProductModal').classList.remove('hidden');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching product details:', error);
+                    alert('Failed to load product details for editing.');
+                }
+            }
+
+            // Remove Product Function
+            async function removeProduct(productId, event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log('Attempting to remove product with ID:', productId);
+
+                const confirmRemove = confirm('Are you sure you want to remove this product? This action cannot be undone.');
+                if (!confirmRemove) {
+                    return;
+                }
+
+                // Close dropdown
+                if (activeDropdown) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+
+                // Find the row before making API call
+                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                console.log('Found row to remove:', row);
+
+                if (!row) {
+                    console.error('Row not found with product ID:', productId);
+                    alert('Error: Could not find the product row to remove.');
+                    return;
+                }
+
+                try {
+                    console.log('Making DELETE request to:', `/api/products/${productId}`);
+                    
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/products/${productId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+
+                    // Check if response has content before trying to parse JSON
+                    let result = {};
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        result = await response.json();
+                    } else {
+                        const textResult = await response.text();
+                        console.log('Non-JSON response:', textResult);
+                        result = { message: textResult || 'Product removed successfully' };
+                    }
+
+                    console.log('API response:', result);
+
+                    if (response.ok) {
+                        // Remove the row from UI immediately
+                        console.log('Removing row from UI');
+                        row.style.transition = 'opacity 0.3s ease';
+                        row.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            row.remove();
+                            console.log('Row removed from DOM');
+                            
+                            // Check if there are no more rows
+                            const remainingRows = document.querySelectorAll('#productTableBody tr[data-product-id]');
+                            if (remainingRows.length === 0) {
+                                const tableBody = document.getElementById('productTableBody');
+                                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No products found.</td></tr>`;
+                            }
+                        }, 300);
+
+                        // Show success message
+                        alert(result.message || 'Product removed successfully!');
+                        
+                    } else {
+                        console.error('Failed to remove product:', result);
+                        alert(`Error: ${result.message || result.error || 'Failed to remove product'}`);
+                    }
+                } catch (error) {
+                    console.error('Error removing product:', error);
+                    alert('Failed to remove product. Please check your network connection and try again.');
+                }
+            }
+
+            // Duplicate Product Function
+            async function duplicateProduct(productId, event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Close dropdown
+                if (activeDropdown) {
+                    activeDropdown.remove();
+                    activeDropdown = null;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/products/my-products', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const products = await response.json();
+                    
+                    if (response.ok) {
+                        const product = products.find(p => p._id === productId);
+                        if (product) {
+                            // Fill the add form with duplicated product data
+                            document.getElementById('productNameInput').value = `${product.name} (Copy)`;
+                            document.getElementById('currentPriceInput').value = product.price;
+                            document.getElementById('stockInput').value = product.quantity;
+                            document.getElementById('stockUnit').value = product.stockUnit || 'kg';
+                            
+                            // Show the add product modal
+                            document.getElementById('addProductModal').classList.remove('hidden');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error duplicating product:', error);
+                    alert('Failed to duplicate product.');
+                }
+            }
+
+            // Make functions globally available
+            window.editProduct = editProduct;
+            window.removeProduct = removeProduct;
+            window.duplicateProduct = duplicateProduct;
+
+            // Function to clear form and open add product modal
+            function clearAndOpenAddProductModal() {
+                // Clear all form fields
+                document.getElementById('addProductForm').reset();
+                
+                // Clear any AI suggestion results
+                document.getElementById('aiSuggestionResult').classList.add('hidden');
+                
+                // Clear all input fields explicitly (in case reset doesn't work for all)
+                document.getElementById('productNameInput').value = '';
+                document.getElementById('productDescriptionInput').value = '';
+                document.getElementById('currentPriceInput').value = '';
+                document.getElementById('stockInput').value = '';
+                document.getElementById('stockUnit').value = 'kg';
+                
+                // Clear file input
+                document.getElementById('productImageInput').value = '';
+                
+                // Clear radio button selections
+                const radioButtons = document.querySelectorAll('input[name="category"]');
+                radioButtons.forEach(radio => radio.checked = false);
+                
+                // Clear all error messages and reset field styles
+                clearAllValidationErrors();
+                
+                // Show the modal
+                document.getElementById('addProductModal').classList.remove('hidden');
+            }
+            
+            // Function to close and clear add product modal
+            function closeAddProductModal() {
+                // Hide the modal
+                document.getElementById('addProductModal').classList.add('hidden');
+                
+                // Clear all form fields
+                document.getElementById('addProductForm').reset();
+                
+                // Clear any AI suggestion results
+                document.getElementById('aiSuggestionResult').classList.add('hidden');
+                
+                // Clear all input fields explicitly
+                document.getElementById('productNameInput').value = '';
+                document.getElementById('productDescriptionInput').value = '';
+                document.getElementById('currentPriceInput').value = '';
+                document.getElementById('stockInput').value = '';
+                document.getElementById('stockUnit').value = 'kg';
+                
+                // Clear file input
+                document.getElementById('productImageInput').value = '';
+                
+                // Clear radio button selections
+                const radioButtons = document.querySelectorAll('input[name="category"]');
+                radioButtons.forEach(radio => radio.checked = false);
+                
+                // Clear all error messages and reset field styles
+                clearAllValidationErrors();
+            }
+            
+            // Function to clear all validation errors
+            function clearAllValidationErrors() {
+                // Hide all error messages
+                const errorElements = ['productNameError', 'productDescriptionError', 'categoryError', 'currentPriceError', 'stockError', 'productImageError'];
+                errorElements.forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                
+                // Reset all input field styles
+                const inputElements = ['productNameInput', 'productDescriptionInput', 'currentPriceInput', 'stockInput', 'productImageInput'];
+                inputElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    element.classList.remove('border-red-500');
+                    element.classList.add('border-gray-300');
+                });
+                
+                // Reset character count
+                document.getElementById('descriptionCount').textContent = '0';
+            }
+            
+            // Make the functions globally available
+            window.clearAndOpenAddProductModal = clearAndOpenAddProductModal;
+            window.closeAddProductModal = closeAddProductModal;
+
+            // Validation Functions
+            function validateProductName(name) {
+                const namePattern = /^[a-zA-Z\s]+$/;
+                const isValid = namePattern.test(name) && name.trim().length >= 2;
+                const errorElement = document.getElementById('productNameError');
+                const inputElement = document.getElementById('productNameInput');
+                
+                if (!isValid) {
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            function validateDescription(description) {
+                const isValid = description.length >= 10 && description.length <= 500;
+                const errorElement = document.getElementById('productDescriptionError');
+                const inputElement = document.getElementById('productDescriptionInput');
+                const countElement = document.getElementById('descriptionCount');
+                
+                // Update character count
+                countElement.textContent = description.length;
+                
+                if (!isValid) {
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            function validateCategory() {
+                const categoryElement = document.querySelector('input[name="category"]:checked');
+                const errorElement = document.getElementById('categoryError');
+                
+                if (!categoryElement) {
+                    errorElement.classList.remove('hidden');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    return true;
+                }
+            }
+
+            function validatePrice(price) {
+                const inputElement = document.getElementById('currentPriceInput');
+                const inputValue = inputElement.value.trim();
+                
+                // If field is empty, don't show error (only show error on form submit)
+                if (inputValue === '') {
+                    const errorElement = document.getElementById('currentPriceError');
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return false; // Not valid but don't show error
+                }
+                
+                const numPrice = parseFloat(inputValue);
+                const isValid = !isNaN(numPrice) && numPrice >= 0.01 && numPrice <= 999999;
+                const errorElement = document.getElementById('currentPriceError');
+                
+                if (!isValid) {
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            function validateStock(stock) {
+                const inputElement = document.getElementById('stockInput');
+                const inputValue = inputElement.value.trim();
+                
+                // If field is empty, don't show error (only show error on form submit)
+                if (inputValue === '') {
+                    const errorElement = document.getElementById('stockError');
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return false; // Not valid but don't show error
+                }
+                
+                const numStock = parseFloat(inputValue);
+                const isValid = !isNaN(numStock) && numStock >= 0.01 && numStock <= 999999;
+                const errorElement = document.getElementById('stockError');
+                
+                if (!isValid) {
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            // Special validation functions for form submission (shows errors for empty fields too)
+            function validatePriceForSubmit() {
+                const inputElement = document.getElementById('currentPriceInput');
+                const inputValue = inputElement.value.trim();
+                const errorElement = document.getElementById('currentPriceError');
+                
+                if (inputValue === '') {
+                    errorElement.textContent = 'Price is required';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                }
+                
+                const numPrice = parseFloat(inputValue);
+                const isValid = !isNaN(numPrice) && numPrice >= 0.01 && numPrice <= 999999;
+                
+                if (!isValid) {
+                    errorElement.textContent = 'Please enter a valid price (minimum ₹0.01)';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            function validateStockForSubmit() {
+                const inputElement = document.getElementById('stockInput');
+                const inputValue = inputElement.value.trim();
+                const errorElement = document.getElementById('stockError');
+                
+                if (inputValue === '') {
+                    errorElement.textContent = 'Stock quantity is required';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                }
+                
+                const numStock = parseFloat(inputValue);
+                const isValid = !isNaN(numStock) && numStock >= 0.01 && numStock <= 999999;
+                
+                if (!isValid) {
+                    errorElement.textContent = 'Please enter a valid stock quantity (minimum 0.01)';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            function validateImageFile(fileInput) {
+                const file = fileInput.files[0];
+                const errorElement = document.getElementById('productImageError');
+                const inputElement = document.getElementById('productImageInput');
+                
+                // If no file selected, it's optional
+                if (!file) {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+                
+                // Check file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                const isValidType = allowedTypes.includes(file.type);
+                
+                // Check file size (5MB limit)
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                const isValidSize = file.size <= maxSize;
+                
+                if (!isValidType) {
+                    errorElement.textContent = 'Please select a valid image file (JPEG, PNG, GIF)';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else if (!isValidSize) {
+                    errorElement.textContent = 'Image file size must be less than 5MB';
+                    errorElement.classList.remove('hidden');
+                    inputElement.classList.add('border-red-500');
+                    inputElement.classList.remove('border-gray-300');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    inputElement.classList.remove('border-red-500');
+                    inputElement.classList.add('border-gray-300');
+                    return true;
+                }
+            }
+
+            // Add real-time validation event listeners
+            document.getElementById('productNameInput').addEventListener('input', function() {
+                validateProductName(this.value);
+            });
+
+            document.getElementById('productDescriptionInput').addEventListener('input', function() {
+                validateDescription(this.value);
+            });
+
+            // Add category validation listeners
+            document.querySelectorAll('input[name="category"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    validateCategory();
+                });
+            });
+
+            document.getElementById('currentPriceInput').addEventListener('input', function() {
+                validatePrice();
+            });
+
+            document.getElementById('stockInput').addEventListener('input', function() {
+                validateStock();
+            });
+
+            document.getElementById('productImageInput').addEventListener('change', function() {
+                validateImageFile(this);
+            });
+
+            // Add Product Form Submission
+            document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                // Get form values
+                const productName = document.getElementById('productNameInput').value.trim();
+                const productDescription = document.getElementById('productDescriptionInput').value.trim();
+                const productPrice = parseFloat(document.getElementById('currentPriceInput').value);
+                const productStock = parseFloat(document.getElementById('stockInput').value);
+                const categoryElement = document.querySelector('input[name="category"]:checked');
+                const fileInput = document.getElementById('productImageInput');
+                const file = fileInput.files[0];
+
+                // Comprehensive Validation
+                let isFormValid = true;
+
+                // Validate product name
+                if (!validateProductName(productName)) {
+                    isFormValid = false;
+                }
+
+                // Validate product description
+                if (!validateDescription(productDescription)) {
+                    isFormValid = false;
+                }
+
+                // Validate category selection
+                if (!validateCategory()) {
+                    isFormValid = false;
+                }
+
+                // Validate price
+                if (!validatePriceForSubmit()) {
+                    isFormValid = false;
+                }
+
+                // Validate stock
+                if (!validateStockForSubmit()) {
+                    isFormValid = false;
+                }
+
+                // Validate image file
+                if (!validateImageFile(fileInput)) {
+                    isFormValid = false;
+                }
+
+                // Stop submission if any validation fails
+                if (!isFormValid) {
+                    alert('Please fix the validation errors before submitting.');
+                    return;
+                }
+
+                try {
+                    let imageUrl = '';
+                    
+                    // Upload image if provided
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        
+                        const uploadResponse = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            const uploadResult = await uploadResponse.json();
+                            imageUrl = uploadResult.imageUrl;
+                        } else {
+                            alert('Failed to upload image. Continuing without image.');
+                        }
+                    }
+
+                    // Add product
+                    const token = localStorage.getItem('token');
+                    const stockUnit = document.getElementById('stockUnit').value;
+                    
+                    const productData = {
+                        name: productName,
+                        category: categoryElement.value,
+                        price: productPrice,
+                        quantity: productStock,
+                        unit: stockUnit, // Changed from stockUnit to unit to match model
+                        location: 'Not specified', // Default location since field is removed
+                        description: productDescription,
+                        imageUrl: imageUrl
+                    };
+
+                    const response = await fetch('/api/products', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(productData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        // Show success message
+                        const successMessage = document.createElement('div');
+                        successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                        successMessage.textContent = 'Product added successfully!';
+                        document.body.appendChild(successMessage);
+                        
+                        // Remove success message after 3 seconds
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 3000);
+                        
+                        console.log('✅ Product added successfully:', result);
+                        document.getElementById('addProductModal').classList.add('hidden');
+                        
+                        // Reset form
+                        document.getElementById('addProductForm').reset();
+                        document.getElementById('aiSuggestionResult').classList.add('hidden');
+                        
+                        // Refresh product list
+                        await fetchAndRenderProducts();
+                    } else {
+                        console.error('❌ Failed to add product:', result);
+                        alert(`Error: ${result.message || 'Failed to add product'}`);
+                    }
+                } catch (error) {
+                    console.error('Error adding product:', error);
+                    alert('Failed to add product. Please check your network connection.');
+                }
+            });
+
+
+
+
+            // Edit Product Form Submission
+            const editProductForm = document.getElementById('editProductForm');
+            editProductForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const productId = document.getElementById('editProductId').value;
+                const productName = document.getElementById('editProductName').value.trim();
+                const productDescription = document.getElementById('editProductDescription').value.trim();
+                const productPrice = parseFloat(document.getElementById('editProductPrice').value);
+                const productStock = parseFloat(document.getElementById('editProductStock').value);
+                const stockUnit = document.getElementById('editStockUnit').value;
+
+                if (!productName) {
+                    alert('Please enter a product name.');
+                    return;
+                }
+
+                if (isNaN(productPrice) || productPrice <= 0) {
+                    alert('Please enter a valid price greater than 0.');
+                    return;
+                }
+
+                if (isNaN(productStock) || productStock < 0) {
+                    alert('Please enter a valid stock quantity (0 or greater).');
+                    return;
+                }
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/products/${productId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            name: productName,
+                            description: productDescription,
+                            price: productPrice,
+                            quantity: productStock,
+                            unit: stockUnit // Changed from stockUnit to unit to match model
+                        }),
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert(result.message || 'Product updated successfully!');
+                        document.getElementById('editProductModal').classList.add('hidden');
+                        
+                        // Refresh product list
+                        await fetchAndRenderProducts();
+                    } else {
+                        alert(`Error: ${result.message || 'Failed to update product'}`);
+                    }
+                } catch (error) {
+                    console.error('Error updating product:', error);
+                    alert('Failed to update product. Please check your network connection.');
+                }
+            });
+
+            // AI Price Suggestion for Add Product
+            const priceSuggestButton = document.getElementById('priceSuggestButton');
+            priceSuggestButton.addEventListener('click', async function() {
+                const productName = document.getElementById('productNameInput').value.trim();
+                if (!productName) {
+                    alert('Please enter a product name first.');
+                    return;
+                }
+
+                // Show loading state
+                const originalText = priceSuggestButton.innerHTML;
+                priceSuggestButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting suggestion...';
+                priceSuggestButton.disabled = true;
+
+                try {
+                    const response = await fetch('/api/price-suggestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productName })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        const suggestedPrice = result.suggested_price.toFixed(2);
+                        
+                        // Ask user if they want to use the suggested price
+                        const usePrice = confirm(`🤖 AI suggests a price of ₹${suggestedPrice} for ${productName}\n\nWould you like to use this suggested price?\n\nClick OK to use this price, or Cancel to keep your current price.`);
+                        
+                        if (usePrice) {
+                            document.getElementById('suggestedPriceValue').textContent = suggestedPrice;
+                            document.getElementById('currentPriceInput').value = suggestedPrice;
+                            document.getElementById('aiSuggestionResult').classList.remove('hidden');
+                            
+                            // Highlight the price input to show it's been updated
+                            const priceInput = document.getElementById('currentPriceInput');
+                            priceInput.classList.add('bg-green-50');
+                            setTimeout(() => {
+                                priceInput.classList.remove('bg-green-50');
+                            }, 1500);
+                        } else {
+                            // User cancelled, just show the suggestion without applying it
+                            document.getElementById('suggestedPriceValue').textContent = suggestedPrice;
+                            document.getElementById('aiSuggestionResult').classList.remove('hidden');
+                        }
+                    } else {
+                        // Show user-friendly message if available, otherwise use a default
+                        const userMessage = result.userMessage || result.error || 'Our AI assistant is currently unavailable. Please set your price manually based on local market rates.';
+                        alert(userMessage);
+                        
+                        // Optionally suggest a fallback price if provided
+                        if (result.fallback_price) {
+                            const useApproximate = confirm(`Would you like to use an approximate price of ₹${result.fallback_price} as a starting point?`);
+                            if (useApproximate) {
+                                document.getElementById('currentPriceInput').value = result.fallback_price;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching price suggestion:', error);
+                    alert('🌐 Connection issue! Please check your internet connection and try again, or set the price manually.');
+                } finally {
+                    // Reset button state
+                    priceSuggestButton.innerHTML = originalText;
+                    priceSuggestButton.disabled = false;
+                }
+            });
+
+            // AI Price Suggestion for Edit Product
+            const editPriceSuggestButton = document.getElementById('editPriceSuggestButton');
+            editPriceSuggestButton.addEventListener('click', async function() {
+                const productName = document.getElementById('editProductName').value.trim();
+                if (!productName) {
+                    alert('Please enter a product name first.');
+                    return;
+                }
+
+                // Show loading state
+                const originalText = editPriceSuggestButton.innerHTML;
+                editPriceSuggestButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting suggestion...';
+                editPriceSuggestButton.disabled = true;
+
+                try {
+                    const response = await fetch('/api/price-suggestion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productName })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        const suggestedPrice = result.suggested_price.toFixed(2);
+                        
+                        // Ask user if they want to use the suggested price
+                        const usePrice = confirm(`🤖 AI suggests a price of ₹${suggestedPrice} for ${productName}\n\nWould you like to use this suggested price?\n\nClick OK to use this price, or Cancel to keep your current price.`);
+                        
+                        if (usePrice) {
+                            document.getElementById('editProductPrice').value = suggestedPrice;
+                            
+                            // Highlight the price input to show it's been updated
+                            const priceInput = document.getElementById('editProductPrice');
+                            priceInput.classList.add('bg-green-50');
+                            setTimeout(() => {
+                                priceInput.classList.remove('bg-green-50');
+                            }, 1500);
+                        }
+                        // If user cancels, nothing happens - keeps current price
+                    } else {
+                        // Show user-friendly message if available, otherwise use a default
+                        const userMessage = result.userMessage || result.error || 'Our AI assistant is currently unavailable. Please set your price manually based on local market rates.';
+                        alert(userMessage);
+                        
+                        // Optionally suggest a fallback price if provided
+                        if (result.fallback_price) {
+                            const useApproximate = confirm(`Would you like to use an approximate price of ₹${result.fallback_price} as a starting point?`);
+                            if (useApproximate) {
+                                document.getElementById('editProductPrice').value = result.fallback_price;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching price suggestion:', error);
+                    alert('🌐 Connection issue! Please check your internet connection and try again, or set the price manually.');
+                } finally {
+                    // Reset button state
+                    editPriceSuggestButton.innerHTML = originalText;
+                    editPriceSuggestButton.disabled = false;
+                }
+            });
+
+            // Initialize products on page load
+            console.log('🚀 About to call fetchAndRenderProducts...');
+            fetchAndRenderProducts();
+        });
+
+        // Debug function to test token and API
+        // Debug function to check token status
+        function checkTokenStatus() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            console.log('🔍 Token status:');
+            console.log('  - Token exists:', !!token);
+            console.log('  - Token preview:', token ? token.substring(0, 30) + '...' : 'None');
+            console.log('  - User data:', user ? JSON.parse(user) : 'None');
+            
+            if (token) {
+                alert(`Token found! You are logged in.\nToken preview: ${token.substring(0, 30)}...`);
+            } else {
+                alert('No token found. You need to log in first.');
+            }
+        }
+
+        // Function to go to login page
+        function goToLogin() {
+            window.location.href = '/login.html';
+        }
+
+        async function debugTokenAndAPI() {
+            console.log('🔍 Starting API debug...');
+            
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            
+            console.log('Token:', token);
+            console.log('User ID:', userId);
+            
+            if (!token) {
+                alert('No token found! Please login again.');
+                return;
+            }
+            
+            try {
+                console.log('Testing API call...');
+                const response = await fetch('/api/products/my-products', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
+                
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    alert(`API Success! Found ${data.length} products`);
+                } else {
+                    alert(`API Error: ${response.status} - ${responseText}`);
+                }
+            } catch (error) {
+                console.error('Debug error:', error);
+                alert(`Debug Error: ${error.message}`);
+            }
+        }
+
+        // Profile dropdown functionality
+        const profileBtn = document.getElementById("profileBtn");
+        const profileMenu = document.getElementById("profileMenu");
+        // Profile dropdown functions
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!profileButton || !profileDropdown) {
+                console.log('Profile elements not found');
+                return;
+            }
+            
+            // Toggle dropdown on button click
+            profileButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout function
+        function handleLogout() {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear localStorage
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                
+                // Redirect to login page
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Initialize profile dropdown on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupProfileDropdown();
+        });
+
+        const profileContainer = document.getElementById("profileContainer");
+    </script>
+</body>
+</html>
+        
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HarvestLoop Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+  <!-- Top Bar -->
+  <nav class="w-full flex items-center justify-between px-8 py-5">
+    <a href="home.html" class="flex items-center gap-3">
+      <!-- Logo in a larger circle -->
+      <img src="/assets/Logo.png"
+          alt="HarvestLoop Logo"
+          class="w-10 h-10 rounded-full object-cover border border-[#bfd4bd]" />
+      <span class="text-[#7dde83] font-extrabold text-2xl">HarvestLoop</span>
+    </a>
+    <a href="signup.html"
+       class="bg-[#7dde83] hover:bg-[#65c96d] text-[#13622f] font-semibold px-6 py-2 text-sm rounded transition">
+      Sign Up
+    </a>
+  </nav>
+
+  <!-- Centered Login Form -->
+  <main class="flex flex-1 items-center justify-center px-4">
+    <div class="bg-[#f3f1ea] shadow-2xl rounded-xl px-8 py-10 w-full max-w-md">
+      <h2 class="text-center text-2xl font-bold mb-3 text-black">Welcome Back</h2>
+      <p class="text-center text-gray-500 mb-8">Enter your credentials to access your account.</p>
+
+      <form id="loginForm">
+        <!-- Email -->
+        <div class="mb-5">
+          <label class="block text-sm text-gray-700 mb-2" for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="name@example.com"
+            class="w-full bg-[#f3f1ea] focus:bg-[#f3f1ea] border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83] transition"
+            required
+          />
+        </div>
+        <!-- Password -->
+        <div class="mb-1">
+          <label class="block text-sm text-gray-700 mb-2" for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder=""
+            class="w-full bg-[#f3f1ea] focus:bg-[#f3f1ea] border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83] transition"
+            required
+          />
+        </div>
+        <!-- OTP (hidden by default) -->
+        <div id="otpSection" class="mb-4" style="display:none;">
+          <label class="block text-sm text-gray-700 mb-2" for="otp">Enter OTP</label>
+          <input
+            type="text"
+            id="otp"
+            name="otp"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            class="w-full bg-[#f3f1ea] border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83] transition"
+            placeholder="6-digit OTP"
+            autocomplete="one-time-code"
+          />
+        </div>
+        <!-- Forgot Password -->
+        <div class="mb-4 text-right -mt-1">
+          <a href="forget-password.html" class="text-xs text-[#7dde83] underline hover:text-[#65c96d]">Forgot your password?</a>
+        </div>
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          id="loginBtn"
+          class="w-full bg-[#7dde83] hover:bg-[#65c96d] text-[#13622f] font-bold py-3 rounded-md transition"
+        >
+          Login
+        </button>
+      </form>
+
+      <!-- Sign up Link -->
+      <div class="text-center mt-6 text-gray-500 text-sm">
+        Don’t have an account?
+        <a href="signup.html" class="text-[#7dde83] underline hover:text-[#65c96d]">Sign up</a>
+      </div>
+    </div>
+  </main>
+  <script>
+  const form = document.getElementById('loginForm');
+  const otpSection = document.getElementById('otpSection');
+  const loginBtn = document.getElementById('loginBtn');
+  let farmerUserId = null;
+  let farmerEmail = '';
+  let farmerPassword = '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // If OTP section is visible, verify OTP
+    if (otpSection.style.display !== 'none') {
+      const otp = form.otp.value.trim();
+      if (!otp || otp.length !== 6) {
+        alert('Please enter the 6-digit OTP sent to your mobile.');
+        return;
+      }
+      try {
+        const verifyRes = await fetch('/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: farmerUserId, otp })
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyRes.ok && verifyData.success) {
+          localStorage.setItem('userId', farmerUserId);
+          localStorage.setItem('token', verifyData.token);
+          localStorage.setItem('userRole', 'Farmer');
+          localStorage.setItem('user', JSON.stringify(verifyData.user));
+          window.location.href = 'farmer-dashboard.html';
+        } else {
+          alert(verifyData.message || 'OTP verification failed');
+        }
+      } catch (err) {
+        alert('OTP verification failed');
+        console.error(err);
+      }
+      return;
+    }
+
+    // Otherwise, normal login
+    const email = form.email.value;
+    const password = form.password.value;
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // Farmer: show OTP input
+        if (data.role === 'Farmer') {
+          farmerUserId = data.userId;
+          farmerEmail = email;
+          farmerPassword = password;
+          otpSection.style.display = '';
+          loginBtn.textContent = 'Verify OTP';
+          alert('OTP sent to your registered email. Please enter it below.');
+        } else if (data.role === 'Consumer') {
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userRole', data.role);
+            window.location.href = '/consumer-dashboard.html';
+          } else {
+            alert(data.message || 'Login failed');
+          }
+        } else {
+          alert('Unknown role');
+        }
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert('Login failed');
+      console.error(error);
+    }
+  });
+</script>
+
+</body>
+</html>
