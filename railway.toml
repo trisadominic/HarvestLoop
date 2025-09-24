@@ -1,6 +1,11 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm install --build-from-source"
+buildCommand = """
+apt-get update && \
+apt-get install -y python3 make g++ && \
+npm ci && \
+npm rebuild bcrypt --build-from-source
+"""
 
 [deploy]
 startCommand = "npm start"
