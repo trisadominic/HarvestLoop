@@ -7,7 +7,8 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "build": "echo 'No build step needed for static HTML/JS/CSS'",
-    "deploy": "your-deploy-command"
+    "deploy": "your-deploy-command",
+    "postinstall": "npm rebuild bcrypt --build-from-source"
   },
   "keywords": [
     "agriculture",

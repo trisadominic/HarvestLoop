@@ -224,6 +224,14 @@ app.get('/api/health/email', async (req, res) => {
     }
 });
 
+// Add health check route
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Catch-all route (move this to the end!)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'home.html'));
