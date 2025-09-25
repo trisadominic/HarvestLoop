@@ -224,10 +224,11 @@ app.get('/api/health/email', async (req, res) => {
     }
 });
 
-// Add health check endpoint
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
+    uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
 });
