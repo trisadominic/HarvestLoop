@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "echo 'Skip build process'"
+  },
+  "deploy": {
+    "startCommand": "node app.js",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckTimeout": 60
+  }
+}

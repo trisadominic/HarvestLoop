@@ -6,3 +6,6 @@ nixpacksConfigPath = "nixpacks.toml"
 startCommand = "npm start"
 healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
+
+[build]
+command = "your-build-command"

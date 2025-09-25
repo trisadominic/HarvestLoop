@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "build": "echo 'No build step needed'",
+    "build": "echo 'Build completed successfully'",
     "postinstall": "npm install bcryptjs --save --no-fund"
   },
   "dependencies": {
