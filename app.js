@@ -224,7 +224,7 @@ app.get('/api/health/email', async (req, res) => {
     }
 });
 
-// Add health check route
+// Add health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',

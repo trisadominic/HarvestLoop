@@ -1,13 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = """
-apt-get update && \
-apt-get install -y python3 make g++ && \
-npm ci && \
-npm rebuild bcrypt --build-from-source
-"""
+nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
+numReplicas = 1
