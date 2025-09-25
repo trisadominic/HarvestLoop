@@ -242,97 +242,68 @@ app.get('*', (req, res) => {
 
 // Login route
 app.post('/login', async (req, res) => {
-    try {
-        // console.log('🔐 Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
-        
-        const { email, password } = req.body;
-        
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required' });
-        }
-
-        // Find user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
-
-        // Handle both hashed and plain text passwords for backward compatibility
-        let passwordMatch = false;
-        
-        if (user.password.startsWith('$2b$')) {
-            // Password is hashed with bcrypt
-            passwordMatch = await bcrypt.compare(password, user.password);
-        } else {
-            // Password is stored as plain text (legacy)
-            passwordMatch = user.password === password;
-        }
-        
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
-
-        // console.log('✅ Login successful for user:', user.email, 'Role:', user.role);
-
-        // For farmers, send OTP via email and require verification
-        if (user.role === 'Farmer') {
-            try {
-                // Generate OTP
-                const otp = Math.floor(100000 + Math.random() * 900000).toString();
-                
-                // Store OTP temporarily (5 minutes expiry)
-                global.otpStore = global.otpStore || new Map();
-                global.otpStore.set(user._id.toString(), {
-                    otp,
-                    expiry: Date.now() + 5 * 60 * 1000,
-                    attempts: 0
-                });
-
-                // Send OTP via email
-                const emailSent = await sendOTPEmail(user.email, otp, user.username);
-                
-                if (!emailSent) {
-                    // Fallback: log OTP to console if email fails
-                    console.log(`📧 OTP for farmer ${user.email}: ${otp} (Email failed, using console)`);
-                }
-                
-                // Return response indicating OTP sent
-                return res.json({
-                    message: emailSent ? 'OTP sent to your email' : 'OTP generated (check console - email service unavailable)',
-                    role: user.role,
-                    userId: user._id.toString(),
-                    requiresOTP: true
-                });
-            } catch (error) {
-                console.error('❌ OTP generation error:', error);
-                return res.status(500).json({ message: 'Failed to send OTP' });
-            }
-        }
-
-        // For consumers, direct login
-        const token = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        res.json({
-            message: 'Login successful',
-            role: user.role,
-            userId: user._id.toString(),
-            token, // <-- add this
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                phone: user.phone
-            }
-        });
-    } catch (error) {
-        console.error('❌ Login Error:', error);
-        res.status(500).json({ message: 'Login failed', error: error.message });
+  try {
+    const { email, password } = req.body;
+    
+    console.log(`🔐 Login attempt: ${email}`);
+    
+    // Step 1: Find user (case-insensitive)
+    const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+    
+    // Step 2: Check if user exists
+    if (!user) {
+      console.log(`❌ User not found: ${email}`);
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
+    
+    console.log(`👤 User found: ${user.email} (ID: ${user._id})`);
+    
+    // Step 3: Get the stored password hash
+    const hashedPassword = user.password;
+    if (!hashedPassword) {
+      console.log(`❌ No password set for user: ${email}`);
+      return res.status(401).json({ message: 'Account setup incomplete' });
+    }
+    
+    // Step 4: Compare passwords using bcryptjs
+    const bcrypt = require('bcryptjs');
+    console.log(`🔄 Comparing passwords...`);
+    
+    // Log the first few chars of the hash for debugging (never log full passwords)
+    console.log(`📝 Stored password hash starts with: ${hashedPassword.substring(0, 10)}...`);
+    
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    
+    // Step 5: Handle authentication result
+    if (!isMatch) {
+      console.log(`❌ Password mismatch for user: ${email}`);
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    
+    console.log(`✅ Password verified for: ${email}`);
+    
+    // Step 6: Generate JWT token
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+    
+    // Step 7: Send success response
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      userId: user._id,
+      email: user.email,
+      username: user.username,
+      role: user.role
+    });
+    
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    res.status(500).json({ message: 'Server error during login' });
+  }
 });
 
 // OTP Verification route for farmers
@@ -741,3 +712,25 @@ startServer();
 
 // Export the app for use in other files (like mobile-server.js)
 module.exports = app;
+
+// Add this temporary debugging route (remove in production)
+app.get('/api/debug/check-user/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+    // Find user without returning password
+    const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } })
+      .select('email username role _id');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ 
+      message: 'User found',
+      user: user
+    });
+  } catch (error) {
+    console.error('Debug route error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
