@@ -28,7 +28,11 @@ class EmailService {
                     clientSecret: process.env.GMAIL_CLIENT_SECRET,
                     refreshToken: process.env.GMAIL_REFRESH_TOKEN,
                     accessToken: accessToken.token
-                }
+                },
+                // Add connection timeout settings
+                connectionTimeout: 10000, // 10 seconds
+                greetingTimeout: 5000,    // 5 seconds
+                socketTimeout: 10000      // 10 seconds
             });
         } catch (error) {
             console.error('Failed to create transport:', error);

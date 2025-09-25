@@ -565,23 +565,20 @@ let dbConnection;
 
 const connectDB = async () => {
   try {
-    // Use the environment variable MONGODB_URI
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/project';
     console.log('🔄 Connecting to MongoDB...');
-    
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/harvestloop';
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    
     console.log('✅ Connected to MongoDB successfully');
   } catch (error) {
     console.log('🔌 MongoDB connection failed');
     console.error('❌ MongoDB connection error:', error);
-    // Don't exit the process immediately, retry connection
-    console.log('🔄 Will retry connection in 5 seconds...');
-    setTimeout(connectDB, 5000);
+    // Don't exit the process, allow retries
+    return false;
   }
+  return true;
 };
 
 mongoose.connection.on('error', (err) => {
