@@ -7,6 +7,7 @@ class EmailService {
       console.error('❌ SENDGRID_API_KEY environment variable not set');
     } else {
       sgMail.setApiKey(apiKey);
+      console.log('✅ SendGrid initialized successfully');
     }
   }
 
@@ -16,7 +17,7 @@ class EmailService {
       
       const msg = {
         to,
-        from: process.env.FROM_EMAIL || 'dominictrisa@gmail.com', // Use your verified sender
+        from: process.env.FROM_EMAIL || 'dominictrisa@gmail.com', // Your verified sender
         subject,
         html,
       };
