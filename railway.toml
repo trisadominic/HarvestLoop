@@ -1,9 +1,8 @@
 [build]
 builder = "nixpacks"
-nixpacksConfigPath = "nixpacks.toml"
+buildCommand = "npm ci --omit=dev"
 
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
-numReplicas = 1
