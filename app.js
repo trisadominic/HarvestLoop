@@ -225,11 +225,31 @@ app.get('/api/health/email', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
+app.get('/health', async (req, res) => {
+  // Check database connection
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  
+  // Basic email service check (doesn't actually send email)
+  let emailStatus = 'unknown';
+  try {
+    const emailService = require('./services/emailService');
+    await emailService.createTransport();
+    emailStatus = 'configured';
+  } catch (error) {
+    emailStatus = 'error';
+    console.error('Health check - Email error:', error.message);
+  }
+  
+  const isHealthy = dbStatus === 'connected';
+  
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'healthy' : 'unhealthy',
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    services: {
+      database: dbStatus,
+      email: emailStatus
+    }
   });
 });
 
