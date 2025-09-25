@@ -1,63 +1,34 @@
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const OAuth2 = google.auth.OAuth2;
+const sgMail = require('@sendgrid/mail');
 
 class EmailService {
   constructor() {
-    this.oauth2Client = new OAuth2(
-      process.env.GMAIL_CLIENT_ID,
-      process.env.GMAIL_CLIENT_SECRET,
-      'https://developers.google.com/oauthplayground' // Use OAuth playground instead of your callback
-    );
-
-    this.oauth2Client.setCredentials({
-      refresh_token: process.env.GMAIL_REFRESH_TOKEN
-    });
-  }
-
-  async createTransport() {
-    try {
-      const accessToken = await this.oauth2Client.getAccessToken();
-      
-      return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // Use SSL
-        auth: {
-          type: 'OAuth2',
-          user: process.env.EMAIL_USER,
-          clientId: process.env.GMAIL_CLIENT_ID,
-          clientSecret: process.env.GMAIL_CLIENT_SECRET,
-          refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-          accessToken: accessToken?.token || ''
-        },
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,   // 10 seconds
-        socketTimeout: 15000      // 15 seconds
-      });
-    } catch (error) {
-      console.error('❌ Failed to create email transport:', error);
-      throw error;
+    const apiKey = process.env.SENDGRID_API_KEY;
+    if (!apiKey) {
+      console.error('❌ SENDGRID_API_KEY environment variable not set');
+    } else {
+      sgMail.setApiKey(apiKey);
     }
   }
 
   async sendEmail(to, subject, html) {
     try {
-      console.log('📧 Attempting to send email...');
-      const transporter = await this.createTransport();
+      console.log('📧 Sending email via SendGrid to:', to);
       
-      const mailOptions = {
-        from: `HarvestLoop <${process.env.EMAIL_USER}>`,
+      const msg = {
         to,
+        from: process.env.FROM_EMAIL || 'dominictrisa@gmail.com', // Use your verified sender
         subject,
-        html
+        html,
       };
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log('✅ Email sent successfully:', info.messageId);
+      
+      const response = await sgMail.send(msg);
+      console.log('✅ Email sent successfully via SendGrid:', response[0].statusCode);
       return true;
     } catch (error) {
-      console.error('❌ Failed to send email:', error);
+      console.error('❌ SendGrid email sending failed:', error.message);
+      if (error.response) {
+        console.error('SendGrid error details:', error.response.body);
+      }
       return false;
     }
   }
