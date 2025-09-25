@@ -25,25 +25,8 @@ const Notification = require('./models/Notification');
 
 const app = express();
 
-// Update the email configuration
-const emailConfig = {
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 5000,   // 5 seconds
-    socketTimeout: 10000,    // 10 seconds
-    debug: true,            // Enable debug logs
-    logger: true            // Enable logging
-};
-
-// Create transporter with retry logic
-const transporter = emailService.createTransport(emailConfig);
+// No need to create a transporter with SendGrid
+// emailService is already initialized and ready to use
 
 // Add connection monitoring
 transporter.verify((error, success) => {
