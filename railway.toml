@@ -3,9 +3,6 @@ builder = "nixpacks"
 nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "node app.js"
 healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
-
-[build]
-command = "your-build-command"

@@ -2,8 +2,10 @@
 nixPkgs = ["nodejs", "npm"]
 
 [phases.install]
-cmds = ["npm ci --omit=dev"]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
 
 [start]
-cmd = "npm start"
-watchPatterns = ["app.js", "routes/**/*.js"]
+cmd = "node app.js"
