@@ -28,18 +28,18 @@ const app = express();
 // No need to create a transporter with SendGrid
 // emailService is already initialized and ready to use
 
-// Add connection monitoring
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('❌ Email verification failed:', {
-            error: error.message,
-            code: error.code,
-            command: error.command
-        });
+// Verify SendGrid connection
+emailService.verifyConnection()
+  .then(success => {
+    if (success) {
+      console.log('✅ Notification system working');
     } else {
-        console.log('✅ Email server connection verified');
+      console.error('❌ Email service verification failed');
     }
-});
+  })
+  .catch(error => {
+    console.error('❌ Email verification error:', error);
+  });
 
 // Function to send OTP email
 async function sendOTPEmail(email, otp, username) {
