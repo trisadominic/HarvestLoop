@@ -215,8 +215,8 @@ app.get('/health', async (req, res) => {
   let emailStatus = 'unknown';
   try {
     const emailService = require('./services/emailService');
-    await emailService.createTransport();
-    emailStatus = 'configured';
+    const isConfigured = await emailService.verifyConnection();
+    emailStatus = isConfigured ? 'configured' : 'error';
   } catch (error) {
     emailStatus = 'error';
     console.error('Health check - Email error:', error.message);
