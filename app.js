@@ -8,7 +8,6 @@ const multer = require('multer');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 const { execFile } = require('child_process');
 const jwt = require('jsonwebtoken');
 const emailService = require('./services/emailService');
@@ -44,7 +43,7 @@ const emailConfig = {
 };
 
 // Create transporter with retry logic
-const transporter = nodemailer.createTransport(emailConfig);
+const transporter = emailService.createTransport(emailConfig);
 
 // Add connection monitoring
 transporter.verify((error, success) => {
