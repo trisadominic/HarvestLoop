@@ -1,8 +1,0 @@
-[build]
-builder = "nixpacks"
-nixpacksConfigPath = "nixpacks.toml"
-
-[deploy]
-startCommand = "node app.js"
-healthcheckPath = "/health"
-restartPolicyType = "ON_FAILURE"
