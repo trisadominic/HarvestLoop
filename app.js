@@ -734,3 +734,88 @@ app.get('/api/debug/check-user/:email', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Store OTPs temporarily in memory (replace with Redis in production)
+const otpStore = new Map();
+
+// Generate and send OTP
+app.post('/api/send-otp', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    
+    if (!phone) {
+      return res.status(400).json({ message: 'Phone number is required' });
+    }
+    
+    console.log(`📱 OTP request for phone: ${phone}`);
+    
+    // Generate OTP
+    const smsService = require('./services/smsService');
+    const otp = smsService.mockOtp(phone); // Use mockOtp for debugging
+    
+    // Store OTP with 5-minute expiry
+    otpStore.set(phone, {
+      code: otp,
+      expires: Date.now() + 5 * 60 * 1000 // 5 minutes
+    });
+    
+    // In production, send SMS
+    // await smsService.sendSms(phone, `Your HarvestLoop verification code is: ${otp}`);
+    
+    console.log(`✅ OTP generated and stored for: ${phone}`);
+    
+    // Log the OTP for testing (remove in production)
+    console.log(`🔐 OTP for ${phone}: ${otp}`);
+    
+    res.status(200).json({ 
+      message: 'OTP sent successfully', 
+      // For development only - remove in production!
+      testOtp: otp
+    });
+  } catch (error) {
+    console.error('❌ OTP generation error:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
+});
+
+// Verify OTP
+app.post('/api/verify-otp', (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    
+    console.log(`🔐 Verifying OTP for phone: ${phone}`);
+    
+    if (!phone || !otp) {
+      return res.status(400).json({ message: 'Phone number and OTP are required' });
+    }
+    
+    const storedData = otpStore.get(phone);
+    
+    // Check if OTP exists and is valid
+    if (!storedData) {
+      console.log(`❌ No OTP found for phone: ${phone}`);
+      return res.status(400).json({ message: 'OTP not found or expired' });
+    }
+    
+    if (Date.now() > storedData.expires) {
+      console.log(`❌ OTP expired for phone: ${phone}`);
+      otpStore.delete(phone); // Clean up expired OTP
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+    
+    // Verify OTP
+    if (storedData.code !== otp) {
+      console.log(`❌ Invalid OTP for phone: ${phone}`);
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+    
+    // OTP verified successfully
+    console.log(`✅ OTP verified successfully for phone: ${phone}`);
+    otpStore.delete(phone); // Clean up used OTP
+    
+    res.status(200).json({ message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('❌ OTP verification error:', error);
+    res.status(500).json({ message: 'Failed to verify OTP' });
+  }
+});
