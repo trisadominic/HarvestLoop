@@ -713,6 +713,10 @@ startServer();
 // Export the app for use in other files (like mobile-server.js)
 module.exports = app;
 
+// Add this near the top of your app.js file
+// Simple in-memory OTP store (replace with Redis in production)
+global.otpStore = {};
+
 // Add this temporary debugging route (remove in production)
 app.get('/api/debug/check-user/:email', async (req, res) => {
   try {
@@ -741,81 +745,86 @@ const otpStore = new Map();
 // Generate and send OTP
 app.post('/api/send-otp', async (req, res) => {
   try {
-    const { phone } = req.body;
+    const { phone, email, method } = req.body;
     
-    if (!phone) {
-      return res.status(400).json({ message: 'Phone number is required' });
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store OTP with 10-minute expiry
+    const otpData = {
+      code: otp,
+      expires: Date.now() + 10 * 60 * 1000, // 10 minutes
+      verified: false
+    };
+    
+    // Store by phone or email depending on method
+    if (method === 'sms' && phone) {
+      console.log(`📱 Generating SMS OTP for ${phone}: ${otp}`);
+      // Store in database or memory
+      // In production, send actual SMS
+      // For now, we'll send the OTP in response for testing
+    } else if (method === 'email' && email) {
+      console.log(`📧 Generating email OTP for ${email}: ${otp}`);
+      // In production, send actual email
+      // For now, we'll send the OTP in response for testing
+    } else {
+      return res.status(400).json({ 
+        message: 'Invalid verification method or missing contact information' 
+      });
     }
     
-    console.log(`📱 OTP request for phone: ${phone}`);
+    // Store OTP in database or memory store
+    // This is simplified - use a proper store in production
+    if (phone) global.otpStore = { ...global.otpStore, [phone]: otpData };
+    if (email) global.otpStore = { ...global.otpStore, [email]: otpData };
     
-    // Generate OTP
-    const smsService = require('./services/smsService');
-    const otp = smsService.mockOtp(phone); // Use mockOtp for debugging
-    
-    // Store OTP with 5-minute expiry
-    otpStore.set(phone, {
-      code: otp,
-      expires: Date.now() + 5 * 60 * 1000 // 5 minutes
+    // IMPORTANT: In development mode, return the OTP
+    // In production, remove this or limit to specific environments
+    return res.status(200).json({ 
+      success: true, 
+      message: 'OTP generated successfully',
+      debugMode: true,
+      testOtp: otp // Remove this line in production
     });
     
-    // In production, send SMS
-    // await smsService.sendSms(phone, `Your HarvestLoop verification code is: ${otp}`);
-    
-    console.log(`✅ OTP generated and stored for: ${phone}`);
-    
-    // Log the OTP for testing (remove in production)
-    console.log(`🔐 OTP for ${phone}: ${otp}`);
-    
-    res.status(200).json({ 
-      message: 'OTP sent successfully', 
-      // For development only - remove in production!
-      testOtp: otp
-    });
   } catch (error) {
-    console.error('❌ OTP generation error:', error);
-    res.status(500).json({ message: 'Failed to send OTP' });
+    console.error('OTP Generation Error:', error);
+    return res.status(500).json({ message: 'Failed to generate OTP' });
   }
 });
+
 
 // Verify OTP
 app.post('/api/verify-otp', (req, res) => {
   try {
-    const { phone, otp } = req.body;
+    const { contact, otp } = req.body; // contact can be email or phone
     
-    console.log(`🔐 Verifying OTP for phone: ${phone}`);
-    
-    if (!phone || !otp) {
-      return res.status(400).json({ message: 'Phone number and OTP are required' });
+    if (!contact || !otp) {
+      return res.status(400).json({ message: 'Contact and OTP are required' });
     }
     
-    const storedData = otpStore.get(phone);
+    // Retrieve stored OTP
+    const storedOtp = global.otpStore?.[contact];
     
-    // Check if OTP exists and is valid
-    if (!storedData) {
-      console.log(`❌ No OTP found for phone: ${phone}`);
+    if (!storedOtp) {
       return res.status(400).json({ message: 'OTP not found or expired' });
     }
     
-    if (Date.now() > storedData.expires) {
-      console.log(`❌ OTP expired for phone: ${phone}`);
-      otpStore.delete(phone); // Clean up expired OTP
+    if (Date.now() > storedOtp.expires) {
+      delete global.otpStore[contact];
       return res.status(400).json({ message: 'OTP expired' });
     }
     
-    // Verify OTP
-    if (storedData.code !== otp) {
-      console.log(`❌ Invalid OTP for phone: ${phone}`);
+    if (storedOtp.code !== otp) {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
     
-    // OTP verified successfully
-    console.log(`✅ OTP verified successfully for phone: ${phone}`);
-    otpStore.delete(phone); // Clean up used OTP
+    // Mark as verified
+    storedOtp.verified = true;
     
-    res.status(200).json({ message: 'OTP verified successfully' });
+    return res.status(200).json({ success: true, message: 'OTP verified successfully' });
   } catch (error) {
-    console.error('❌ OTP verification error:', error);
-    res.status(500).json({ message: 'Failed to verify OTP' });
+    console.error('OTP Verification Error:', error);
+    return res.status(500).json({ message: 'Failed to verify OTP' });
   }
 });

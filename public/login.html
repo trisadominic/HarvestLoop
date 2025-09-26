@@ -56,18 +56,16 @@
           />
         </div>
         <!-- OTP (hidden by default) -->
-        <div id="otpSection" class="mb-4" style="display:none;">
-          <label class="block text-sm text-gray-700 mb-2" for="otp">Enter OTP</label>
-          <input
-            type="text"
-            id="otp"
-            name="otp"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            class="w-full bg-[#f3f1ea] border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7dde83] transition"
-            placeholder="6-digit OTP"
-            autocomplete="one-time-code"
-          />
+        <div id="otp-section" class="mb-4" style="display:none; margin-top: 20px;">
+          <div class="form-group">
+            <label for="otp">Enter OTP</label>
+            <input type="text" id="otp" class="form-control" placeholder="6-digit OTP">
+          </div>
+          
+          <!-- This is for debugging only - remove in production -->
+          <div id="test-otp" style="color: green; font-weight: bold; margin: 10px 0; display: none;"></div>
+          
+          <button type="button" onclick="verifyOtp()" class="btn btn-primary">Verify OTP</button>
         </div>
         <!-- Forgot Password -->
         <div class="mb-4 text-right -mt-1">
@@ -92,7 +90,7 @@
   </main>
   <script>
   const form = document.getElementById('loginForm');
-  const otpSection = document.getElementById('otpSection');
+  const otpSection = document.getElementById('otp-section');
   const loginBtn = document.getElementById('loginBtn');
   let farmerUserId = null;
   let farmerEmail = '';
