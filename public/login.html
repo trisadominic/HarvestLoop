@@ -86,6 +86,20 @@
         Don’t have an account?
         <a href="signup.html" class="text-[#7dde83] underline hover:text-[#65c96d]">Sign up</a>
       </div>
+
+      <!-- Add this to your login.html near your OTP input field -->
+      <div id="test-otp-container" style="margin: 20px 0; padding: 10px; background-color: #f8f9fa; border-left: 5px solid #28a745;">
+        <p style="margin: 0;"><strong>Test Mode:</strong> <span id="test-otp-display">Waiting for OTP...</span></p>
+        <small style="color: #6c757d;">This is for testing only. Remove in production.</small>
+      </div>
+
+      <!-- Add this to your login page for testing -->
+      <div id="direct-login" style="margin-top: 30px; padding: 15px; border-top: 1px solid #ddd;">
+        <h4>Developer Testing Options</h4>
+        <button type="button" onclick="bypassOtp()" class="btn btn-warning">
+          Bypass OTP (Testing Only)
+        </button>
+      </div>
     </div>
   </main>
   <script>
@@ -168,6 +182,42 @@
       console.error(error);
     }
   });
+
+  function bypassOtp() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    if (!email || !password) {
+      alert('Please enter email and password');
+      return;
+    }
+    
+    // Directly attempt login without OTP
+    fetch('/api/direct-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Store auth token
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        
+        // Redirect to dashboard
+        window.location.href = '/dashboard.html';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred during login');
+    });
+  }
 </script>
 
 </body>

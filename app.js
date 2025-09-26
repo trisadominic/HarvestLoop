@@ -745,86 +745,138 @@ const otpStore = new Map();
 // Generate and send OTP
 app.post('/api/send-otp', async (req, res) => {
   try {
-    const { phone, email, method } = req.body;
+    const { email, phone } = req.body;
     
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Store OTP with 10-minute expiry
-    const otpData = {
+    // Store OTP in memory store or database
+    // Example with memory store (replace with your actual storage method)
+    const otpStore = global.otpStore = global.otpStore || {};
+    otpStore[email || phone] = {
       code: otp,
-      expires: Date.now() + 10 * 60 * 1000, // 10 minutes
-      verified: false
+      expires: Date.now() + 10 * 60 * 1000 // 10 minutes
     };
     
-    // Store by phone or email depending on method
-    if (method === 'sms' && phone) {
-      console.log(`📱 Generating SMS OTP for ${phone}: ${otp}`);
-      // Store in database or memory
-      // In production, send actual SMS
-      // For now, we'll send the OTP in response for testing
-    } else if (method === 'email' && email) {
-      console.log(`📧 Generating email OTP for ${email}: ${otp}`);
-      // In production, send actual email
-      // For now, we'll send the OTP in response for testing
-    } else {
-      return res.status(400).json({ 
-        message: 'Invalid verification method or missing contact information' 
-      });
+    console.log(`🔐 Generated OTP for ${email || phone}: ${otp}`);
+    
+    // Try sending email - but don't block response on it
+    if (email) {
+      try {
+        const emailService = require('./services/emailService');
+        emailService.sendEmail(
+          email,
+          'Your HarvestLoop OTP Code',
+          `<h2>Your verification code is: ${otp}</h2><p>This code will expire in 10 minutes.</p>`
+        ).catch(err => console.error('Email sending error:', err));
+      } catch (error) {
+        console.error('Failed to send email:', error);
+      }
     }
     
-    // Store OTP in database or memory store
-    // This is simplified - use a proper store in production
-    if (phone) global.otpStore = { ...global.otpStore, [phone]: otpData };
-    if (email) global.otpStore = { ...global.otpStore, [email]: otpData };
-    
-    // IMPORTANT: In development mode, return the OTP
-    // In production, remove this or limit to specific environments
-    return res.status(200).json({ 
-      success: true, 
+    // In production, you would not return the OTP in the response
+    // But for testing purposes, we'll return it
+    res.status(200).json({
+      success: true,
       message: 'OTP generated successfully',
-      debugMode: true,
-      testOtp: otp // Remove this line in production
+      testMode: true,
+      otp: otp // Only for testing - remove in production!
     });
-    
   } catch (error) {
-    console.error('OTP Generation Error:', error);
-    return res.status(500).json({ message: 'Failed to generate OTP' });
+    console.error('OTP generation error:', error);
+    res.status(500).json({ success: false, message: 'Error generating OTP' });
   }
 });
 
-
-// Verify OTP
+// OTP verification endpoint
 app.post('/api/verify-otp', (req, res) => {
   try {
-    const { contact, otp } = req.body; // contact can be email or phone
+    const { email, phone, otp } = req.body;
     
-    if (!contact || !otp) {
-      return res.status(400).json({ message: 'Contact and OTP are required' });
+    // Get OTP from storage
+    const otpStore = global.otpStore || {};
+    const storedOtpData = otpStore[email || phone];
+    
+    if (!storedOtpData) {
+      return res.status(400).json({
+        success: false,
+        message: 'No OTP found for this user'
+      });
     }
     
-    // Retrieve stored OTP
-    const storedOtp = global.otpStore?.[contact];
-    
-    if (!storedOtp) {
-      return res.status(400).json({ message: 'OTP not found or expired' });
+    if (Date.now() > storedOtpData.expires) {
+      delete otpStore[email || phone];
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired'
+      });
     }
     
-    if (Date.now() > storedOtp.expires) {
-      delete global.otpStore[contact];
-      return res.status(400).json({ message: 'OTP expired' });
+    if (storedOtpData.code !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
     }
     
-    if (storedOtp.code !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
+    // OTP verified successfully
+    delete otpStore[email || phone];
     
-    // Mark as verified
-    storedOtp.verified = true;
-    
-    return res.status(200).json({ success: true, message: 'OTP verified successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'OTP verified successfully'
+    });
   } catch (error) {
-    console.error('OTP Verification Error:', error);
-    return res.status(500).json({ message: 'Failed to verify OTP' });
+    console.error('OTP verification error:', error);
+    res.status(500).json({ success: false, message: 'Error verifying OTP' });
+  }
+});
+
+// Add this to your app.js
+app.post('/api/direct-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Check password
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(password, user.password);
+    
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Generate token
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+    
+    console.log(`🔑 Direct login successful for user: ${email}`);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      userId: user._id,
+      role: user.role
+    });
+  } catch (error) {
+    console.error('Direct login error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
