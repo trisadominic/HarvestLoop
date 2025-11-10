@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Access Control - Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">🔒 Subscription Access Control System</h1>
+            
+            <!-- Current User Status -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">📊 Current User Status</h2>
+                <div id="userStatus" class="space-y-2">
+                    <p class="text-gray-600">Loading user subscription status...</p>
+                </div>
+            </div>
+
+            <!-- Test Scenarios -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Deal Creation Test -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-600">🤝 Deal Creation</h3>
+                    <p class="text-sm text-gray-600 mb-4">Test creating a negotiation deal</p>
+                    <button onclick="testDealCreation()" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Test Deal Creation
+                    </button>
+                    <div id="dealResult" class="mt-3 text-sm"></div>
+                </div>
+
+                <!-- Farmer Details Test -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-green-600">👨‍🌾 Farmer Details</h3>
+                    <p class="text-sm text-gray-600 mb-4">Test unlocking farmer contact info</p>
+                    <button onclick="testFarmerUnlock()" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Test Farmer Unlock
+                    </button>
+                    <div id="farmerResult" class="mt-3 text-sm"></div>
+                </div>
+
+                <!-- Purchase Test -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-purple-600">💰 Purchase</h3>
+                    <p class="text-sm text-gray-600 mb-4">Test purchase confirmation</p>
+                    <button onclick="testPurchase()" class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Test Purchase
+                    </button>
+                    <div id="purchaseResult" class="mt-3 text-sm"></div>
+                </div>
+            </div>
+
+            <!-- Access Control Rules -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">📋 Access Control Rules</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-green-600 mb-2">✅ Access Granted When:</h3>
+                        <ul class="list-disc list-inside text-sm space-y-1 text-gray-700">
+                            <li>Active subscription status</li>
+                            <li>Minimum 5 subscription points</li>
+                            <li>Valid authentication token</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-red-600 mb-2">❌ Access Denied When:</h3>
+                        <ul class="list-disc list-inside text-sm space-y-1 text-gray-700">
+                            <li>No active subscription</li>
+                            <li>Less than 5 subscription points</li>
+                            <li>Expired subscription</li>
+                            <li>Invalid/missing authentication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+                <h2 class="text-xl font-semibold mb-4">⚡ Quick Actions</h2>
+                <div class="flex flex-wrap gap-4">
+                    <a href="/subscription.html" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        💳 Upgrade Subscription
+                    </a>
+                    <a href="/consumer-dashboard.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        📊 View Dashboard
+                    </a>
+                    <a href="/vegetables.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        🥬 Browse Products
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user subscription status
+        async function loadUserStatus() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    document.getElementById('userStatus').innerHTML = `
+                        <p class="text-red-600">❌ Not logged in</p>
+                        <a href="/login.html" class="text-blue-500 underline">Login to test subscription features</a>
+                    `;
+                    return;
+                }
+
+                const response = await fetch('/api/subscriptions/my-subscription', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const subscription = await response.json();
+
+                const statusColor = subscription.status === 'active' ? 'text-green-600' : 'text-red-600';
+                const pointsColor = subscription.points >= 5 ? 'text-green-600' : 'text-orange-600';
+                const accessStatus = subscription.status === 'active' && subscription.points >= 5 ? '✅ Full Access' : '❌ Limited Access';
+
+                document.getElementById('userStatus').innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <p><strong>Status:</strong> <span class="${statusColor}">${subscription.status || 'inactive'}</span></p>
+                            <p><strong>Plan:</strong> ${subscription.plan || 'None'}</p>
+                        </div>
+                        <div>
+                            <p><strong>Points:</strong> <span class="${pointsColor}">${subscription.points || 0}</span></p>
+                            <p><strong>Access Level:</strong> ${accessStatus}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('userStatus').innerHTML = `
+                    <p class="text-red-600">❌ Error loading subscription status</p>
+                `;
+            }
+        }
+
+        // Test deal creation
+        async function testDealCreation() {
+            const resultDiv = document.getElementById('dealResult');
+            resultDiv.innerHTML = '<p class="text-blue-500">Testing...</p>';
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/deals', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: '674b1e8e9f15f2c6fab36fd8', // Test product ID
+                        quantity: 1,
+                        proposedPrice: 50,
+                        message: 'Test deal'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.requiresSubscription) {
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ ${data.message}</p><p class="text-xs">Status: ${data.status}, Points: ${data.points}</p>`;
+                } else if (data.success) {
+                    resultDiv.innerHTML = '<p class="text-green-600">✅ Deal created successfully!</p>';
+                } else {
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ ${data.error || data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p class="text-red-600">❌ Network error</p>';
+            }
+        }
+
+        // Test farmer unlock
+        async function testFarmerUnlock() {
+            const resultDiv = document.getElementById('farmerResult');
+            resultDiv.innerHTML = '<p class="text-blue-500">Testing...</p>';
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/subscriptions/unlock-farmer-info/674b1e8e9f15f2c6fab36fd5', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.requiresSubscription) {
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ ${data.message}</p><p class="text-xs">Status: ${data.status}, Points: ${data.points}</p>`;
+                } else if (data.success) {
+                    resultDiv.innerHTML = '<p class="text-green-600">✅ Farmer details unlocked!</p>';
+                } else {
+                    resultDiv.innerHTML = `<p class="text-red-600">❌ ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p class="text-red-600">❌ Network error</p>';
+            }
+        }
+
+        // Test purchase
+        async function testPurchase() {
+            const resultDiv = document.getElementById('purchaseResult');
+            resultDiv.innerHTML = '<p class="text-blue-500">Testing...</p>';
+            
+            // Since we need a valid deal ID for purchase testing, we'll show the expected behavior
+            resultDiv.innerHTML = `
+                <p class="text-blue-600">📝 Purchase testing requires a valid deal ID</p>
+                <p class="text-xs">Expected: Subscription validation before purchase confirmation</p>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadUserStatus);
+    </script>
+</body>
+</html>

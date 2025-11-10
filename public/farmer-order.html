@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - HarvestLoop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f8f6ef] text-gray-800 font-serif min-h-screen">
+
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/farmer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Centered Navigation Menu -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="/farmer-dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+
+                <a href="/farmer-product.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-seedling mr-3"></i> Products
+                </a>
+
+                <a href="/farmer-order.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-shopping-basket mr-3"></i> My Orders
+                </a>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button id="profile-button" class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                        <a href="/farmer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                        </a>
+                        <a href="/farmer-dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-th mr-3 w-4"></i> Dashboard
+                        </a>
+                        <a href="/farmer-product.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-seedling mr-3 w-4"></i> Products
+                        </a>
+                        <a href="/farmer-order.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#logout" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-8 pt-28 pb-10">
+        <!-- Header Section -->
+        <section class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-[#608d58]">My Orders</h1>
+                    <p class="text-sm text-gray-600">Track and manage incoming purchase orders</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Filter Dropdown -->
+                    <select id="statusFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500">
+                        <option value="">All Orders & Deals</option>
+                        <option value="pending">Pending (In Negotiation)</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="purchased">Purchased (Consumer Bought)</option>
+                        <option value="declined">Declined</option>
+                        <option value="cancelled">Cancelled (Rejected During Negotiation)</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                    <!-- Order Count -->
+                    <span id="orderCount" class="text-sm text-gray-500">Loading orders...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-8">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-500">Loading your orders...</span>
+        </div>
+
+        <!-- Orders Section -->
+        <section class="pb-16">
+            <!-- Orders Container -->
+            <div id="orders-container" class="space-y-6">
+                <!-- Orders will be dynamically loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <div class="text-gray-400 text-6xl mb-4">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Orders Found</h3>
+                <p class="text-gray-500 mb-6">You haven't received any orders yet. Keep your products updated to attract customers!</p>
+                <a href="/farmer-product.html" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    <i class="fas fa-seedling mr-2"></i>Manage Products
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b">
+                <h2 class="text-xl font-bold text-gray-900">Order Details</h2>
+                <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div id="orderModalContent" class="p-6">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Loading spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Order card animations */
+        .order-card {
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-accepted {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-purchased {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .status-declined {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .status-expired {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+        }
+
+        /* Make cancelled orders slightly faded */
+        .order-card.cancelled {
+            opacity: 0.75;
+        }
+
+        .order-card.cancelled .order-content {
+            position: relative;
+        }
+
+        .order-card.cancelled .order-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(239, 68, 68, 0.1) 10px,
+                rgba(239, 68, 68, 0.1) 20px
+            );
+            pointer-events: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const userRole = localStorage.getItem('userRole');
+
+            console.log('Auth check - Token:', !!token, 'UserId:', userId, 'UserRole:', userRole);
+
+            if (!token || !userId || (userRole && userRole.toLowerCase() !== 'farmer')) {
+                console.log('Authentication failed, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Initialize page
+            setupProfileDropdown();
+            setupStatusFilter();
+            fetchOrders();
+        });
+
+        let orders = [];
+
+        // Status description helper function
+        function getStatusDescription(status) {
+            const statusDescriptions = {
+                'pending': 'In Negotiation - Waiting for farmer or consumer action',
+                'purchased': 'Successfully Purchased - Consumer bought the product',
+                'cancelled': 'Cancelled - Order rejected or cancelled during negotiation',
+                'accepted': 'Accepted by Farmer',
+                'declined': 'Declined by Farmer',
+                'expired': 'Deal Expired'
+            };
+            return statusDescriptions[status] || status;
+        }
+
+        // Fetch orders from API
+        async function fetchOrders(statusFilter = '') {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const loadingState = document.getElementById('loading-state');
+            const ordersContainer = document.getElementById('orders-container');
+            const emptyState = document.getElementById('empty-state');
+            const orderCount = document.getElementById('orderCount');
+
+            if (!token) {
+                console.log('No token found, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                // Show loading state
+                loadingState.classList.remove('hidden');
+                ordersContainer.classList.add('hidden');
+                emptyState.classList.add('hidden');
+
+                // Build API URL with status filter
+                let apiUrl = '/api/orders/my-orders?role=farmer';
+                if (statusFilter) {
+                    apiUrl += `&status=${statusFilter}`;
+                }
+
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.log('Token invalid, redirecting to login');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('userRole');
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                orders = await response.json();
+                console.log('Orders received:', orders);
+
+                // Hide loading state
+                loadingState.classList.add('hidden');
+
+                // Update order count
+                const filterText = statusFilter ? ` (${statusFilter})` : '';
+                orderCount.textContent = `${orders.length} order${orders.length !== 1 ? 's' : ''} found${filterText}`;
+
+                if (orders.length === 0) {
+                    // Show empty state
+                    emptyState.classList.remove('hidden');
+                } else {
+                    // Show orders
+                    displayOrders(orders);
+                    ordersContainer.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                
+                // Hide loading state
+                loadingState.classList.add('hidden');
+                
+                // Show error message
+                ordersContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-red-500 text-4xl mb-4">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Error Loading Orders</h3>
+                        <p class="text-gray-600 mb-4">Unable to fetch your orders. Please try again.</p>
+                        <button onclick="fetchOrders()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-redo mr-2"></i>Retry
+                        </button>
+                    </div>
+                `;
+                ordersContainer.classList.remove('hidden');
+            }
+        }
+
+        // Display orders in the UI
+        function displayOrders(orders) {
+            const container = document.getElementById('orders-container');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => createOrderCard(order)).join('');
+        }
+
+        // Create individual order card HTML
+        function createOrderCard(order) {
+            const statusClass = `status-${order.status}`;
+            const statusIcon = getStatusIcon(order.status);
+            const orderDate = new Date(order.createdAt).toLocaleDateString();
+            const orderTime = new Date(order.createdAt).toLocaleTimeString();
+            
+            // Determine if this is a deal or regular order
+            const isDeal = order.type === 'deal';
+            
+            // Get product info
+            const productName = order.productId?.name || order.productId?.product_name || 'Unknown Product';
+            const productImage = order.productId?.imageUrl || '/assets/default-product.jpg';
+            
+            // Get consumer info
+            const consumerName = order.consumerId?.username || order.consumer || 'Unknown Customer';
+            
+            // Price display for deals
+            const priceDisplay = isDeal ? 
+                (order.proposedPrice && order.originalPrice && order.proposedPrice !== order.originalPrice ? 
+                    `<p class="text-lg font-semibold text-green-600">₹${order.price} <span class="text-sm line-through text-gray-400">₹${order.originalPrice}</span></p>` :
+                    `<p class="text-lg font-semibold text-gray-900">₹${order.price}</p>`) :
+                `<p class="text-lg font-semibold text-gray-900">₹${order.price}</p>`;
+            
+            return `
+                <div class="order-card ${order.status === 'cancelled' || order.status === 'declined' ? 'cancelled' : ''} bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showOrderDetails('${order._id}')">
+                    <div class="p-6 order-content">
+                        <!-- Order Header -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-2xl">
+                                    <i class="fas ${isDeal ? 'fa-handshake' : 'fa-receipt'} ${getStatusColor(order.status)}"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">#${order._id.slice(-8).toUpperCase()}</h3>
+                                    <p class="text-sm text-gray-500">${orderDate} at ${orderTime}</p>
+                                    <p class="text-xs ${getStatusTextColor(order.status)} font-medium">
+                                        ${isDeal ? 'Deal' : 'Order'} ${formatStatusText(order.status)}
+                                        ${isDeal && order.proposedPrice && order.originalPrice && order.proposedPrice !== order.originalPrice ? 
+                                            ` (${Math.round(((order.originalPrice - order.proposedPrice) / order.originalPrice) * 100)}% off)` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="status-badge ${statusClass}">
+                                <i class="${statusIcon} mr-1"></i>
+                                ${formatStatusText(order.status)}
+                            </div>
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="${productImage}" alt="${productName}" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.src='/assets/default-product.jpg'">
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">${productName}</h4>
+                                <p class="text-sm text-gray-600">Quantity: ${order.quantity}</p>
+                                <p class="text-sm text-gray-600">Customer: ${consumerName}</p>
+                                ${isDeal && order.message ? `<p class="text-xs text-gray-500 italic">"${order.message}"</p>` : ''}
+                            </div>
+                            <div class="text-right">
+                                ${priceDisplay}
+                                <p class="text-sm text-gray-500">${isDeal ? 'Deal Amount' : 'Total Amount'}</p>
+                                ${isDeal && order.expiresAt && order.status === 'pending' ? 
+                                    `<p class="text-xs text-orange-600">Expires: ${new Date(order.expiresAt).toLocaleDateString()}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Order/Deal Actions -->
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div class="flex items-center space-x-4">
+                                ${getActionButtons(order, isDeal)}
+                            </div>
+                            <button onclick="event.stopPropagation(); showOrderDetails('${order._id}')" 
+                                    class="text-green-600 hover:text-green-700 text-sm font-medium">
+                                View Details <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get status icon based on order/deal status
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': 'fas fa-clock',
+                'accepted': 'fas fa-check',
+                'purchased': 'fas fa-check-circle',
+                'cancelled': 'fas fa-times-circle',
+                'declined': 'fas fa-times',
+                'expired': 'fas fa-hourglass-end'
+            };
+            return icons[status] || 'fas fa-question-circle';
+        }
+
+        // Get status color for icons
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'text-yellow-500',
+                'accepted': 'text-green-600',
+                'purchased': 'text-green-700',
+                'cancelled': 'text-red-500',
+                'declined': 'text-red-500',
+                'expired': 'text-gray-500'
+            };
+            return colors[status] || 'text-gray-500';
+        }
+
+        // Get status text color
+        function getStatusTextColor(status) {
+            const colors = {
+                'pending': 'text-yellow-600',
+                'accepted': 'text-green-600',
+                'purchased': 'text-green-700',
+                'cancelled': 'text-red-600',
+                'declined': 'text-red-600',
+                'expired': 'text-gray-600'
+            };
+            return colors[status] || 'text-gray-600';
+        }
+
+        // Format status text for display
+        function formatStatusText(status) {
+            const formats = {
+                'pending': 'Pending (In Negotiation)',
+                'accepted': 'Accepted',
+                'purchased': 'Purchased ✓',
+                'cancelled': 'Cancelled (Negotiation Ended)',
+                'declined': 'Declined',
+                'expired': 'Expired'
+            };
+            return formats[status] || status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        // Get action buttons based on status and type
+        function getActionButtons(order, isDeal) {
+            const status = order.status;
+            
+            if (isDeal) {
+                switch (status) {
+                    case 'pending':
+                        return `
+                            <button onclick="event.stopPropagation(); acceptDeal('${order._id}')" 
+                                    class="text-green-600 hover:text-green-700 text-sm font-medium bg-green-50 px-3 py-1 rounded mr-2">
+                                <i class="fas fa-check mr-1"></i>Accept Deal
+                            </button>
+                            <button onclick="event.stopPropagation(); declineDeal('${order._id}')" 
+                                    class="text-red-600 hover:text-red-700 text-sm font-medium">
+                                <i class="fas fa-times mr-1"></i>Decline Deal
+                            </button>
+                        `;
+                    case 'accepted':
+                        return `
+                            <span class="text-green-600 text-sm">
+                                <i class="fas fa-check-circle mr-1"></i>Deal Accepted - Waiting for Consumer Purchase
+                            </span>
+                        `;
+                    case 'declined':
+                        return `
+                            <span class="text-red-600 text-sm">
+                                <i class="fas fa-times-circle mr-1"></i>Deal Declined by You
+                            </span>
+                        `;
+                    case 'purchased':
+                        return `
+                            <span class="text-blue-600 text-sm">
+                                <i class="fas fa-check-circle mr-1"></i>Deal Completed Successfully
+                            </span>
+                        `;
+                    case 'cancelled':
+                        return `
+                            <span class="text-red-600 text-sm">
+                                <i class="fas fa-times-circle mr-1"></i>Deal Cancelled by Consumer
+                            </span>
+                        `;
+                    case 'expired':
+                        return `
+                            <span class="text-gray-600 text-sm">
+                                <i class="fas fa-hourglass-end mr-1"></i>Deal Expired
+                            </span>
+                        `;
+                    default:
+                        return '';
+                }
+            } else {
+                // Regular order actions
+                switch (status) {
+                    case 'pending':
+                        return `
+                            <span class="text-yellow-600 text-sm">
+                                <i class="fas fa-clock mr-1"></i>Order Pending
+                            </span>
+                        `;
+                    case 'purchased':
+                        return `
+                            <span class="text-blue-600 text-sm">
+                                <i class="fas fa-check-circle mr-1"></i>Order Completed
+                            </span>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+        }
+
+        // Setup status filter
+        function setupStatusFilter() {
+            const statusFilter = document.getElementById('statusFilter');
+            statusFilter.addEventListener('change', function() {
+                fetchOrders(this.value);
+            });
+        }
+
+        // Show order details modal
+        function showOrderDetails(orderId) {
+            const order = orders.find(o => o._id === orderId);
+            if (!order) return;
+
+            const modal = document.getElementById('orderModal');
+            const modalContent = document.getElementById('orderModalContent');
+            
+            const isDeal = order.type === 'deal';
+            const productName = order.productId?.name || order.productId?.product_name || 'Unknown Product';
+            const productImage = order.productId?.imageUrl || '/assets/default-product.jpg';
+            const consumerName = order.consumerId?.username || order.consumer || 'Unknown Customer';
+            
+            modalContent.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Order Info -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">${isDeal ? 'Deal' : 'Order'} Information</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Order ID</p>
+                                <p class="font-medium">#${order._id.slice(-8).toUpperCase()}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Status</p>
+                                <span class="status-badge status-${order.status}">
+                                    <i class="${getStatusIcon(order.status)} mr-1"></i>
+                                    ${formatStatusText(order.status)}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Date Created</p>
+                                <p class="font-medium">${new Date(order.createdAt).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Customer</p>
+                                <p class="font-medium">${consumerName}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Product Details</h3>
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <img src="${productImage}" alt="${productName}" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">${productName}</h4>
+                                <p class="text-sm text-gray-600">Quantity: ${order.quantity}</p>
+                                <p class="text-sm text-gray-600">Price: ₹${order.price}</p>
+                                ${isDeal && order.message ? `<p class="text-sm text-gray-600 mt-2 italic">"${order.message}"</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${isDeal && order.status === 'pending' ? `
+                    <!-- Deal Actions -->
+                    <div class="flex space-x-3">
+                        <button onclick="acceptDeal('${order._id}'); closeOrderModal();" 
+                                class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium">
+                            <i class="fas fa-check mr-2"></i>Accept Deal
+                        </button>
+                        <button onclick="declineDeal('${order._id}'); closeOrderModal();" 
+                                class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium">
+                            <i class="fas fa-times mr-2"></i>Decline Deal
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        // Close order modal
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.add('hidden');
+        }
+
+        // Accept deal
+        async function acceptDeal(dealId) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`/api/deals/${dealId}/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Refresh orders
+                    fetchOrders();
+                    alert('Deal accepted successfully!');
+                } else {
+                    alert('Failed to accept deal. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error accepting deal:', error);
+                alert('Error accepting deal. Please try again.');
+            }
+        }
+
+        // Decline deal
+        async function declineDeal(dealId) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`/api/deals/${dealId}/decline`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Refresh orders
+                    fetchOrders();
+                    alert('Deal declined successfully!');
+                } else {
+                    alert('Failed to decline deal. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error declining deal:', error);
+                alert('Error declining deal. Please try again.');
+            }
+        }
+
+        // Profile dropdown functions
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!profileButton || !profileDropdown) {
+                console.log('Profile elements not found');
+                return;
+            }
+                
+            // Toggle dropdown on button click
+            profileButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout function
+        function handleLogout() {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear localStorage
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                
+                // Redirect to login page
+                window.location.href = '/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

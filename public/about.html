@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us - HarvestLoop</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+  <!-- Fixed Navbar -->
+  <nav class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+    <div>
+      <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="home.html">
+        <img
+          src="/assets/Logo.png"
+          alt="Website Logo"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        HarvestLoop
+      </a>
+    </div>
+    <div class="flex gap-3">
+      <!-- Home Button -->
+      <a
+        href="home.html"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#7dde83]/80 h-10 px-4 py-2"
+      >
+        Home
+      </a>
+      <!-- About Button -->
+      <a
+        href="about.html"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#7dde83] text-white hover:bg-[#608d58] h-10 px-4 py-2"
+      >
+        About
+      </a>
+      <!-- Login Button -->
+      <a
+        href="login.html"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-amber-500 hover:text-white h-10 px-4 py-2"
+      >
+        Login
+      </a>
+      <!-- Sign Up Button -->
+      <a
+        href="signup.html"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-[#7dde83]/80 h-10 px-4 py-2"
+      >
+        Sign Up
+      </a>
+    </div>
+  </nav>
+
+  <!-- Content Wrapper to offset fixed nav height -->
+  <div class="relative pt-[88px]">
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden bg-[#ddccb1] text-gray-800">
+      <div class="relative max-w-6xl mx-auto px-6 py-16 text-center">
+        <div class="mb-6">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-[#7dde83] rounded-full mb-4">
+            <i class="fas fa-seedling text-white text-3xl"></i>
+          </div>
+        </div>
+        <h1 class="text-5xl font-bold mb-6 text-gray-800">
+          About HarvestLoop
+        </h1>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          Connecting farmers directly with consumers by facilitating contact information exchange, powered by technology, transparency, and direct communication.
+        </p>
+      </div>
+    </div>
+
+    <!-- About Content -->
+    <div class="max-w-6xl mx-auto px-6 py-16">
+
+      <!-- Mission Cards -->
+      <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-[#7dde83]/20">
+          <div class="w-16 h-16 bg-[#7dde83] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i class="fas fa-seedling text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-4">Fresh from Farm</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Connect directly with local farmers and get contact information to purchase the freshest produce. Every farmer is verified and ready to share their harvest details.
+          </p>
+        </div>
+
+        <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-amber-200">
+          <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i class="fas fa-handshake text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-4">Fair & Transparent</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Fair prices for farmers, great value for you. Our platform enables direct contact between farmers and consumers for transparent negotiations and deals.
+          </p>
+        </div>
+
+        <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-[#608d58]/20">
+          <div class="w-16 h-16 bg-[#608d58] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <i class="fas fa-leaf text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-4">Sustainable Future</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Supporting eco-friendly farming practices and promoting sustainable agriculture for a healthier planet and community.
+          </p>
+        </div>
+      </div>
+
+      <!-- How It Works Section -->
+      <div class="bg-white rounded-3xl shadow-xl p-12 mb-16 border border-gray-100">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">Simple steps to connect with local farmers and get their contact information for direct purchases</p>
+        </div>
+        
+        <div class="grid md:grid-cols-4 gap-8">
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div class="w-20 h-20 bg-[#7dde83] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <i class="fas fa-search text-white text-2xl"></i>
+              </div>
+              <div class="absolute -top-2 -right-2 w-8 h-8 bg-[#608d58] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">1</div>
+            </div>
+            <h4 class="font-bold text-gray-800 mb-3 text-lg">Discover & Browse</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">Explore fresh produce from verified local farmers in your area with detailed product information.</p>
+          </div>
+          
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div class="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <i class="fas fa-comments text-white text-2xl"></i>
+              </div>
+              <div class="absolute -top-2 -right-2 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">2</div>
+            </div>
+            <h4 class="font-bold text-gray-800 mb-3 text-lg">Connect & Negotiate</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">Get farmer contact details, communicate directly about products, prices, and availability for your needs.</p>
+          </div>
+          
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div class="w-20 h-20 bg-[#7dde83] rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <i class="fas fa-phone text-white text-2xl"></i>
+              </div>
+              <div class="absolute -top-2 -right-2 w-8 h-8 bg-[#608d58] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">3</div>
+            </div>
+            <h4 class="font-bold text-gray-800 mb-3 text-lg">Direct Contact</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">Use the shared contact information to reach farmers directly and arrange your purchases independently.</p>
+          </div>
+          
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div class="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <i class="fas fa-handshake text-white text-2xl"></i>
+              </div>
+              <div class="absolute -top-2 -right-2 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">4</div>
+            </div>
+            <h4 class="font-bold text-gray-800 mb-3 text-lg">Complete Transaction</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">Finalize your purchase directly with the farmer using your preferred payment and pickup methods.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benefits Section -->
+      <div class="grid md:grid-cols-2 gap-8 mb-16">
+        <div class="bg-[#ddccb1] rounded-3xl p-8 border border-[#7dde83]/20">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-[#7dde83] rounded-2xl flex items-center justify-center mr-4">
+              <i class="fas fa-heart text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">Why Choose Us?</h3>
+          </div>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-[#7dde83] mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Direct access to farmer contact information</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-[#7dde83] mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Competitive prices through direct negotiation</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-[#7dde83] mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Personal communication and custom arrangements</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-[#7dde83] mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Flexible purchasing and pickup options</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-[#7dde83] mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Support local farming communities</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-amber-200">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center mr-4">
+              <i class="fas fa-shield-alt text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800">Platform Features</h3>
+          </div>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <i class="fas fa-star text-amber-500 mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Secure contact information sharing system</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-star text-amber-500 mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Verified farmer profiles and product listings</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-star text-amber-500 mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">User-friendly platform for easy browsing</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-star text-amber-500 mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Mobile-optimized for on-the-go access</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-star text-amber-500 mt-1 mr-3 flex-shrink-0"></i>
+              <span class="text-gray-800 font-medium">Community support and guidance</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Team Section -->
+      <div class="bg-white rounded-3xl shadow-xl p-12 border border-gray-100">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">Passionate individuals dedicated to revolutionizing agriculture and connecting communities</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-12">
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <img src="/assets/founder1.jpg" alt="Trisa Dominic" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-[#7dde83]/30" />
+            </div>
+            <h4 class="text-2xl font-bold text-gray-800 mb-2">Trisa Dominic</h4>
+          </div>
+          
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <img src="/assets/founder2.jpg" alt="Swathy Suresh" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-amber-300" />
+            </div>
+            <h4 class="text-2xl font-bold text-gray-800 mb-2">Swathy Suresh</h4>
+          </div>
+          
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <img src="/assets/founder3.jpg" alt="Roopavathi" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-[#608d58]/30" />
+            </div>
+            <h4 class="text-2xl font-bold text-gray-800 mb-2">Roopavathi</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="bg-[#ddccb1] py-6 text-center text-gray-700 text-sm">
+    &copy; 2025 HarvestLoop. All rights reserved.
+  </footer>
+
+</body>
+</html>

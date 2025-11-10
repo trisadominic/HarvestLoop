@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect Hub - Order Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+    <!-- Header Section -->
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="admin_dashboard.html">
+                <img src="assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover"/>
+                HarvestLoop
+            </a>
+
+            <!-- Center Tabs -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="admin_dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+                <a href="admin-farmers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-users mr-3"></i> Farmers
+                </a>
+                <a href="admin-consumers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-building mr-3"></i> Consumers
+                </a>
+                <a href="admin-products.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-seedling mr-3"></i> Products
+                </a>
+                <a href="admin-orders.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-shopping-cart mr-3"></i> Orders
+                </a>
+            </div>
+
+            <!-- Right-Aligned Profile -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button id="profile-button" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <span class="font-medium">Admin</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user mr-2"></i> Profile
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-cog mr-2"></i> Settings
+                        </a>
+                        <hr class="my-1">
+                        <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 pt-20">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#3d6339] mb-2">Order Management</h1>
+                <p class="mb-6 text-gray-600">Monitor and manage all orders across the platform</p>
+            </div>
+
+            <!-- Order Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-shopping-cart text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                            <p id="totalOrders" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-2xl text-yellow-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Pending Orders</p>
+                            <p id="pendingOrders" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Completed Orders</p>
+                            <p id="completedOrders" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-dollar-sign text-2xl text-green-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                            <p id="totalRevenue" class="text-2xl font-semibold text-gray-900">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="searchInput" placeholder="Search by order ID, customer, or farmer..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                    <div class="flex gap-4">
+                        <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <input type="date" id="dateFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <button onclick="refreshData()" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white/70 rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Order Details</h3>
+                    <button onclick="closeOrderModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="orderModalContent" class="px-6 py-4">
+                    <!-- Modal content will be inserted here -->
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+                    <button onclick="closeOrderModal()" class="bg-gray-300 px-4 py-2 rounded text-gray-700 hover:bg-gray-400">
+                        Close
+                    </button>
+                    <button id="updateStatusBtn" onclick="updateOrderStatus()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" style="display: none;">
+                        Update Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let orders = [];
+        let currentOrderId = null;
+        let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        // Check authentication
+        if (!token) {
+            console.log('No token found, attempting auto-login...');
+            autoLoginAdmin();
+        }
+
+        // Auto-login function for admin
+        async function autoLoginAdmin() {
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userRole', data.role);
+                    console.log('Auto-login successful');
+                    loadOrdersData();
+                } else {
+                    console.error('Auto-login failed:', data.message);
+                    showError('Authentication failed. Please login manually.');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showError('Connection error. Please check server.');
+            }
+        }
+
+        // Load orders data from API
+        async function loadOrdersData() {
+            try {
+                console.log('🔍 Loading orders data...');
+                const response = await fetch('/api/admin/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    orders = data.orders || data; // Handle both new format {orders: []} and old format []
+                    console.log('✅ Orders loaded:', orders.length);
+                    refreshTable();
+                    updateStatistics();
+                } else if (response.status === 401 || response.status === 403) {
+                    console.error('❌ Authentication failed');
+                    await autoLoginAdmin();
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', response.status, errorText);
+                    showError(`Failed to load orders: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading orders:', error);
+                showError('Failed to load orders data.');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="px-6 py-4 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            if (token) {
+                loadOrdersData();
+            }
+            setupProfileDropdown();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', refreshTable);
+            document.getElementById('statusFilter').addEventListener('change', refreshTable);
+            document.getElementById('dateFilter').addEventListener('change', refreshTable);
+        }
+
+        // Refresh table with filters
+        function refreshTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            const filteredOrders = orders.filter(order => {
+                const matchesSearch = (order.id || '').toString().toLowerCase().includes(searchTerm) || 
+                                   (order.customerName || '').toLowerCase().includes(searchTerm) ||
+                                   (order.farmerName || '').toLowerCase().includes(searchTerm) ||
+                                   (order.productName || '').toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || order.status === statusFilter;
+                const matchesDate = !dateFilter || (order.createdAt && order.createdAt.startsWith(dateFilter));
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+
+            renderOrdersTable(filteredOrders);
+        }
+
+        // Render orders table with real data
+        function renderOrdersTable(ordersToShow) {
+            const tbody = document.getElementById('ordersTableBody');
+            
+            if (ordersToShow.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            No orders found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = ordersToShow.map(order => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        #${order.orderId || order.id || 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${order.customer?.name || 'Unknown'}</div>
+                        <div class="text-sm text-gray-500">${order.customer?.email || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${order.farmer?.name || 'Unknown'}</div>
+                        <div class="text-sm text-gray-500">${order.farmer?.email || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${order.product?.name || 'Unknown'}</div>
+                        <div class="text-sm text-gray-500">${order.quantity || 0} ${order.product?.unit || 'units'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        $${order.totalAmount || '0.00'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}">
+                            ${(order.status || 'pending').toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewOrderDetails('${order.id}')" 
+                                class="text-blue-600 hover:text-blue-800 mr-2" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="downloadReceipt('${order.id}')" 
+                                class="text-green-600 hover:text-green-800" title="Download Receipt">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Get status color classes
+        function getStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'purchased': return 'bg-green-100 text-green-800';
+                case 'cancelled': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Get payment status color classes
+        function getPaymentStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'paid': return 'bg-green-100 text-green-800';
+                case 'failed': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalOrders = orders.length;
+            const pendingOrders = orders.filter(o => o.status === 'pending').length;
+            const completedOrders = orders.filter(o => o.status === 'purchased').length;
+            const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.totalAmount) || 0), 0);
+
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+            document.getElementById('completedOrders').textContent = completedOrders;
+            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+        }
+
+        // View order details
+        function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            currentOrderId = orderId;
+            const modalContent = document.getElementById('orderModalContent');
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Order Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="font-medium">Order ID:</span> #${order.orderId || order.id || 'N/A'}</p>
+                                <p><span class="font-medium">Status:</span> 
+                                    <span class="px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}">
+                                        ${(order.status || 'pending').toUpperCase()}
+                                    </span>
+                                </p>
+                                <p><span class="font-medium">Payment Status:</span> 
+                                    <span class="px-2 py-1 text-xs rounded-full ${getPaymentStatusColor(order.paymentStatus)}">
+                                        ${(order.paymentStatus || 'pending').toUpperCase()}
+                                    </span>
+                                </p>
+                                <p><span class="font-medium">Order Date:</span> ${order.orderDate ? new Date(order.orderDate).toLocaleString() : 'N/A'}</p>
+                                <p><span class="font-medium">Total Amount:</span> $${order.totalAmount || '0.00'}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Product Details</h4>
+                            <div class="space-y-2">
+                                <p><span class="font-medium">Product:</span> ${order.product?.name || 'Unknown'}</p>
+                                <p><span class="font-medium">Quantity:</span> ${order.quantity || 0} ${order.product?.unit || 'units'}</p>
+                                <p><span class="font-medium">Price per Unit:</span> $${order.pricePerUnit || '0.00'}</p>
+                                <p><span class="font-medium">Category:</span> ${order.product?.category || 'Unknown'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Customer Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="font-medium">Name:</span> ${order.customer?.name || 'Unknown'}</p>
+                                <p><span class="font-medium">Email:</span> ${order.customer?.email || 'N/A'}</p>
+                                <p><span class="font-medium">Phone:</span> ${order.customer?.phone || 'N/A'}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Farmer Information</h4>
+                            <div class="space-y-2">
+                                <p><span class="font-medium">Name:</span> ${order.farmer?.name || 'Unknown'}</p>
+                                <p><span class="font-medium">Email:</span> ${order.farmer?.email || 'N/A'}</p>
+                                <p><span class="font-medium">Phone:</span> ${order.farmer?.phone || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="font-semibold text-gray-900 mb-3">Update Order Status</h4>
+                    <select id="newOrderStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                        <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                        <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                </div>
+            `;
+
+            document.getElementById('updateStatusBtn').style.display = 'inline-block';
+            document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        // Close order modal
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.add('hidden');
+            currentOrderId = null;
+        }
+
+        // Update order status
+        function updateOrderStatus() {
+            if (!currentOrderId) return;
+            
+            const newStatus = document.getElementById('newOrderStatus').value;
+            const order = orders.find(o => o.id === currentOrderId);
+            
+            if (order && newStatus !== order.status) {
+                // Here you would typically make an API call to update the status
+                alert(`Update order #${currentOrderId} status to: ${newStatus.toUpperCase()}\n(This would make an API call to update the order status)`);
+                
+                // For now, update locally
+                order.status = newStatus;
+                refreshTable();
+                updateStatistics();
+                closeOrderModal();
+            }
+        }
+
+        // Download receipt
+        function downloadReceipt(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // Here you would typically generate and download a PDF receipt
+            alert(`Download receipt for order #${orderId}\n(This would generate and download a PDF receipt)`);
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadOrdersData();
+        }
+
+        // Profile dropdown setup
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>

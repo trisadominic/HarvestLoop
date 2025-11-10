@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Admin Debug</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .step { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Admin Debug - Step by Step</h1>
+    
+    <div class="step">
+        <h3>Step 1: Check Token in Storage</h3>
+        <button onclick="checkToken()">Check Token</button>
+        <div id="tokenResult"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Test Login API</h3>
+        <button onclick="testLogin()">Test Admin Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 3: Test Stats API</h3>
+        <button onclick="testStats()">Test Stats API</button>
+        <div id="statsResult"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 4: Test Activity API</h3>
+        <button onclick="testActivity()">Test Activity API</button>
+        <div id="activityResult"></div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        
+        function checkToken() {
+            const localToken = localStorage.getItem('token');
+            const sessionToken = sessionStorage.getItem('token');
+            const userRole = localStorage.getItem('userRole');
+            
+            const result = document.getElementById('tokenResult');
+            
+            if (localToken || sessionToken) {
+                currentToken = localToken || sessionToken;
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Token found!<br>
+                        LocalStorage: ${localToken ? 'Yes' : 'No'}<br>
+                        SessionStorage: ${sessionToken ? 'Yes' : 'No'}<br>
+                        User Role: ${userRole || 'Not set'}<br>
+                        Token (first 50 chars): ${currentToken.substring(0, 50)}...
+                    </div>`;
+            } else {
+                result.innerHTML = `<div class="error">❌ No token found in storage</div>`;
+            }
+        }
+        
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    currentToken = data.token;
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userRole', data.role);
+                    
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Login successful!<br>
+                            Role: ${data.role}<br>
+                            Token saved to localStorage
+                        </div>`;
+                } else {
+                    result.innerHTML = `<div class="error">❌ Login failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Login error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testStats() {
+            const result = document.getElementById('statsResult');
+            
+            if (!currentToken) {
+                result.innerHTML = '<div class="error">❌ No token available. Please login first.</div>';
+                return;
+            }
+            
+            try {
+                console.log('Making stats request with token:', currentToken.substring(0, 20) + '...');
+                
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Stats response status:', response.status);
+                console.log('Stats response headers:', response.headers);
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    console.log('Stats data:', stats);
+                    
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Stats API working!<br>
+                            Farmers: ${stats.totalFarmers}<br>
+                            Companies: ${stats.totalConsumers}<br>
+                            Products: ${stats.totalProducts}<br>
+                            Orders: ${stats.totalOrders}
+                        </div>`;
+                } else {
+                    const errorText = await response.text();
+                    console.error('Stats API error:', response.status, errorText);
+                    result.innerHTML = `<div class="error">❌ Stats API error: ${response.status} - ${errorText}</div>`;
+                }
+            } catch (error) {
+                console.error('Stats request error:', error);
+                result.innerHTML = `<div class="error">❌ Stats request error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testActivity() {
+            const result = document.getElementById('activityResult');
+            
+            if (!currentToken) {
+                result.innerHTML = '<div class="error">❌ No token available. Please login first.</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/activity', {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const activities = await response.json();
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Activity API working!<br>
+                            Found ${activities.length} activities
+                        </div>`;
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ Activity API error: ${response.status} - ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Activity request error: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-check token on page load
+        window.onload = function() {
+            checkToken();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Consumer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="/js/navigation-manager.js"></script>
+    <script src="/js/disable-browser-navigation.js"></script>
+</head>
+<body class="bg-white">
+    <header class="bg-white">
+        <div class="fixed top-0 left-0 w-full z-50 bg-white flex items-center justify-between px-8 py-4 shadow-sm">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="/consumer-dashboard.html">
+                <img src="/assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover" />
+                HarvestLoop
+            </a>
+
+            <!-- Center Navigation -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="/consumer-dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition duration-150">
+                    <i class="fas fa-compass mr-2"></i> Discover
+                </a>
+                <a href="/consumer-orders.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition duration-150">
+                    <i class="fas fa-shopping-basket mr-2"></i> My Orders
+                </a>
+                <a href="/manage-subscription.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black transition duration-150">
+                    <i class="fas fa-crown mr-2"></i> Subscription
+                </a>
+            </div>
+
+            <!-- Right Profile Section -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Menu</div>
+                        <a href="/consumer-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-user mr-3 w-4"></i> Your Profile
+                        </a>
+                        <a href="/consumer-orders.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-shopping-bag mr-3 w-4"></i> My Orders
+                        </a>
+                        <a href="/manage-subscription.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-crown mr-3 w-4"></i> Subscription
+                        </a>
+                        <a href="/billing-history.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                            <i class="fas fa-receipt mr-3 w-4"></i> Billing History
+                        </a>
+                        <a href="/login.html" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition border-t">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+        <!-- Hero Section -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-green-600 to-blue-600 text-white">
+            <div class="absolute inset-0 bg-black/20"></div>
+            <div class="relative max-w-6xl mx-auto px-6 py-16 text-center">
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
+                        <i class="fas fa-seedling text-3xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent">
+                    About HarvestLoop
+                </h1>
+                <p class="text-xl text-green-100 max-w-3xl mx-auto leading-relaxed">
+                    Connecting farmers directly with consumers by facilitating contact information exchange, powered by technology, transparency, and direct communication.
+                </p>
+            </div>
+        </div>
+
+        <!-- About Content -->
+        <div class="max-w-6xl mx-auto px-6 py-16">
+
+            <!-- Mission Cards -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-green-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-seedling text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Fresh from Farm</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Connect directly with local farmers and get contact information to purchase the freshest produce. Every farmer is verified and ready to share their harvest details.
+                    </p>
+                </div>
+
+                <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-blue-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-handshake text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Fair & Transparent</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Fair prices for farmers, great value for you. Our platform enables direct contact between farmers and consumers for transparent negotiations and deals.
+                    </p>
+                </div>
+
+                <div class="group bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-purple-100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-leaf text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Sustainable Future</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Supporting eco-friendly farming practices and promoting sustainable agriculture for a healthier planet and community.
+                    </p>
+                </div>
+            </div>
+
+            <!-- How It Works Section -->
+            <div class="bg-white rounded-3xl shadow-xl p-12 mb-16 border border-gray-100">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Simple steps to connect with local farmers and get their contact information for direct purchases</p>
+                </div>
+                
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fas fa-search text-white text-2xl"></i>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">1</div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-3 text-lg">Discover & Browse</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Explore fresh produce from verified local farmers in your area with detailed product information.</p>
+                    </div>
+                    
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fas fa-comments text-white text-2xl"></i>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">2</div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-3 text-lg">Connect & Negotiate</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Get farmer contact details, communicate directly about products, prices, and availability for your needs.</p>
+                    </div>
+                    
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fas fa-phone text-white text-2xl"></i>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">3</div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-3 text-lg">Direct Contact</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Use the shared contact information to reach farmers directly and arrange your purchases independently.</p>
+                    </div>
+                    
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <i class="fas fa-handshake text-white text-2xl"></i>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">4</div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 mb-3 text-lg">Complete Transaction</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed">Finalize your purchase directly with the farmer using your preferred payment and pickup methods.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-3xl p-8 border border-green-200">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center mr-4">
+                            <i class="fas fa-heart text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-green-800">Why Choose Us?</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-green-800 font-medium">Direct access to farmer contact information</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-green-800 font-medium">Competitive prices through direct negotiation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-green-800 font-medium">Personal communication and custom arrangements</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-green-800 font-medium">Flexible purchasing and pickup options</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-green-800 font-medium">Support local farming communities</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl p-8 border border-blue-200">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mr-4">
+                            <i class="fas fa-shield-alt text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-blue-800">Platform Features</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-blue-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-blue-800 font-medium">Secure contact information sharing system</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-blue-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-blue-800 font-medium">Verified farmer profiles and product listings</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-blue-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-blue-800 font-medium">User-friendly platform for easy browsing</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-blue-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-blue-800 font-medium">Mobile-optimized for on-the-go access</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-blue-600 mt-1 mr-3 flex-shrink-0"></i>
+                            <span class="text-blue-800 font-medium">Community support and guidance</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div class="bg-white rounded-3xl shadow-xl p-12 border border-gray-100">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Passionate individuals dedicated to revolutionizing agriculture and connecting communities</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-12">
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <img src="/assets/founder1.jpg" alt="Trisa Dominic" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-green-200" />
+                        </div>
+                        <h4 class="text-2xl font-bold text-gray-800 mb-2">Trisa Dominic</h4>
+                    </div>
+                    
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <img src="/assets/founder2.jpg" alt="Swathy Suresh" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-blue-200" />
+                        </div>
+                        <h4 class="text-2xl font-bold text-gray-800 mb-2">Swathy Suresh</h4>
+                    </div>
+                    
+                    <div class="text-center group">
+                        <div class="relative mb-6">
+                            <img src="/assets/founder3.jpg" alt="Roopavathi" class="w-32 h-32 rounded-full mx-auto shadow-2xl group-hover:scale-105 transition-transform duration-300 object-cover border-4 border-purple-200" />
+                        </div>
+                        <h4 class="text-2xl font-bold text-gray-800 mb-2">Roopavathi</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <img src="/assets/Logo.png" alt="HarvestLoop Logo" class="w-8 h-8 rounded-full">
+                        <h3 class="text-2xl font-bold text-[#7dde83]">HarvestLoop</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Bringing fresh, organic produce from local farms directly to your doorstep. 
+                        Supporting sustainable agriculture and healthy living.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/consumer-dashboard.html" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#categories" onclick="scrollToCategories()" class="text-gray-400 hover:text-white transition cursor-pointer">Categories</a></li>
+                        <li><a href="/consumer-about.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="/manage-subscription.html" class="text-gray-400 hover:text-white transition">Subscription</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/fruit.html" class="text-gray-400 hover:text-white transition">Fruits</a></li>
+                        <li><a href="/vegetables.html" class="text-gray-400 hover:text-white transition">Vegetables</a></li>
+                        <li><a href="/grains.html" class="text-gray-400 hover:text-white transition">Grains</a></li>
+                        <li><a href="/dairy.html" class="text-gray-400 hover:text-white transition">Dairy</a></li>
+                        <li><a href="/eggs.html" class="text-gray-400 hover:text-white transition">Eggs</a></li>
+                        <li><a href="/coffee.html" class="text-gray-400 hover:text-white transition">Coffee</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-[#7dde83]"></i>
+                            <span class="text-gray-400">Richmond Circle 3rd Stage, Bangalore-560027</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-phone text-[#7dde83]"></i>
+                            <span class="text-gray-400">8124675634</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-[#7dde83]"></i>
+                            <span class="text-gray-400">harvestloop@gmail.com</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#7dde83]"></i>
+                            <span class="text-gray-400">Mon-Sat: 8AM-8PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 HarvestLoop. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Profile dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', function() {
+                    profileDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // Navigation function
+        function navigateBack() {
+            window.location.href = '/consumer-dashboard.html';
+        }
+    </script>
+</body>
+</html>

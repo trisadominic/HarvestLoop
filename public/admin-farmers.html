@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect Hub - Farmer Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+    <!-- Header Section -->
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="admin-dashboard.html">
+                <img src="assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover"/>
+                HarvestLoop
+            </a>
+
+            <!-- Center Tabs -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="admin_dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+                <a href="admin-farmers.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-users mr-3"></i> Farmers
+                </a>
+                <a href="admin-consumers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-building mr-3"></i> Consumers
+                </a>
+                <!-- Products and Orders tabs removed as requested -->
+            </div>
+
+            <!-- Right-Aligned Profile -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+                    <!-- Profile Dropdown (only logout, matches dashboard) -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Admin Menu</div>
+                        <a href="#" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="relative pt-[88px]">
+        <!-- Main Content -->
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-[#3d6339] mb-2">Farmer Management</h1>
+            <p class="mb-6 text-gray-600">Manage farmer accounts and monitor negotiations</p>
+
+            <!-- Statistics Boxes moved below title -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active Farmers</p>
+                            <p class="text-2xl font-bold text-gray-900" id="activeFarmers">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-seedling text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Products</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalProducts">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-handshake text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active Transactions</p>
+                            <p class="text-2xl font-bold text-gray-900" id="activeNegotiations">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-rupee-sign text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalRevenue">₹0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section moved above table -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Farmer Management</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="searchInput" 
+                           placeholder="Search by name or email" 
+                           class="border p-2 rounded bg-white/50">
+                    <select id="statusFilter" class="border p-2 rounded bg-white/50">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                    <select id="locationFilter" class="border p-2 rounded bg-white/50">
+                        <option value="">All Locations</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Farmers Table -->
+            <div class="bg-white/70 rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer Details</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="farmerTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Table rows will be inserted here -->
+                </tbody>
+            </table>
+            </div>
+
+            <!-- Negotiation Monitor Section -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-[#3d6339] mb-1">Transaction Monitor</h2>
+                        <p class="text-sm text-gray-600">View and manage all transactions - Negotiations & Direct Orders - Admin Controls</p>
+                    </div>
+                </div>
+                <div id="negotiationsList" class="space-y-4">
+                    <!-- Negotiation items will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<!-- Edit Farmer Modal -->
+    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-96">
+                <h3 class="text-lg font-semibold mb-4">Edit Farmer Details</h3>
+                <form id="editFarmerForm">
+                    <input type="hidden" id="farmerId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="editName" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="editEmail" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="tel" id="editPhone" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="closeEditModal()" 
+                                    class="bg-gray-300 px-4 py-2 rounded text-gray-700">Cancel</button>
+                            <button type="submit" 
+                                    class="bg-green-500 px-4 py-2 rounded text-white">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let farmers = [];
+        let negotiations = [];
+        let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        // Check authentication
+        if (!token) {
+            console.log('No token found, attempting auto-login...');
+            autoLoginAdmin();
+        }
+
+        // Auto-login function for admin
+        async function autoLoginAdmin() {
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userRole', data.role);
+                    console.log('Auto-login successful');
+                    loadFarmersData();
+                } else {
+                    console.error('Auto-login failed:', data.message);
+                    showError('Authentication failed. Please login manually.');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showError('Connection error. Please check server.');
+            }
+        }
+
+        // Load farmers data from API
+        async function loadFarmersData() {
+            try {
+                console.log('🔍 Loading farmers data...');
+                
+                const response = await fetch('/api/admin/farmers', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    farmers = await response.json();
+                    console.log('✅ Farmers loaded:', farmers.length);
+                    console.log('📋 First farmer data:', farmers[0]); // Debug first farmer
+                    if (farmers.length > 0) {
+                        console.log('📱 Phone fields check:', {
+                            phone: farmers[0].phone,
+                            mobile: farmers[0].mobile,
+                            hasPhone: 'phone' in farmers[0],
+                            hasMobile: 'mobile' in farmers[0]
+                        });
+                    }
+                    
+                    // Store as allFarmers for filtering
+                    allFarmers = farmers;
+                    
+                    refreshTable();
+                    // Load negotiations after farmers are loaded
+                    await loadNegotiationsData();
+                    
+                    // Update statistics AFTER negotiations are loaded
+                    updateFarmerStatistics(farmers);
+                } else if (response.status === 401 || response.status === 403) {
+                    console.error('❌ Authentication failed');
+                    await autoLoginAdmin();
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', response.status, errorText);
+                    showError(`Failed to load farmers: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading farmers:', error);
+                showError('Failed to load farmers data.');
+            }
+        }
+
+        function updateFarmerStatistics(farmers) {
+            console.log('📊 Updating farmer statistics with:', farmers.length, 'farmers');
+            
+            const activeFarmers = farmers.filter(f => f.isActive !== false).length;
+            const totalProducts = farmers.reduce((sum, f) => sum + (f.productCount || f.totalProducts || 0), 0);
+            
+            // Calculate active negotiations/transactions from real data
+            let activeNegotiations = 0;
+            if (negotiations && negotiations.length > 0) {
+                activeNegotiations = negotiations.filter(t => 
+                    (t.type === 'negotiation' && t.status === 'accepted') ||
+                    (t.type === 'direct-order' && t.status === 'accepted')
+                ).length;
+            }
+            
+            // Calculate total revenue from completed transactions (negotiations with status: 'purchased' and orders with status: 'purchased')
+            let totalRevenue = 0;
+            if (negotiations && negotiations.length > 0) {
+                // Include purchased negotiations and purchased direct orders
+                const completedTransactions = negotiations.filter(t => 
+                    (t.type === 'negotiation' && t.status === 'purchased') ||
+                    (t.type === 'direct-order' && t.status === 'purchased')
+                );
+                console.log('💰 Found', completedTransactions.length, 'completed transactions for revenue calculation');
+                
+                // Breakdown by type
+                const purchasedNegotiations = completedTransactions.filter(t => t.type === 'negotiation').length;
+                const purchasedDirectOrders = completedTransactions.filter(t => t.type === 'direct-order').length;
+                
+                console.log(`💰 Revenue breakdown: ${purchasedNegotiations} from negotiations, ${purchasedDirectOrders} from direct orders`);
+                
+                totalRevenue = completedTransactions.reduce((sum, t) => {
+                    const price = parseFloat(t.totalPrice) || 0;
+                    console.log('💰 Transaction:', t.product, 'Type:', t.type, 'Price:', t.totalPrice, 'Parsed:', price);
+                    return sum + price;
+                }, 0);
+                
+                console.log('💰 Total revenue calculated:', totalRevenue);
+            } else {
+                console.log('💰 No transaction data available for revenue calculation');
+            }
+
+            console.log('📈 Statistics:', {
+                activeFarmers,
+                totalProducts,
+                activeNegotiations,
+                totalRevenue
+            });
+
+            // Update DOM elements using their IDs
+            const farmersElement = document.getElementById('activeFarmers');
+            const productsElement = document.getElementById('totalProducts');
+            const negotiationsElement = document.getElementById('activeNegotiations');
+            const revenueElement = document.getElementById('totalRevenue');
+
+            if (farmersElement) {
+                farmersElement.textContent = activeFarmers;
+                console.log('✅ Updated active farmers:', activeFarmers);
+            }
+            if (productsElement) {
+                productsElement.textContent = totalProducts;
+                console.log('✅ Updated total products:', totalProducts);
+            }
+            if (negotiationsElement) {
+                negotiationsElement.textContent = activeNegotiations;
+                console.log('✅ Updated active negotiations:', activeNegotiations);
+            }
+            if (revenueElement) {
+                revenueElement.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+                console.log('✅ Updated total revenue:', totalRevenue);
+            }
+        }
+
+        // Search and filter functionality
+        function setupSearchAndFilters() {
+            const searchInput = document.getElementById('farmerSearch');
+            const statusFilter = document.getElementById('statusFilter');
+            const locationFilter = document.getElementById('locationFilter');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', filterAndRenderFarmers);
+            }
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterAndRenderFarmers);
+            }
+            if (locationFilter) {
+                locationFilter.addEventListener('change', filterAndRenderFarmers);
+            }
+        }
+
+        function filterAndRenderFarmers() {
+            const searchTerm = document.getElementById('farmerSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+            const locationFilter = document.getElementById('locationFilter')?.value || 'all';
+
+            let filteredFarmers = allFarmers.filter(farmer => {
+                // Text search
+                const matchesSearch = !searchTerm || 
+                    (farmer.fullName || farmer.username || '').toLowerCase().includes(searchTerm) ||
+                    (farmer.email || '').toLowerCase().includes(searchTerm) ||
+                    (farmer.farmName || '').toLowerCase().includes(searchTerm) ||
+                    (farmer.phone || farmer.mobile || '').includes(searchTerm);
+
+                // Status filter
+                let matchesStatus = true;
+                if (statusFilter && statusFilter !== 'all') {
+                    if (statusFilter === 'active') {
+                        // Active means farmer has no deals/transactions
+                        const farmerDeals = negotiations.filter(deal => 
+                            deal.farmerName === (farmer.fullName || farmer.username) ||
+                            deal.farmerId === farmer._id
+                        );
+                        matchesStatus = farmer.isActive !== false && farmerDeals.length === 0;
+                    } else if (statusFilter === 'inactive') {
+                        matchesStatus = farmer.isActive === false;
+                    }
+                } else if (statusFilter === 'all') {
+                    matchesStatus = true;
+                }
+
+                // Location filter
+                const matchesLocation = locationFilter === 'all' || 
+                    (farmer.state || farmer.farmAddress || '').toLowerCase().includes(locationFilter.toLowerCase());
+
+                return matchesSearch && matchesStatus && matchesLocation;
+            });
+
+            renderFarmersTable(filteredFarmers);
+        }
+
+        // Load negotiations data from API
+        async function loadNegotiationsData() {
+            try {
+                console.log('🔍 Loading transactions data (negotiations + orders)...');
+                
+                const response = await fetch('/api/admin/transactions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📋 Raw API response:', data);
+                    
+                    // API returns transactions array directly
+                    let rawNegotiations = Array.isArray(data) ? data : [];
+                    
+                    // Filter out pending status and consolidate transaction types
+                    negotiations = rawNegotiations.filter(item => item.status !== 'pending').map(item => {
+                        // If status is pending, change to accepted (shouldn't happen due to filter, but safety)
+                        if (item.status === 'pending') {
+                            item.status = 'accepted';
+                        }
+                        // Remove any payment status since paid option doesn't exist
+                        if (item.paymentStatus) {
+                            delete item.paymentStatus;
+                        }
+                        // Consolidate order-from-negotiation into negotiation type
+                        if (item.type === 'order-from-negotiation') {
+                            item.type = 'negotiation';
+                        }
+                        return item;
+                    });
+                    
+                    console.log('📊 Transactions assigned:', negotiations);
+                    console.log('� Total transactions count:', negotiations.length);
+                    
+                    // Separate by type for logging
+                    const negotiationsCount = negotiations.filter(t => t.type === 'negotiation').length;
+                    const directOrdersCount = negotiations.filter(t => t.type === 'direct-order').length;
+                    
+                    console.log(`📈 Breakdown: ${negotiationsCount} negotiations, ${directOrdersCount} direct orders`);
+                    
+                    if (negotiations.length > 0) {
+                        console.log('📋 Sample transaction:', negotiations[0]);
+                    }
+                    
+                    loadNegotiations();
+                    
+                    // Update statistics with transactions data
+                    if (farmers && farmers.length > 0) {
+                        updateFarmerStatistics(farmers);
+                    }
+                } else {
+                    console.error('❌ Failed to load transactions:', response.status);
+                    const errorText = await response.text();
+                    console.error('❌ Error details:', errorText);
+                    // Fall back to empty array
+                    negotiations = [];
+                    loadNegotiations();
+                    
+                    // Update statistics even with empty transactions
+                    if (farmers && farmers.length > 0) {
+                        updateFarmerStatistics(farmers);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error loading transactions:', error);
+                // Fall back to empty array
+                negotiations = [];
+                loadNegotiations();
+                
+                // Update statistics even with empty negotiations
+                if (farmers && farmers.length > 0) {
+                    updateFarmerStatistics(farmers);
+                }
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const tbody = document.getElementById('farmerTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            setupSearchAndFilters();
+            if (token) {
+                loadFarmersData();
+            }
+            setupProfileDropdown();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            const editForm = document.getElementById('editFarmerForm');
+            if (editForm) {
+                editForm.addEventListener('submit', handleEditSubmit);
+            }
+        }
+
+        // Refresh table with filters
+        function refreshTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            const filteredFarmers = farmers.filter(farmer => {
+                const matchesSearch = (farmer.fullName || farmer.username || '').toLowerCase().includes(searchTerm) || 
+                                   (farmer.email || '').toLowerCase().includes(searchTerm);
+                // For now, treat all farmers as active since we don't have status field
+                const matchesStatus = !statusFilter || statusFilter === 'active';
+                return matchesSearch && matchesStatus;
+            });
+
+            renderFarmersTable(filteredFarmers);
+        }
+
+        // Render farmers table with enhanced actions
+        function renderFarmersTable(farmersToShow) {
+            const tbody = document.getElementById('farmerTableBody');
+            
+            if (farmersToShow.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-users mr-2"></i>
+                            No farmers found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = farmersToShow.map(farmer => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-user-tie text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="font-medium text-gray-900">${farmer.fullName || farmer.username || 'N/A'}</div>
+                                <div class="text-sm text-gray-500">${farmer.farmName || 'Farm name not set'}</div>
+                                <div class="text-xs text-gray-400">${farmer.farmAddress || farmer.state || 'Location not set'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${farmer.email || 'N/A'}</div>
+                        <div class="text-xs text-gray-500">Joined: ${farmer.joinDate ? new Date(farmer.joinDate).toLocaleDateString('en-IN') : (farmer.createdAt ? new Date(farmer.createdAt).toLocaleDateString('en-IN') : 'N/A')}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${farmer.phone || farmer.mobile || 'N/A'}</div>
+                        <div class="text-xs text-gray-500">${farmer.productCount || farmer.totalProducts || 0} products</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${farmer.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${farmer.isActive !== false ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="showFarmerViewPopup('${farmer._id || farmer.id}')" 
+                                    class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" 
+                                    title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="showFarmerEditPopup('${farmer._id || farmer.id}')" 
+                                    class="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50" 
+                                    title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="showFarmerMorePopup('${farmer._id || farmer.id}')" 
+                                    class="text-gray-600 hover:text-gray-800 p-2 rounded-full hover:bg-gray-50" 
+                                    title="More Actions">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Popup Modal Functions
+        function showFarmerViewPopup(farmerId) {
+            console.log('🔍 showFarmerViewPopup called with farmerId:', farmerId);
+            
+            // Create popup for viewing farmer details
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Farmer Details</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="farmerViewContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            loadFarmerDetails(farmerId, 'view');
+        }
+
+        function showFarmerEditPopup(farmerId) {
+            console.log('✏️ showFarmerEditPopup called with farmerId:', farmerId);
+            
+            // Create popup for editing farmer
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Farmer</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="farmerEditContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            loadFarmerDetails(farmerId, 'edit');
+        }
+
+        function showFarmerMorePopup(farmerId) {
+            console.log('⚙️ showFarmerMorePopup called with farmerId:', farmerId);
+            
+            // Create popup for more actions
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Farmer Actions</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <button onclick="viewFarmerProducts('${farmerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i class="fas fa-seedling text-blue-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-blue-900">View Products</div>
+                                <div class="text-sm text-blue-600">See all farmer's products</div>
+                            </div>
+                        </button>
+                        <button onclick="viewFarmerNegotiations('${farmerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors">
+                            <i class="fas fa-handshake text-yellow-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-yellow-900">View Negotiations</div>
+                                <div class="text-sm text-yellow-600">See active and past negotiations</div>
+                            </div>
+                        </button>
+                        <button onclick="deleteFarmer('${farmerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            <i class="fas fa-trash text-red-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-red-900">Delete Farmer</div>
+                                <div class="text-sm text-red-600">Permanently remove farmer</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        async function loadFarmerDetails(farmerId, mode = 'view') {
+            console.log(`📋 loadFarmerDetails called with farmerId: ${farmerId}, mode: ${mode}`);
+            
+            try {
+                const response = await fetch(`/api/admin/farmers/${farmerId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                console.log('🌐 API response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error('Failed to load farmer details');
+                }
+
+                const farmer = await response.json();
+                console.log('✅ Farmer details loaded:', farmer);
+                
+                if (mode === 'view') {
+                    displayFarmerViewContent(farmer);
+                } else if (mode === 'edit') {
+                    displayFarmerEditContent(farmer);
+                }
+            } catch (error) {
+                console.error('Error loading farmer details:', error);
+                const content = document.getElementById(`farmer${mode === 'view' ? 'View' : 'Edit'}Content`);
+                if (content) {
+                    content.innerHTML = `
+                        <div class="text-center py-8 text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                            <p>Error loading farmer details</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function displayFarmerViewContent(farmer) {
+            const content = document.getElementById('farmerViewContent');
+            if (!content) return;
+
+            const joinDate = farmer.joinDate || farmer.createdAt;
+            const formattedJoinDate = joinDate ? new Date(joinDate).toLocaleDateString('en-IN') : 'N/A';
+            
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                            <p class="text-gray-900">${farmer.fullName || farmer.username || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                            <p class="text-gray-900">${farmer.email || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                            <p class="text-gray-900">${farmer.phone || farmer.mobile || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Farm Name</label>
+                            <p class="text-gray-900">${farmer.farmName || 'Not set'}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Farm Address</label>
+                            <p class="text-gray-900">${farmer.farmAddress || farmer.state || 'Not set'}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Status</label>
+                            <span class="px-3 py-1 text-sm rounded-full ${farmer.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${farmer.isActive !== false ? 'ACTIVE' : 'INACTIVE'}
+                            </span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Join Date</label>
+                            <p class="text-gray-900">${formattedJoinDate}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Total Products</label>
+                            <p class="text-gray-900">${farmer.productCount || farmer.totalProducts || 0}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Close
+                        </button>
+                        <button onclick="showFarmerEditPopup('${farmer._id || farmer.id}'); this.closest('.fixed').remove();" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            <i class="fas fa-edit mr-2"></i>Edit Farmer
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayFarmerEditContent(farmer) {
+            const content = document.getElementById('farmerEditContent');
+            if (!content) return;
+
+            content.innerHTML = `
+                <form onsubmit="updateFarmerDetails(event, '${farmer._id || farmer.id}')" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="editFarmerName" value="${farmer.fullName || farmer.username || ''}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="editFarmerEmail" value="${farmer.email || ''}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <input type="tel" id="editFarmerPhone" value="${farmer.phone || farmer.mobile || ''}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Farm Name</label>
+                            <input type="text" id="editFarmName" value="${farmer.farmName || ''}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Farm Address</label>
+                            <input type="text" id="editFarmAddress" value="${farmer.farmAddress || farmer.state || ''}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <select id="editFarmerStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                                <option value="true" ${farmer.isActive !== false ? 'selected' : ''}>Active</option>
+                                <option value="false" ${farmer.isActive === false ? 'selected' : ''}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="this.closest('.fixed').remove()" 
+                                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            `;
+        }
+
+        async function updateFarmerDetails(event, farmerId) {
+            event.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('editFarmerName').value,
+                email: document.getElementById('editFarmerEmail').value,
+                phone: document.getElementById('editFarmerPhone').value,
+                farmName: document.getElementById('editFarmName').value,
+                farmAddress: document.getElementById('editFarmAddress').value,
+                isActive: document.getElementById('editFarmerStatus').value === 'true'
+            };
+
+            try {
+                const response = await fetch(`/api/admin/farmers/${farmerId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.querySelector('.fixed').remove();
+                    loadFarmersData();
+                    showNotification('Farmer updated successfully', 'success');
+                } else {
+                    throw new Error('Failed to update farmer');
+                }
+            } catch (error) {
+                console.error('Error updating farmer:', error);
+                showNotification('Error updating farmer', 'error');
+            }
+        }
+
+        // Additional action functions
+        async function viewFarmerProducts(farmerId) {
+            console.log('🌱 viewFarmerProducts called with farmerId:', farmerId);
+            
+            // Close the current modal
+            document.querySelector('.fixed').remove();
+            
+            // Create popup for viewing farmer products
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-seedling text-green-600 mr-2"></i>
+                            Farmer Products
+                        </h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="farmerProductsContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-green-600 text-2xl mr-3"></i>
+                            <span class="text-gray-600">Loading farmer products...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Load farmer products
+            try {
+                const response = await fetch(`/api/admin/farmers/${farmerId}/products`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load farmer products');
+                }
+
+                const products = await response.json();
+                console.log('✅ Farmer products loaded:', products);
+                
+                displayFarmerProducts(products);
+                
+            } catch (error) {
+                console.error('❌ Error loading farmer products:', error);
+                const content = document.getElementById('farmerProductsContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div class="text-center py-8 text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                            <p class="text-lg mb-2">Error loading farmer products</p>
+                            <p class="text-sm">${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function displayFarmerProducts(products) {
+            const content = document.getElementById('farmerProductsContent');
+            if (!content) return;
+
+            if (products.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-seedling text-4xl mb-4 text-gray-300"></i>
+                        <p class="text-lg mb-2">No Products Found</p>
+                        <p class="text-sm">This farmer hasn't added any products yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="mb-4 flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">${products.length}</span> product${products.length !== 1 ? 's' : ''} found
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            `;
+            
+            products.forEach(product => {
+                const statusClass = product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const statusText = product.active ? 'Active' : 'Inactive';
+                
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-semibold text-gray-900 text-sm">${product.name}</h4>
+                            <span class="px-2 py-1 text-xs rounded-full ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Category:</span>
+                                <span class="text-gray-900">${product.category}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Price:</span>
+                                <span class="text-gray-900 font-medium">₹${product.price}/${product.unit}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Quantity:</span>
+                                <span class="text-gray-900">${product.quantity} ${product.unit}</span>
+                            </div>
+                            ${product.organic ? `
+                                <div class="flex items-center text-green-600 text-xs">
+                                    <i class="fas fa-leaf mr-1"></i>
+                                    <span>Organic</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${product.description ? `
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <p class="text-xs text-gray-600">${product.description}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                            Added: ${new Date(product.createdAt).toLocaleDateString('en-IN')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        async function viewFarmerNegotiations(farmerId) {
+            console.log('🤝 viewFarmerNegotiations called with farmerId:', farmerId);
+            
+            // Close the current modal
+            document.querySelector('.fixed').remove();
+            
+            // Create popup for viewing farmer negotiations
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-handshake text-yellow-600 mr-2"></i>
+                            Farmer Negotiations
+                        </h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="farmerNegotiationsContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-yellow-600 text-2xl mr-3"></i>
+                            <span class="text-gray-600">Loading farmer negotiations...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Load farmer negotiations
+            try {
+                const response = await fetch(`/api/admin/farmers/${farmerId}/negotiations`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load farmer negotiations');
+                }
+
+                const rawNegotiations = await response.json();
+                
+                // Filter out pending status and consolidate transaction types  
+                const negotiations = rawNegotiations.filter(item => item.status !== 'pending').map(item => {
+                    if (item.status === 'pending') {
+                        item.status = 'accepted';
+                    }
+                    // Remove any payment status since paid option doesn't exist
+                    if (item.paymentStatus) {
+                        delete item.paymentStatus;
+                    }
+                    // Consolidate order-from-negotiation into negotiation type
+                    if (item.type === 'order-from-negotiation') {
+                        item.type = 'negotiation';
+                    }
+                    return item;
+                });
+                
+                console.log('✅ Farmer negotiations loaded:', negotiations);
+                
+                displayFarmerNegotiations(negotiations);
+                
+            } catch (error) {
+                console.error('❌ Error loading farmer negotiations:', error);
+                const content = document.getElementById('farmerNegotiationsContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div class="text-center py-8 text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                            <p class="text-lg mb-2">Error loading farmer negotiations</p>
+                            <p class="text-sm">${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function displayFarmerNegotiations(negotiations) {
+            const content = document.getElementById('farmerNegotiationsContent');
+            if (!content) return;
+
+            if (negotiations.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-handshake text-4xl mb-4 text-gray-300"></i>
+                        <p class="text-lg mb-2">No Negotiations Found</p>
+                        <p class="text-sm">This farmer hasn't been involved in any negotiations yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group negotiations by status
+            const statusGroups = {
+                'accepted': negotiations.filter(n => n.status === 'accepted'),
+                'rejected': negotiations.filter(n => n.status === 'rejected'),
+                'purchased': negotiations.filter(n => n.status === 'purchased'),
+                'expired': negotiations.filter(n => n.status === 'expired')
+            };
+            
+            let html = `
+                <div class="mb-4 flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">${negotiations.length}</span> negotiation${negotiations.length !== 1 ? 's' : ''} found
+                    </div>
+                    <div class="flex space-x-2 text-xs">
+                        ${Object.entries(statusGroups).map(([status, items]) => {
+                            if (items.length === 0) return '';
+                            const colors = {
+                                'accepted': 'bg-green-100 text-green-800',
+                                'rejected': 'bg-red-100 text-red-800',
+                                'purchased': 'bg-blue-100 text-blue-800',
+                                'expired': 'bg-gray-100 text-gray-800'
+                            };
+                            return `<span class="px-2 py-1 rounded-full ${colors[status]}">${status}: ${items.length}</span>`;
+                        }).join('')}
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Consumer</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+            
+            negotiations.forEach(negotiation => {
+                const statusColors = {
+                    'accepted': 'bg-green-100 text-green-800',
+                    'rejected': 'bg-red-100 text-red-800',
+                    'purchased': 'bg-blue-100 text-blue-800',
+                    'expired': 'bg-gray-100 text-gray-800'
+                };
+                
+                const statusClass = statusColors[negotiation.status] || 'bg-gray-100 text-gray-800';
+                const originalPrice = negotiation.originalPrice || 0;
+                const proposedPrice = negotiation.pricePerUnit || 0;
+                const savings = originalPrice - proposedPrice;
+                
+                html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${negotiation.product}</div>
+                            <div class="text-xs text-gray-500">${negotiation.category}</div>
+                            ${negotiation.message ? `<div class="text-xs text-gray-400 mt-1 italic">"${negotiation.message}"</div>` : ''}
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${negotiation.consumerName}</div>
+                            <div class="text-xs text-gray-500">${negotiation.consumerEmail}</div>
+                            ${negotiation.consumerPhone ? `<div class="text-xs text-gray-500">${negotiation.consumerPhone}</div>` : ''}
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${negotiation.quantity} ${negotiation.unit}</div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">₹${parseFloat(proposedPrice).toFixed(2)}/${negotiation.unit}</div>
+                            ${originalPrice !== proposedPrice ? `
+                                <div class="text-xs text-gray-500">
+                                    Original: ₹${parseFloat(originalPrice).toFixed(2)}
+                                    ${savings > 0 ? `<span class="text-red-600">(-₹${parseFloat(savings).toFixed(2)})</span>` : 
+                                      savings < 0 ? `<span class="text-green-600">(+₹${parseFloat(Math.abs(savings)).toFixed(2)})</span>` : ''}
+                                </div>
+                            ` : ''}
+                            <div class="text-xs font-medium text-gray-700">Total: ₹${parseFloat(negotiation.totalPrice).toFixed(2)}</div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full ${statusClass}">
+                                ${negotiation.status.toUpperCase()}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-xs text-gray-500">
+                            <div>Created: ${new Date(negotiation.createdAt).toLocaleDateString('en-IN')}</div>
+                            ${negotiation.farmerResponseAt ? `<div>Responded: ${new Date(negotiation.farmerResponseAt).toLocaleDateString('en-IN')}</div>` : ''}
+                            ${negotiation.expiresAt ? `<div>Expires: ${new Date(negotiation.expiresAt).toLocaleDateString('en-IN')}</div>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        async function viewFarmerAnalytics(farmerId) {
+            document.querySelector('.fixed').remove();
+            // Implement analytics viewing logic
+            showNotification('Loading farmer analytics...', 'info');
+        }
+
+        async function toggleFarmerStatus(farmerId) {
+            if (confirm('Are you sure you want to toggle this farmer\'s status?')) {
+                try {
+                    const response = await fetch(`/api/admin/farmers/${farmerId}/toggle-status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        document.querySelector('.fixed').remove();
+                        loadFarmersData();
+                        showNotification('Farmer status updated', 'success');
+                    } else {
+                        throw new Error('Failed to toggle status');
+                    }
+                } catch (error) {
+                    console.error('Error toggling farmer status:', error);
+                    showNotification('Error updating farmer status', 'error');
+                }
+            }
+        }
+
+        async function deleteFarmer(farmerId) {
+            console.log('🗑️ deleteFarmer called with farmerId:', farmerId);
+            
+            // Close the current modal
+            document.querySelector('.fixed').remove();
+            
+            // Get farmer details for confirmation
+            const farmer = farmers.find(f => 
+                (f._id && f._id.toString() === farmerId) || 
+                (f.id && f.id.toString() === farmerId)
+            );
+            
+            const farmerName = farmer ? (farmer.fullName || farmer.username) : 'Unknown Farmer';
+            
+            // Create delete confirmation popup
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">Delete Farmer</h3>
+                            <p class="text-sm text-gray-600">This action cannot be undone</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-4">
+                            Are you sure you want to delete <strong>"${farmerName}"</strong>?
+                        </p>
+                        
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-red-800 mb-2">This will permanently delete:</h4>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                <li class="flex items-center">
+                                    <i class="fas fa-user text-xs mr-2"></i>
+                                    Farmer profile and account
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-seedling text-xs mr-2"></i>
+                                    All associated products
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-shopping-cart text-xs mr-2"></i>
+                                    Order history
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-handshake text-xs mr-2"></i>
+                                    Negotiation records
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-database text-xs mr-2"></i>
+                                    All farm information
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button onclick="confirmDeleteFarmer('${farmerId}', '${farmerName}')" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Delete Farmer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+        
+        async function confirmDeleteFarmer(farmerId, farmerName) {
+            console.log('🔥 Confirming delete for farmer:', farmerId);
+            
+            // Show loading state
+            const deleteButton = event.target;
+            const originalContent = deleteButton.innerHTML;
+            deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+            deleteButton.disabled = true;
+            
+            try {
+                const response = await fetch(`/api/admin/farmers/${farmerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Farmer deleted successfully:', result);
+                    
+                    // Close the confirmation modal
+                    document.querySelector('.fixed').remove();
+                    
+                    // Reload farmers data
+                    await loadFarmersData();
+                    
+                    // Show success popup instead of notification
+                    showDeleteSuccessPopup(farmerName, result);
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to delete farmer');
+                }
+            } catch (error) {
+                console.error('❌ Error deleting farmer:', error);
+                
+                // Restore button state
+                deleteButton.innerHTML = originalContent;
+                deleteButton.disabled = false;
+                
+                // Show error popup instead of notification
+                showDeleteErrorPopup(farmerName, error.message);
+            }
+        }
+        
+        function showDeleteSuccessPopup(farmerName, result) {
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">Farmer Deleted Successfully</h3>
+                            <p class="text-sm text-gray-600">Operation completed successfully</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-4">
+                            <strong>"${farmerName}"</strong> has been permanently deleted from the system.
+                        </p>
+                        
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-green-800 mb-2">Successfully removed:</h4>
+                            <ul class="text-sm text-green-700 space-y-1">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Farmer profile and account
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    All associated products
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Order history
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Negotiation records
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    All farm information
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                            <i class="fas fa-check mr-2"></i>OK
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+        
+        function showDeleteErrorPopup(farmerName, errorMessage) {
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">Delete Failed</h3>
+                            <p class="text-sm text-gray-600">Unable to delete farmer</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-4">
+                            Failed to delete <strong>"${farmerName}"</strong> from the system.
+                        </p>
+                        
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-red-800 mb-2">Error Details:</h4>
+                            <p class="text-sm text-red-700">${errorMessage}</p>
+                        </div>
+                        
+                        <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-yellow-800 mb-2">What you can do:</h4>
+                            <ul class="text-sm text-yellow-700 space-y-1">
+                                <li class="flex items-center">
+                                    <i class="fas fa-refresh text-xs mr-2"></i>
+                                    Try again in a few moments
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-wifi text-xs mr-2"></i>
+                                    Check your internet connection
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-phone text-xs mr-2"></i>
+                                    Contact support if problem persists
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="this.closest('.fixed').remove(); location.reload();" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-refresh mr-2"></i>Retry
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // View farmer details in modal
+        function viewFarmerDetails(farmerId) {
+            console.log('Opening farmer details for ID:', farmerId);
+            
+            if (!farmers || farmers.length === 0) {
+                console.error('No farmers data available');
+                alert('No farmer data loaded. Please refresh the page.');
+                return;
+            }
+            
+            const farmer = farmers.find(f => {
+                const match1 = f._id && f._id.toString() === farmerId;
+                const match2 = f.id && f.id.toString() === farmerId;
+                const match3 = f._id && f._id === farmerId;
+                const match4 = f.id && f.id === farmerId;
+                return match1 || match2 || match3 || match4;
+            });
+            
+            if (!farmer) {
+                console.error('Farmer not found with ID:', farmerId);
+                alert(`Farmer not found with ID: ${farmerId}`);
+                return;
+            }
+
+            console.log('Found farmer:', farmer.username || farmer.fullName);
+            
+            // Remove any existing modal
+            const existingModal = document.getElementById('viewModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create fresh modal with farmer data using inline styles only
+            const modalHTML = `
+                <div id="viewModal" style="
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    background-color: rgba(75, 85, 99, 0.8) !important;
+                    z-index: 999999999 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    margin: 0 !important;
+                    padding: 20px !important;
+                    box-sizing: border-box !important;
+                " onclick="closeViewModal()">
+                    <div style="
+                        background: white !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+                        width: 90% !important;
+                        max-width: 900px !important;
+                        max-height: 90vh !important;
+                        overflow-y: auto !important;
+                        position: relative !important;
+                        z-index: 1000000000 !important;
+                    " onclick="event.stopPropagation()">
+                        <div style="background: rgb(240, 253, 244); padding: 16px; border-bottom: 1px solid rgb(34, 197, 94); border-radius: 12px 12px 0 0;">
+                            <h3 style="font-size: 18px; font-weight: 600; color: rgb(21, 128, 61); display: flex; align-items: center; margin: 0;">
+                                <i class="fas fa-user-circle" style="margin-right: 8px;"></i>
+                                ${farmer.fullName || farmer.username || 'Farmer'} Details
+                            </h3>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="background: rgb(239, 246, 255); padding: 12px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(30, 64, 175); margin-bottom: 8px; display: flex; align-items: center;"><i class="fas fa-user" style="margin-right: 8px;"></i>Personal Information</h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 4px 0;"><strong>Name:</strong> ${farmer.fullName || farmer.username || 'N/A'}</p>
+                                        <p style="margin: 4px 0;"><strong>Email:</strong> ${farmer.email || 'N/A'}</p>
+                                        <p style="margin: 4px 0;"><strong>Phone:</strong> ${farmer.phone || farmer.mobile || 'N/A'}</p>
+                                        <p style="margin: 4px 0;"><strong>Role:</strong> <span style="background: rgb(34, 197, 94); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${farmer.role || 'Farmer'}</span></p>
+                                    </div>
+                                </div>
+                                <div style="background: rgb(254, 249, 195); padding: 12px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(161, 98, 7); margin-bottom: 8px; display: flex; align-items: center;"><i class="fas fa-seedling" style="margin-right: 8px;"></i>Farm Information</h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 4px 0;"><strong>Farm Name:</strong> ${farmer.farmName || 'Not specified'}</p>
+                                        <p style="margin: 4px 0;"><strong>Address:</strong> ${farmer.farmAddress || 'Not specified'}</p>
+                                        <p style="margin: 4px 0;"><strong>Farm Size:</strong> ${farmer.farmSize || 0} acres</p>
+                                        <p style="margin: 4px 0;"><strong>Products:</strong> ${farmer.productTypes && farmer.productTypes.length > 0 ? farmer.productTypes.join(', ') : 'None specified'}</p>
+                                    </div>
+                                </div>
+                                <div style="background: rgb(240, 253, 244); padding: 12px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(21, 128, 61); margin-bottom: 8px; display: flex; align-items: center;"><i class="fas fa-chart-bar" style="margin-right: 8px;"></i>Statistics</h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 4px 0;"><strong>Products:</strong> <span style="margin-left: 8px;">${farmer.productCount || farmer.totalProducts || 0}</span></p>
+                                        <p style="margin: 4px 0;"><strong>Orders:</strong> <span style="margin-left: 8px;">${farmer.orderCount || farmer.totalOrders || 0}</span></p>
+                                        <p style="margin: 4px 0;"><strong>Member Since:</strong> <span style="margin-left: 8px;">${farmer.joinDate ? new Date(farmer.joinDate).toLocaleDateString() : (farmer.createdAt ? new Date(farmer.createdAt).toLocaleDateString() : 'N/A')}</span></p>
+                                        <p style="margin: 4px 0;"><strong>Status:</strong> <span style="margin-left: 8px;">Active</span></p>
+                                    </div>
+                                </div>
+                                <div style="background: rgb(250, 245, 255); padding: 12px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(107, 33, 168); margin-bottom: 8px; display: flex; align-items: center;"><i class="fas fa-clock" style="margin-right: 8px;"></i>Account Details</h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 4px 0;"><strong>User ID:</strong> <code style="background: rgb(243, 244, 246); padding: 4px; border-radius: 4px; font-size: 10px; word-break: break-all; margin-left: 8px;">${farmer._id || farmer.id}</code></p>
+                                        <p style="margin: 4px 0;"><strong>Last Updated:</strong> <span style="margin-left: 8px; font-size: 12px; color: rgb(75, 85, 99);">${farmer.updatedAt ? new Date(farmer.updatedAt).toLocaleString() : 'N/A'}</span></p>
+                                        <p style="margin: 4px 0;"><strong>Verification:</strong> <span style="margin-left: 8px;">✓ Verified</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgb(249, 250, 251); padding: 16px; border-top: 1px solid rgb(229, 231, 235); border-radius: 0 0 12px 12px; display: flex; justify-content: flex-end;">
+                            <button type="button" onclick="closeViewModal()" style="
+                                background: rgb(107, 114, 128) !important;
+                                color: white !important;
+                                padding: 8px 16px !important;
+                                border-radius: 6px !important;
+                                border: none !important;
+                                cursor: pointer !important;
+                                font-family: inherit !important;
+                            " onmouseover="this.style.background='rgb(75, 85, 99)'" onmouseout="this.style.background='rgb(107, 114, 128)'">
+                                <i class="fas fa-times" style="margin-right: 8px;"></i>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the very end of body to ensure it's on top
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            console.log('✅ Fresh farmer modal created with real data - should be visible on top!');
+        }
+
+        // Status styling helper (kept for compatibility)
+        function getStatusClass(status) {
+            const classes = {
+                active: 'bg-green-100 text-green-800',
+                suspended: 'bg-red-100 text-red-800'
+            };
+            return classes[status] || 'bg-green-100 text-green-800';
+        }
+
+        // Modal functions
+        function openEditModal(farmerId) {
+            const farmer = farmers.find(f => (f._id && f._id.toString()) === farmerId || (f.id && f.id.toString()) === farmerId);
+            if (!farmer) {
+                console.error('Farmer not found for editing:', farmerId);
+                return;
+            }
+
+            document.getElementById('farmerId').value = farmer._id || farmer.id;
+            document.getElementById('editName').value = farmer.fullName || farmer.username || '';
+            document.getElementById('editEmail').value = farmer.email || '';
+            document.getElementById('editPhone').value = farmer.phone || farmer.mobile || '';
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function closeViewModal() {
+            console.log('Closing modal...');
+            
+            // Remove any modal that exists
+            const modal = document.getElementById('viewModal');
+            if (modal) {
+                modal.remove();
+                console.log('Modal removed completely');
+            } else {
+                console.log('No modal found to close');
+            }
+        }
+
+        function closeNegotiationModal() {
+            console.log('Closing negotiation modal...');
+            
+            // Remove negotiation modal
+            const modal = document.getElementById('negotiationModal');
+            if (modal) {
+                modal.remove();
+                console.log('Negotiation modal removed completely');
+            } else {
+                console.log('No negotiation modal found to close');
+            }
+        }
+
+        // Test function to check modal works
+
+
+        // Form submission handler
+        async function handleEditSubmit(e) {
+            e.preventDefault();
+            console.log('Form submitted, processing...');
+            
+            const farmerId = document.getElementById('farmerId').value;
+            const updatedName = document.getElementById('editName').value;
+            const updatedEmail = document.getElementById('editEmail').value;
+            const updatedPhone = document.getElementById('editPhone').value;
+            
+            console.log('Updating farmer:', farmerId, {
+                name: updatedName,
+                email: updatedEmail,
+                phone: updatedPhone
+            });
+            
+            try {
+                // Send PUT request to update farmer in database
+                const response = await fetch(`/api/admin/farmers/${farmerId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullName: updatedName,
+                        username: updatedName,
+                        email: updatedEmail,
+                        phone: updatedPhone,
+                        mobile: updatedPhone
+                    })
+                });
+                
+                if (response.ok) {
+                    const updatedFarmer = await response.json();
+                    console.log('✅ Farmer updated in database:', updatedFarmer);
+                    
+                    // Update local data with response from server
+                    const farmerIndex = farmers.findIndex(f => 
+                        (f._id && f._id.toString() === farmerId) || 
+                        (f.id && f.id.toString() === farmerId)
+                    );
+                    
+                    if (farmerIndex !== -1) {
+                        farmers[farmerIndex] = {
+                            ...farmers[farmerIndex],
+                            ...updatedFarmer,
+                            fullName: updatedName,
+                            username: updatedName,
+                            email: updatedEmail,
+                            phone: updatedPhone,
+                            mobile: updatedPhone
+                        };
+                        
+                        // Refresh the table to show changes
+                        refreshTable();
+                        
+                        // Close modal and show success
+                        closeEditModal();
+                        alert('Farmer details updated successfully and saved to database!');
+                        
+                        console.log('✅ Farmer updated successfully in database and local data');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.error('❌ Failed to update farmer in database:', errorData);
+                    alert(`Failed to update farmer: ${errorData.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('❌ Error updating farmer:', error);
+                
+                // Fallback to local update only if API fails
+                console.log('Falling back to local update only...');
+                const farmerIndex = farmers.findIndex(f => 
+                    (f._id && f._id.toString() === farmerId) || 
+                    (f.id && f.id.toString() === farmerId)
+                );
+                
+                if (farmerIndex !== -1) {
+                    farmers[farmerIndex] = {
+                        ...farmers[farmerIndex],
+                        fullName: updatedName,
+                        username: updatedName,
+                        email: updatedEmail,
+                        phone: updatedPhone,
+                        mobile: updatedPhone
+                    };
+                    
+                    refreshTable();
+                    closeEditModal();
+                    alert('Farmer details updated locally only. Database update failed. Please check your connection.');
+                } else {
+                    alert('Error: Farmer not found for update');
+                }
+            }
+        }
+
+        // Status update function (kept for compatibility)
+        function updateStatus(farmerId, newStatus) {
+            const farmer = farmers.find(f => f.id === farmerId);
+            if (farmer) {
+                farmer.status = newStatus;
+                refreshTable();
+            }
+        }
+
+        // Load negotiations with admin controls
+        function loadNegotiations() {
+            const container = document.getElementById('negotiationsList');
+            if (!container) {
+                console.error('❌ negotiationsList container not found');
+                return;
+            }
+            
+            // Sample negotiations data (in real app, this would come from API)
+            if (negotiations.length === 0) {
+                // Add some sample negotiations for demo
+                negotiations = [
+                    {
+                        id: 'neg001',
+                        product: 'Organic Tomatoes',
+                        consumerName: 'Fresh Foods Ltd',
+                        farmerName: 'Trisa (Heaven garden)',
+                        quantity: 100,
+                        unit: 'kg',
+                        pricePerUnit: 45,
+                        totalPrice: 4500,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                        expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) // 5 days from now
+                    },
+                    {
+                        id: 'neg002',
+                        product: 'Fresh Vegetables Mix',
+                        consumerName: 'Green Mart',
+                        farmerName: 'Rajesh Kumar',
+                        quantity: 50,
+                        unit: 'kg',
+                        pricePerUnit: 35,
+                        totalPrice: 1750,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                        expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+                    },
+                    {
+                        id: 'neg003',
+                        product: 'Seasonal Fruits',
+                        consumerName: 'Organic Store',
+                        farmerName: 'Trisa (Heaven garden)',
+                        quantity: 25,
+                        unit: 'kg',
+                        pricePerUnit: 60,
+                        totalPrice: 1500,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                        acceptedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+                    }
+                ];
+            }
+            
+            if (negotiations.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-handshake text-4xl mb-4"></i>
+                        <p>No active transactions found</p>
+                        <button onclick="generateSampleNegotiations()" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Generate Sample Data
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = negotiations.map(nego => `
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-semibold text-lg text-gray-900">${nego.product || nego.productName}</h3>
+                                    
+                                    <!-- Transaction Type Badge -->
+                                    <span class="px-2 py-1 text-xs rounded-full ${
+                                        nego.type === 'negotiation' ? 'bg-blue-100 text-blue-800' :
+                                        nego.type === 'direct-order' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">
+                                        ${nego.type === 'negotiation' ? 'NEGOTIATION' :
+                                          nego.type === 'direct-order' ? 'DIRECT ORDER' :
+                                          'TRANSACTION'}
+                                    </span>
+                                    
+                                    <!-- Status Badge -->
+                                    <span class="px-3 py-1 text-xs rounded-full ${
+                                        nego.status === 'accepted' ? 'bg-green-100 text-green-800' : 
+                                        nego.status === 'purchased' ? 'bg-emerald-100 text-emerald-800' :
+                                        nego.status === 'rejected' || nego.status === 'declined' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">
+                                        ${nego.status ? nego.status.toUpperCase() : 'N/A'}
+                                    </span>
+                                    
+
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Consumer:</p>
+                                        <p class="text-sm text-gray-900">${nego.consumerName}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Farmer:</p>
+                                        <p class="text-sm text-gray-900">${nego.farmerName}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Quantity:</p>
+                                        <p class="text-sm text-gray-900">${nego.quantity} ${nego.unit || 'kg'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Price:</p>
+                                        <p class="text-sm text-gray-900">₹${nego.pricePerUnit || nego.proposedPrice}/unit</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-lg font-semibold text-green-600">
+                                        Total: ₹${nego.totalPrice || (nego.pricePerUnit * nego.quantity || nego.proposedPrice * nego.quantity)}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        Created: ${nego.createdAt ? new Date(nego.createdAt).toLocaleDateString() : 'N/A'}
+                                        ${nego.expiresAt ? ` • Expires: ${new Date(nego.expiresAt).toLocaleDateString()}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Action Buttons -->
+                        <div class="border-t border-gray-100 pt-3">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    ID: ${nego.id} • Created: ${nego.createdAt ? new Date(nego.createdAt).toLocaleDateString() : 'N/A'}
+                                    ${nego.expiresAt ? ` • Expires: ${new Date(nego.expiresAt).toLocaleDateString()}` : ''}
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <button onclick="viewNegotiationDetails('${nego.id}')" 
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">
+                                        <i class="fas fa-eye mr-1"></i> View
+                                    </button>
+                                    <button onclick="deleteNegotiation('${nego.id}', '${nego.product}')" 
+                                            class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition">
+                                        <i class="fas fa-trash mr-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('✅ Negotiations rendered successfully with admin controls');
+        }
+
+        // Admin Negotiation Management Functions (Simplified)
+        function deleteNegotiation(negoId, productName) {
+            console.log('🗑️ deleteNegotiation called with negoId:', negoId, 'product:', productName);
+            
+            const nego = negotiations.find(n => n.id === negoId);
+            if (!nego) {
+                showDeleteErrorPopup('Negotiation', 'Negotiation not found');
+                return;
+            }
+            
+            // Create delete confirmation popup for negotiation
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">Delete Negotiation</h3>
+                            <p class="text-sm text-gray-600">This action cannot be undone</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-4">
+                            Are you sure you want to delete this negotiation for <strong>"${productName}"</strong>?
+                        </p>
+                        
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                            <h4 class="text-sm font-medium text-gray-800 mb-2">Negotiation Details:</h4>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div><strong>Product:</strong> ${nego.product}</div>
+                                <div><strong>Consumer:</strong> ${nego.consumerName}</div>
+                                <div><strong>Farmer:</strong> ${nego.farmerName}</div>
+                                <div><strong>Total:</strong> ₹${nego.totalPrice}</div>
+                                <div><strong>Status:</strong> <span class="capitalize">${nego.status}</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-red-800 mb-2">This will permanently delete:</h4>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                <li class="flex items-center">
+                                    <i class="fas fa-handshake text-xs mr-2"></i>
+                                    Negotiation record
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-receipt text-xs mr-2"></i>
+                                    Price negotiation details
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-calendar text-xs mr-2"></i>
+                                    Deal timestamps and status
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button onclick="confirmDeleteNegotiation('${negoId}', '${productName}')" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Delete Negotiation
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+        
+        async function confirmDeleteNegotiation(negoId, productName) {
+            console.log('🔥 Confirming delete for negotiation:', negoId);
+            
+            // Show loading state
+            const deleteButton = event.target;
+            const originalContent = deleteButton.innerHTML;
+            deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+            deleteButton.disabled = true;
+            
+            try {
+                const response = await fetch(`/api/admin/negotiations/${negoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Negotiation deleted successfully:', result);
+                    
+                    // Close the confirmation modal
+                    document.querySelector('.fixed').remove();
+                    
+                    // Reload negotiations data
+                    await loadNegotiationsData();
+                    
+                    // Show success popup
+                    showDeleteNegotiationSuccessPopup(productName, result);
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to delete negotiation');
+                }
+            } catch (error) {
+                console.error('❌ Error deleting negotiation:', error);
+                
+                // Restore button state
+                deleteButton.innerHTML = originalContent;
+                deleteButton.disabled = false;
+                
+                // Show error popup
+                showDeleteErrorPopup('Negotiation', error.message);
+            }
+        }
+        
+        function showDeleteNegotiationSuccessPopup(productName, result) {
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-gray-900">Negotiation Deleted Successfully</h3>
+                            <p class="text-sm text-gray-600">Operation completed successfully</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-4">
+                            The negotiation for <strong>"${productName}"</strong> has been permanently deleted from the system.
+                        </p>
+                        
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-green-800 mb-2">Successfully removed:</h4>
+                            <ul class="text-sm text-green-700 space-y-1">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Negotiation record
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Price negotiation details
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-xs mr-2"></i>
+                                    Deal timestamps and status
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                            <i class="fas fa-check mr-2"></i>OK
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+        
+        function viewNegotiationDetails(negoId) {
+            const nego = negotiations.find(n => n.id === negoId);
+            if (!nego) {
+                alert('Negotiation not found');
+                return;
+            }
+            
+            console.log('Opening negotiation details for:', negoId);
+            
+            // Remove any existing modal
+            const existingModal = document.getElementById('negotiationModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create negotiation details modal
+            const modalHTML = `
+                <div id="negotiationModal" style="
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    background-color: rgba(75, 85, 99, 0.8) !important;
+                    z-index: 999999999 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    margin: 0 !important;
+                    padding: 20px !important;
+                    box-sizing: border-box !important;
+                " onclick="closeNegotiationModal()">
+                    <div style="
+                        background: white !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+                        width: 90% !important;
+                        max-width: 800px !important;
+                        max-height: 90vh !important;
+                        overflow-y: auto !important;
+                        position: relative !important;
+                        z-index: 1000000000 !important;
+                    " onclick="event.stopPropagation()">
+                        <div style="background: rgb(59, 130, 246); padding: 16px; border-radius: 12px 12px 0 0; color: white;">
+                            <h3 style="font-size: 20px; font-weight: 600; margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-handshake" style="margin-right: 10px;"></i>
+                                Negotiation Details - ${nego.product}
+                            </h3>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div style="background: rgb(239, 246, 255); padding: 16px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(30, 64, 175); margin-bottom: 12px; display: flex; align-items: center;">
+                                        <i class="fas fa-seedling" style="margin-right: 8px;"></i>Product Information
+                                    </h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 6px 0;"><strong>Product:</strong> ${nego.product}</p>
+                                        <p style="margin: 6px 0;"><strong>Quantity:</strong> ${nego.quantity} ${nego.unit || 'kg'}</p>
+                                        <p style="margin: 6px 0;"><strong>Price per Unit:</strong> ₹${nego.pricePerUnit || nego.proposedPrice}</p>
+                                        <p style="margin: 6px 0; font-size: 18px; color: rgb(34, 197, 94);"><strong>Total Amount:</strong> ₹${nego.totalPrice || (nego.pricePerUnit * nego.quantity)}</p>
+                                    </div>
+                                </div>
+                                <div style="background: rgb(254, 249, 195); padding: 16px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(161, 98, 7); margin-bottom: 12px; display: flex; align-items: center;">
+                                        <i class="fas fa-users" style="margin-right: 8px;"></i>Parties Involved
+                                    </h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 6px 0;"><strong>Consumer:</strong> ${nego.consumerName}</p>
+                                        <p style="margin: 6px 0;"><strong>Farmer:</strong> ${nego.farmerName}</p>
+                                        ${nego.type !== 'direct-order' ? `<p style="margin: 6px 0;"><strong>Negotiation ID:</strong> <code style="background: rgb(243, 244, 246); padding: 4px; border-radius: 4px; font-size: 12px;">${nego.id}</code></p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div style="background: rgb(240, 253, 244); padding: 16px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(21, 128, 61); margin-bottom: 12px; display: flex; align-items: center;">
+                                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>Status
+                                    </h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 6px 0;"><strong>Status:</strong> 
+                                            <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; ${
+                                                nego.status === 'accepted' ? 'background: rgb(187, 247, 208); color: rgb(21, 128, 61);' : 
+                                                nego.status === 'rejected' ? 'background: rgb(254, 202, 202); color: rgb(153, 27, 27);' :
+                                                'background: rgb(229, 231, 235); color: rgb(75, 85, 99);'
+                                            }">${nego.status ? nego.status.toUpperCase() : 'N/A'}</span>
+                                        </p>
+                                        ${nego.rejectionReason ? `<p style="margin: 6px 0; color: rgb(153, 27, 27);"><strong>❌ Rejection Reason:</strong> ${nego.rejectionReason}</p>` : ''}
+                                        ${nego.flagged ? `<p style="margin: 6px 0; color: rgb(153, 27, 27);"><strong>⚠️ Flagged:</strong> ${nego.flagReason}</p>` : ''}
+                                    </div>
+                                </div>
+                                <div style="background: rgb(250, 245, 255); padding: 16px; border-radius: 12px;">
+                                    <h4 style="font-weight: 600; color: rgb(107, 33, 168); margin-bottom: 12px; display: flex; align-items: center;">
+                                        <i class="fas fa-clock" style="margin-right: 8px;"></i>Timeline
+                                    </h4>
+                                    <div style="space-y: 8px;">
+                                        <p style="margin: 6px 0;"><strong>Created:</strong> ${nego.createdAt ? new Date(nego.createdAt).toLocaleString() : 'N/A'}</p>
+                                        ${nego.expiresAt ? `<p style="margin: 6px 0;"><strong>Expires:</strong> ${new Date(nego.expiresAt).toLocaleString()}</p>` : ''}
+                                        ${nego.acceptedAt ? `<p style="margin: 6px 0; color: rgb(21, 128, 61);"><strong>✅ Accepted:</strong> ${new Date(nego.acceptedAt).toLocaleString()}</p>` : ''}
+                                        ${nego.rejectedAt ? `<p style="margin: 6px 0; color: rgb(153, 27, 27);"><strong>❌ Rejected:</strong> ${new Date(nego.rejectedAt).toLocaleString()}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgb(249, 250, 251); padding: 16px; border-top: 1px solid rgb(229, 231, 235); border-radius: 0 0 12px 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 12px; color: rgb(107, 114, 128);">
+                                Last updated: ${nego.updatedAt ? new Date(nego.updatedAt).toLocaleString() : new Date().toLocaleString()}
+                            </div>
+                            <button type="button" onclick="closeNegotiationModal()" style="
+                                background: rgb(59, 130, 246) !important;
+                                color: white !important;
+                                padding: 10px 20px !important;
+                                border-radius: 8px !important;
+                                border: none !important;
+                                cursor: pointer !important;
+                                font-family: inherit !important;
+                                font-weight: 600 !important;
+                            " onmouseover="this.style.background='rgb(37, 99, 235)'" onmouseout="this.style.background='rgb(59, 130, 246)'">
+                                <i class="fas fa-times" style="margin-right: 8px;"></i>Close Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the very end of body to ensure it's on top
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            console.log('✅ Negotiation details modal created and displayed');
+        }
+
+
+        // Profile dropdown setup
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Generate sample negotiations function (without pending status)
+        function generateSampleNegotiations() {
+            console.log('🎲 Generating sample negotiations without pending status...');
+            
+            negotiations = [
+                {
+                    id: 'sample_001',
+                    type: 'negotiation',
+                    product: 'Premium Tomatoes',
+                    consumerName: 'Fresh Market Co.',
+                    farmerName: 'Rajesh Kumar',
+                    quantity: 100,
+                    unit: 'kg',
+                    pricePerUnit: 45,
+                    totalPrice: 4500,
+                    status: 'accepted',
+                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                    acceptedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'sample_002',
+                    type: 'direct-order',
+                    product: 'Organic Vegetables',
+                    consumerName: 'Green Mart',
+                    farmerName: 'Trisa (Heaven garden)',
+                    quantity: 50,
+                    unit: 'kg',
+                    pricePerUnit: 35,
+                    totalPrice: 1750,
+                    status: 'purchased',
+                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'sample_003',
+                    type: 'negotiation',
+                    product: 'Seasonal Fruits',
+                    consumerName: 'Organic Store',
+                    farmerName: 'Mary Joseph',
+                    quantity: 25,
+                    unit: 'kg',
+                    pricePerUnit: 60,
+                    totalPrice: 1500,
+                    status: 'accepted',
+                    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+                }
+            ];
+            
+            console.log('✅ Generated sample negotiations:', negotiations.length);
+            loadNegotiations();
+        }
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect Hub - Product Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+    <!-- Header Section -->
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="admin_dashboard.html">
+                <img src="assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover"/>
+                HarvestLoop
+            </a>
+
+            <!-- Center Tabs -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="admin_dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+                <a href="admin-farmers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-users mr-3"></i> Farmers
+                </a>
+                <a href="admin-consumers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-building mr-3"></i> Consumers
+                </a>
+                <a href="admin-products.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-seedling mr-3"></i> Products
+                </a>
+                <a href="admin-orders.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-shopping-cart mr-3"></i> Orders
+                </a>
+            </div>
+
+            <!-- Right-Aligned Profile -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button id="profile-button" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <span class="font-medium">Admin</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user mr-2"></i> Profile
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-cog mr-2"></i> Settings
+                        </a>
+                        <hr class="my-1">
+                        <a href="#" onclick="handleLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 pt-20">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-[#3d6339] mb-2">Product Management</h1>
+                <p class="mb-6 text-gray-600">Manage products and monitor inventory across the platform</p>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="searchInput" placeholder="Search by product name or farmer..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                    <div class="flex gap-4">
+                        <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">All Categories</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Eggs">Eggs</option>
+                        </select>
+                        <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button onclick="refreshData()" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="bg-white/70 rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Details</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price & Unit</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Product Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-seedling text-2xl text-green-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Products</p>
+                            <p id="totalProducts" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active Products</p>
+                            <p id="activeProducts" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-tags text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Categories</p>
+                            <p id="totalCategories" class="text-2xl font-semibold text-gray-900">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-dollar-sign text-2xl text-yellow-500"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Avg Price</p>
+                            <p id="avgPrice" class="text-2xl font-semibold text-gray-900">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Details Modal -->
+    <div id="productModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Product Details</h3>
+                    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="productModalContent" class="px-6 py-4">
+                    <!-- Modal content will be inserted here -->
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                    <button onclick="closeProductModal()" class="bg-gray-300 px-4 py-2 rounded text-gray-700 hover:bg-gray-400">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let products = [];
+        let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        // Check authentication
+        if (!token) {
+            console.log('No token found, attempting auto-login...');
+            autoLoginAdmin();
+        }
+
+        // Auto-login function for admin
+        async function autoLoginAdmin() {
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userRole', data.role);
+                    console.log('Auto-login successful');
+                    loadProductsData();
+                } else {
+                    console.error('Auto-login failed:', data.message);
+                    showError('Authentication failed. Please login manually.');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showError('Connection error. Please check server.');
+            }
+        }
+
+        // Load products data from API
+        async function loadProductsData() {
+            try {
+                console.log('🔍 Loading products data...');
+                const response = await fetch('/api/admin/products', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    products = await response.json();
+                    console.log('✅ Products loaded:', products.length);
+                    refreshTable();
+                    updateStatistics();
+                } else if (response.status === 401 || response.status === 403) {
+                    console.error('❌ Authentication failed');
+                    await autoLoginAdmin();
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ API Error:', response.status, errorText);
+                    showError(`Failed to load products: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading products:', error);
+                showError('Failed to load products data.');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            if (token) {
+                loadProductsData();
+            }
+            setupProfileDropdown();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', refreshTable);
+            document.getElementById('categoryFilter').addEventListener('change', refreshTable);
+            document.getElementById('statusFilter').addEventListener('change', refreshTable);
+        }
+
+        // Refresh table with filters
+        function refreshTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            const filteredProducts = products.filter(product => {
+                const matchesSearch = (product.name || '').toLowerCase().includes(searchTerm) || 
+                                   (product.farmerName || '').toLowerCase().includes(searchTerm) ||
+                                   (product.description || '').toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                const matchesStatus = !statusFilter || (product.active ? 'active' : 'inactive') === statusFilter;
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            renderProductsTable(filteredProducts);
+        }
+
+        // Render products table with real data
+        function renderProductsTable(productsToShow) {
+            const tbody = document.getElementById('productsTableBody');
+            
+            if (productsToShow.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-seedling mr-2"></i>
+                            No products found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = productsToShow.map(product => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                ${product.image ? 
+                                    `<img class="h-10 w-10 rounded-full object-cover" src="/uploads/${product.image}" alt="${product.name}">` :
+                                    `<div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-seedling text-gray-400"></i>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="ml-4">
+                                <div class="font-medium text-gray-900">${product.name || 'N/A'}</div>
+                                <div class="text-sm text-gray-500">${product.description || 'No description'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${product.farmerName || 'Unknown'}</div>
+                        <div class="text-sm text-gray-500">${product.farmerEmail || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">$${product.price || '0'}</div>
+                        <div class="text-sm text-gray-500">per ${product.unit || 'unit'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                            ${product.category || 'Unknown'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded-full ${product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${product.active ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewProductDetails('${product.id}')" 
+                                class="text-blue-600 hover:text-blue-800 mr-2" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="toggleProductStatus('${product.id}')" 
+                                class="text-yellow-600 hover:text-yellow-800" title="Toggle Status">
+                            <i class="fas fa-toggle-${product.active ? 'on' : 'off'}"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalProducts = products.length;
+            const activeProducts = products.filter(p => p.active).length;
+            const categories = [...new Set(products.map(p => p.category).filter(c => c))];
+            const avgPrice = products.length > 0 ? 
+                (products.reduce((sum, p) => sum + (parseFloat(p.price) || 0), 0) / products.length).toFixed(2) : 0;
+
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('activeProducts').textContent = activeProducts;
+            document.getElementById('totalCategories').textContent = categories.length;
+            document.getElementById('avgPrice').textContent = `$${avgPrice}`;
+        }
+
+        // View product details
+        function viewProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const modalContent = document.getElementById('productModalContent');
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Product Information</h4>
+                        <div class="space-y-2">
+                            <p><span class="font-medium">Name:</span> ${product.name || 'N/A'}</p>
+                            <p><span class="font-medium">Description:</span> ${product.description || 'No description'}</p>
+                            <p><span class="font-medium">Category:</span> ${product.category || 'Unknown'}</p>
+                            <p><span class="font-medium">Price:</span> $${product.price || '0'} per ${product.unit || 'unit'}</p>
+                            <p><span class="font-medium">Status:</span> 
+                                <span class="px-2 py-1 text-xs rounded-full ${product.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${product.active ? 'ACTIVE' : 'INACTIVE'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-2">Farmer Information</h4>
+                        <div class="space-y-2">
+                            <p><span class="font-medium">Farmer:</span> ${product.farmerName || 'Unknown'}</p>
+                            <p><span class="font-medium">Email:</span> ${product.farmerEmail || 'N/A'}</p>
+                            <p><span class="font-medium">Created:</span> ${product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+                ${product.image ? `
+                    <div class="mt-4">
+                        <h4 class="font-semibold text-gray-900 mb-2">Product Image</h4>
+                        <img src="/uploads/${product.image}" alt="${product.name}" class="w-full max-w-md rounded-lg">
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        // Close product modal
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        // Toggle product status
+        function toggleProductStatus(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            // Here you would typically make an API call to update the status
+            alert(`Toggle status for product: ${product.name}\n(This would make an API call to update the product status)`);
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadProductsData();
+        }
+
+        // Profile dropdown setup
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (profileButton && profileDropdown) {
+                profileButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>

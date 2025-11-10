@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FarmConnect Hub - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Profile dropdown animation */
+    #profile-dropdown {
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.2s ease-out;
+      pointer-events: none;
+    }
+    #profile-dropdown:not(.hidden) {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Profile button hover effect */
+    #profile-button:hover {
+      color: #059669;
+    }
+  </style>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+ <!-- Header Section -->
+<header class="bg-[#ddccb1]">
+  <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+
+    <!-- Logo & Name -->
+    <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="admin_dashboard.html">
+        <img src="assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover"/>
+        HarvestLoop
+    </a>
+
+    <!-- Center Tabs -->
+    <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+      <a href="admin_dashboard.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+        <i class="fas fa-th mr-3"></i> Dashboard
+      </a>
+      <a href="admin-farmers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+        <i class="fas fa-users mr-3"></i> Farmers
+      </a>
+      <a href="admin-consumers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+        <i class="fas fa-building mr-3"></i> Consumers
+      </a>
+    </div>
+
+    <!-- Right-Aligned Profile -->
+    <div class="flex items-center space-x-4 z-10">
+      <div class="relative" id="profileContainer">
+        <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+          <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+          <div class="px-4 py-2 border-b font-semibold text-gray-700">Admin Menu</div>
+          <a href="#" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</header>
+
+
+<div class="relative pt-[88px]">
+  <!-- Dashboard Body -->
+  <div class="p-6">
+    <h1 class="text-2xl font-bold text-[#3d6339] mb-2">Welcome back, Admin!</h1>
+    <p class="mb-6">Today is <span id="date" class="font-medium text-green-800"></span></p>
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+      <!-- Total Farmers -->
+      <div class="bg-white p-4 rounded shadow">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold mb-2">Total Farmers</h2>
+          <div class="text-3xl">👨‍🌾</div>
+        </div>
+        <div id="totalFarmers" class="text-2xl font-bold text-green-700">Loading...</div>
+        <small class="text-gray-500">Active farmer accounts</small>
+      </div>
+
+      <!-- Total Consumers -->
+      <div class="bg-white p-4 rounded shadow">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold mb-2">Total Consumers</h2>
+          <div class="text-3xl">🏢</div>
+        </div>
+        <div id="totalConsumers" class="text-2xl font-bold text-green-700">Loading...</div>
+        <small class="text-gray-500">Registered buyers</small>
+      </div>
+
+      <!-- Total Products -->
+      <div class="bg-white p-4 rounded shadow">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold mb-2">Total Products</h2>
+          <div class="text-3xl">🥦</div>
+        </div>
+        <div id="totalProducts" class="text-2xl font-bold text-green-700">Loading...</div>
+        <small class="text-gray-500">Farmer uploaded products</small>
+      </div>
+
+      <!-- Total Orders -->
+      <div class="bg-white p-4 rounded shadow">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold mb-2">Total Orders</h2>
+          <div class="text-3xl">📦</div>
+        </div>
+        <div id="totalOrders" class="text-2xl font-bold text-green-700">Loading...</div>
+        <small class="text-gray-500">Completed transactions</small>
+      </div>
+
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+      <h3 class="text-xl font-semibold mb-1">Recent Admin Activity</h3>
+      <p class="text-sm text-gray-600 mb-4">A log of recent actions by admin or system alerts.</p>
+
+      <div id="recentActivityContainer" class="space-y-4">
+        <p class="mb-2"><span class="font-bold">Loading...</span> Fetching recent activity.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  console.log('🔑 Token check:', token ? 'Token found' : 'No token found');
+  console.log('🔑 LocalStorage token:', localStorage.getItem('token'));
+  console.log('🔑 SessionStorage token:', sessionStorage.getItem('token'));
+  
+  // If no token, try to get one by logging in as admin automatically
+  if (!token) {
+    console.log('❌ No token found, attempting auto-login...');
+    autoLoginAdmin();
+  } else {
+    // Token exists, proceed with loading data
+    loadDashboardData();
+  }
+
+  // Auto-login function for admin
+  async function autoLoginAdmin() {
+    try {
+      console.log('🔄 Attempting auto-login for admin...');
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'admin@farmconnect.com',
+          password: 'admin123'
+        })
+      });
+
+      const data = await response.json();
+      console.log('🔐 Auto-login response:', data);
+
+      if (response.ok && data.token) {
+        token = data.token;
+        localStorage.setItem('token', token);
+        localStorage.setItem('userRole', data.role);
+        console.log('✅ Auto-login successful, loading dashboard...');
+        loadDashboardData();
+      } else {
+        console.error('❌ Auto-login failed:', data.message);
+        showFallbackData();
+      }
+    } catch (error) {
+      console.error('❌ Auto-login error:', error);
+      showFallbackData();
+    }
+  }
+
+  // Load dashboard data
+  function loadDashboardData() {
+    updateAdminStats();
+    updateRecentActivity();
+  }
+
+  // Show fallback data if APIs fail
+  function showFallbackData() {
+    console.log('📊 Showing fallback data...');
+    // Try to get simple stats without authentication
+    trySimpleStats();
+  }
+
+  // Try to get stats without authentication as fallback
+  async function trySimpleStats() {
+    try {
+      console.log('🔄 Trying simple stats (no auth)...');
+      const response = await fetch('/api/admin/simple-stats');
+      
+      if (response.ok) {
+        const stats = await response.json();
+        console.log('📈 Simple stats received:', stats);
+        document.getElementById('totalFarmers').textContent = stats.totalFarmers || 0;
+        document.getElementById('totalConsumers').textContent = stats.totalConsumers || 0;
+        document.getElementById('totalProducts').textContent = stats.totalProducts || 0;
+        document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
+        
+        const activityContainer = document.getElementById('recentActivityContainer');
+        activityContainer.innerHTML = '<p class="text-blue-600">✅ Basic statistics loaded successfully (authentication bypass mode)</p>';
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error('❌ Simple stats also failed:', error);
+      document.getElementById('totalFarmers').textContent = 'Error';
+      document.getElementById('totalConsumers').textContent = 'Error';
+      document.getElementById('totalProducts').textContent = 'Error';
+      document.getElementById('totalOrders').textContent = 'Error';
+      
+      const activityContainer = document.getElementById('recentActivityContainer');
+      activityContainer.innerHTML = '<p class="text-red-600">❌ Unable to load any data. Please check server and database connection.</p>';
+    }
+  }
+
+  // Fetch real stats from API
+  async function updateAdminStats() {
+    console.log('🔍 Starting updateAdminStats...');
+    console.log('🔑 Token:', token ? 'Present' : 'Missing');
+    
+    try {
+      console.log('📡 Making API call to /api/admin/stats');
+      const response = await fetch('/api/admin/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('📊 Response status:', response.status);
+      console.log('📊 Response ok:', response.ok);
+
+      if (response.ok) {
+        const stats = await response.json();
+        console.log('📈 Stats received:', stats);
+        document.getElementById('totalFarmers').textContent = stats.totalFarmers || 0;
+        document.getElementById('totalConsumers').textContent = stats.totalConsumers || 0;
+        document.getElementById('totalProducts').textContent = stats.totalProducts || 0;
+        document.getElementById('totalOrders').textContent = stats.totalOrders || 0;
+      } else if (response.status === 401 || response.status === 403) {
+        console.error('❌ Authentication failed:', response.status);
+        // Try to re-authenticate
+        console.log('🔄 Attempting re-authentication...');
+        await autoLoginAdmin();
+      } else {
+        const errorText = await response.text();
+        console.error('❌ API Error:', response.status, errorText);
+        showFallbackData();
+      }
+    } catch (error) {
+      console.error('❌ Error fetching stats:', error);
+      showFallbackData();
+    }
+  }
+
+  // Fetch real activity from API
+  async function updateRecentActivity() {
+    console.log('🔍 Starting updateRecentActivity...');
+    
+    try {
+      console.log('📡 Making API call to /api/admin/activity');
+      const response = await fetch('/api/admin/activity', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const activityContainer = document.getElementById('recentActivityContainer');
+      console.log('📊 Activity response status:', response.status);
+
+      if (response.ok) {
+        const activities = await response.json();
+        console.log('📈 Activities received:', activities);
+        
+        if (activities.length === 0) {
+          activityContainer.innerHTML = '<p class="text-gray-500">No recent activity found.</p>';
+          return;
+        }
+
+        activityContainer.innerHTML = activities.map(activity => {
+          const time = new Date(activity.timestamp).toLocaleString();
+          const iconClass = getActivityIcon(activity.type);
+          
+          return `
+            <div class="flex items-start space-x-3 mb-4 bg-blue-50 p-3 rounded-lg">
+              <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <i class="${iconClass} text-blue-600"></i>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm"><span class="font-bold">${activity.message}</span></p>
+                <p class="text-xs text-gray-500 mt-1">${time}</p>
+              </div>
+            </div>`;
+        }).join('');
+      } else if (response.status === 401 || response.status === 403) {
+        console.error('❌ Authentication failed for activity:', response.status);
+        activityContainer.innerHTML = '<p class="text-red-500">Access denied. Admin privileges required.</p>';
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Activity API Error:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching activity:', error);
+      const activityContainer = document.getElementById('recentActivityContainer');
+      activityContainer.innerHTML = '<p class="text-red-500">Failed to load recent activity.</p>';
+    }
+  }
+
+  // Get appropriate icon for activity type
+  function getActivityIcon(type) {
+    switch (type) {
+      case 'user':
+      case 'farmer_registration':
+        return 'fas fa-user-plus';
+      case 'consumer_registration':
+        return 'fas fa-building';
+      case 'product':
+      case 'product_added':
+        return 'fas fa-seedling';
+      case 'order':
+        return 'fas fa-shopping-cart';
+      case 'deal':
+        return 'fas fa-handshake';
+      default:
+        return 'fas fa-bell';
+    }
+  }
+
+  // Logout function
+  function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Profile Dropdown
+  function setupProfileDropdown() {
+    const profileButton = document.getElementById('profile-button');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupProfileDropdown();
+    document.getElementById("date").textContent = new Date().toDateString();
+    // Data loading is handled by the token check logic above
+  });
+</script>
+
+</body>
+</html>

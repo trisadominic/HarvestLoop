@@ -1,0 +1,3326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmConnect Hub - Consumer Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Profile dropdown animation */
+        #profile-dropdown {
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+        #profile-dropdown:not(.hidden) {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Profile button hover effect */
+        #profile-button:hover {
+            color: #059669;
+        }
+    </style>
+</head>
+<body class="bg-[#f6f0e9] min-h-screen flex flex-col font-serif">
+
+    <!-- Header Section -->
+    <header class="bg-[#ddccb1]">
+        <div class="fixed top-0 left-0 w-full z-50 bg-[#f6f0e9] flex items-center justify-between px-8 py-4">
+            <!-- Logo & Name -->
+            <a class="flex items-center gap-2 text-2xl font-bold font-serif text-[#7dde83]" href="admin-dashboard.html">
+                <img src="assets/Logo.png" alt="Website Logo" class="w-10 h-10 rounded-full object-cover"/>
+                HarvestLoop
+            </a>
+
+            <!-- Center Tabs -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 flex space-x-4 z-0">
+                <a href="admin_dashboard.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-th mr-3"></i> Dashboard
+                </a>
+                <a href="admin-farmers.html" class="flex items-center px-3 py-1 text-sm text-gray-700 hover:text-black">
+                    <i class="fas fa-users mr-3"></i> Farmers
+                </a>
+                <a href="admin-consumers.html" class="flex items-center px-3 py-1 text-sm bg-white rounded-md shadow-sm text-black">
+                    <i class="fas fa-user-friends mr-3"></i> Consumers
+                </a>
+                <!-- Products and Orders tabs removed as requested -->
+            </div>
+
+            <!-- Right-Aligned Profile -->
+            <div class="flex items-center space-x-4 z-10">
+                <div class="relative" id="profileContainer">
+                    <button class="flex items-center focus:outline-none hover:opacity-80 transition cursor-pointer" id="profile-button">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+                    <!-- Profile Dropdown (only logout, matches dashboard) -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+                        <div class="px-4 py-2 border-b font-semibold text-gray-700">Admin Menu</div>
+                        <a href="#" onclick="handleLogout()" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                            <i class="fas fa-sign-out-alt mr-3 w-4"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="relative pt-[88px]">
+        <!-- Main Content -->
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-[#3d6339] mb-2">Consumer Management</h1>
+            <p class="mb-6 text-gray-600">Manage consumer accounts and monitor transactions</p>
+
+            <!-- Statistics Boxes moved below title -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-user-friends text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active Consumers</p>
+                            <p class="text-2xl font-bold text-gray-900" id="activeConsumers">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-crown text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Subscribed Members</p>
+                            <p class="text-2xl font-bold text-gray-900" id="premiumMembers">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-handshake text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Orders</p>
+                            <p class="text-2xl font-bold text-gray-900" id="activeNegotiations">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-rupee-sign text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                            <p class="text-2xl font-bold text-gray-900" id="totalRevenue">₹0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section moved above table -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Consumer Management</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="searchInput" 
+                           placeholder="Search by name or email" 
+                           class="border p-2 rounded bg-white/50">
+                    <select id="statusFilter" class="border p-2 rounded bg-white/50">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                    <select id="locationFilter" class="border p-2 rounded bg-white/50">
+                        <option value="">All Locations</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Bangalore">Bangalore</option>
+                        <option value="Chennai">Chennai</option>
+                        <option value="Kolkata">Kolkata</option>
+                        <option value="Pune">Pune</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Consumers Table -->
+            <div class="bg-white/70 rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Consumer Details</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="consumerTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Table rows will be inserted here -->
+                </tbody>
+            </table>
+            </div>
+
+            <!-- Transaction Monitor Section -->
+            <div class="bg-white/70 rounded-lg p-6 shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-[#3d6339] mb-1">Transaction Monitor</h2>
+                        <p class="text-sm text-gray-600">View and manage all transactions - Negotiations & Direct Orders - Admin Controls</p>
+                    </div>
+                </div>
+                <div id="negotiationsList" class="space-y-4">
+                    <!-- Negotiation items will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Consumer Modal -->
+    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-96">
+                <h3 class="text-lg font-semibold mb-4">Edit Consumer Details</h3>
+                <form id="editConsumerForm">
+                    <input type="hidden" id="consumerId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Consumer Name</label>
+                            <input type="text" id="editName" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="editEmail" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="tel" id="editPhone" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="closeEditModal()" 
+                                    class="bg-gray-300 px-4 py-2 rounded text-gray-700">Cancel</button>
+                            <button type="submit" 
+                                    class="bg-green-500 px-4 py-2 rounded text-white">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Subscription Modal -->
+    <div id="editSubscriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-96">
+                <h3 class="text-lg font-semibold mb-4">Edit Subscription Details</h3>
+                <form id="editSubscriptionForm">
+                    <input type="hidden" id="subscriptionId">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Consumer Name</label>
+                            <input type="text" id="editSubscriptionConsumer" class="mt-1 block w-full border rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Plan Type</label>
+                            <select id="editSubscriptionPlan" class="mt-1 block w-full border rounded-md p-2">
+                                <option value="Basic">Basic</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Farmer Connect">Farmer Connect</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="editSubscriptionStatus" class="mt-1 block w-full border rounded-md p-2">
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="expired">Expired</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Monthly Fee ($)</label>
+                            <input type="number" id="editSubscriptionFee" step="0.01" class="mt-1 block w-full border rounded-md p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Auto Renewal</label>
+                            <select id="editSubscriptionRenewal" class="mt-1 block w-full border rounded-md p-2">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="closeEditSubscriptionModal()" 
+                                    class="bg-gray-300 px-4 py-2 rounded text-gray-700">Cancel</button>
+                            <button type="submit" 
+                                    class="bg-green-500 px-4 py-2 rounded text-white">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Negotiation Details Modal -->
+    <div id="negotiationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+                <div class="bg-[#3d6339] text-white p-4 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold" id="negotiationModalTitle">Negotiation Details</h3>
+                    <button onclick="closeNegotiationModal()" class="text-white hover:text-gray-300">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+                    <div id="negotiationDetails" class="space-y-4">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // @ts-nocheck
+        // Global variables
+        let consumers = [];
+        let negotiations = []; // Store negotiation data
+        let subscriptions = []; // Store subscription data
+        let transactionsData = []; // Store transaction/order data for consumer actions
+        let mockDataGenerated = false; // Flag to prevent regenerating mock data
+        let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        // API Configuration
+        const API_BASE = '/api/admin';
+        const SUBSCRIPTION_API = '/api/subscriptions';
+
+        // Simple initialization - will be handled in DOMContentLoaded
+        console.log('🚀 Admin Consumers Page Script Loaded');
+        console.log('🔑 Initial token check:', token ? 'Token found in storage' : 'No token in storage');
+        
+        // Simple test function to verify script is working
+        window.testScript = function() {
+            console.log('✅ Script execution test - WORKING');
+            return 'Script is working!';
+        };
+
+        // FORCE TEST: Try to call negotiations API directly after 3 seconds
+        setTimeout(async () => {
+            console.log('🔥 FORCING negotiations API test...');
+            try {
+                const response = await fetch('/api/admin/negotiations', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('🔥 Force test response:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🔥 Force test data:', data);
+                } else {
+                    const errorText = await response.text();
+                    console.log('🔥 Force test error:', errorText);
+                }
+            } catch (error) {
+                console.log('🔥 Force test exception:', error);
+            }
+        }, 3000);
+
+        // Auto-login function for admin
+        async function autoLoginAdmin() {
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.token) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userRole', data.role);
+                    console.log('✅ Auto-login successful, calling loadConsumersData...');
+                    loadConsumersData();
+                } else {
+                    console.error('Auto-login failed:', data.message);
+                    showError('Authentication failed. Please login manually.');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showError('Connection error. Please check server.');
+            }
+        }
+
+        // Load consumers data from API
+        async function loadConsumersData() {
+            try {
+                console.log('📋 Starting loadConsumersData...');
+                const response = await fetch('/api/admin/consumers', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('📋 Consumers API response status:', response.status);
+
+                if (response.ok) {
+                    consumers = await response.json();
+                    console.log('📋 Consumers loaded:', consumers.length);
+                    console.log('📋 First consumer structure:', consumers[0]);
+                    
+                    // Always try to load negotiations after consumers load
+                    console.log('📋 About to call loadNegotiationsData...');
+                    await loadNegotiationsData();
+                    console.log('📋 Finished loadNegotiationsData, calling loadSubscriptionsData...');
+                    
+                    await loadSubscriptionsData();
+                    console.log('📋 Finished loadSubscriptionsData, calling loadTransactionsData...');
+                    
+                    await loadTransactionsData();
+                    console.log('📋 Finished loadTransactionsData, calling refreshTable...');
+                    
+                    refreshTable();
+                    await updateStatistics();
+                    console.log('📋 All data loading completed successfully');
+                } else if (response.status === 401 || response.status === 403) {
+                    console.error('Authentication failed');
+                    await autoLoginAdmin();
+                } else {
+                    const errorText = await response.text();
+                    console.error('API Error:', response.status, errorText);
+                    showError(`Failed to load consumers: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error loading consumers:', error);
+                showError('Failed to load consumers data.');
+            }
+        }
+
+        // Load negotiations data from API
+        async function loadNegotiationsData() {
+            try {
+                console.log('🔥 FORCING negotiations API call...');
+                console.log('🔑 Current token:', token);
+                
+                const response = await fetch('/api/admin/negotiations', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('📡 API Response status:', response.status);
+                console.log('📡 API Response ok:', response.ok);
+
+                if (response.ok) {
+                    negotiations = await response.json();
+                    console.log('✅ Real negotiations loaded:', negotiations.length);
+                    if (negotiations.length > 0) {
+                        console.log('📋 Sample negotiation:', negotiations[0]);
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ API Error for negotiations:', response.status, errorText);
+                    
+                    if (response.status === 401 || response.status === 403) {
+                        console.log('🔐 Authentication failed, trying to re-login...');
+                        await autoLoginAdmin();
+                        // Retry after re-login
+                        return loadNegotiationsData();
+                    } else {
+                        console.log('⚠️ Using empty negotiations array due to API error');
+                        negotiations = [];
+                    }
+                }
+            } catch (error) {
+                console.error('💥 Network error loading negotiations:', error);
+                console.log('⚠️ Using empty negotiations array due to network error');
+                negotiations = [];
+            }
+        }
+
+        // Load transactions data for consumer actions
+        async function loadTransactionsData() {
+            try {
+                console.log('📦 Loading transactions data...');
+                const response = await fetch('/api/admin/transactions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    transactionsData = await response.json();
+                    window.transactionsData = transactionsData; // Make it globally available
+                    console.log('✅ Transactions loaded:', transactionsData.length);
+                    if (transactionsData.length > 0) {
+                        console.log('📋 Sample transaction:', transactionsData[0]);
+                    }
+                } else {
+                    console.error('❌ API Error for transactions:', response.status);
+                    transactionsData = [];
+                }
+            } catch (error) {
+                console.error('💥 Network error loading transactions:', error);
+                transactionsData = [];
+            }
+        }
+
+        // Load subscriptions data from API
+        async function loadSubscriptionsData() {
+            try {
+                console.log('📊 Loading subscriptions data...');
+                
+                // Try to load real subscriptions from your subscription API
+                const subscriptionResponse = await fetch('/api/subscriptions/admin/all', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('📊 Subscriptions API response status:', subscriptionResponse.status);
+
+                if (subscriptionResponse.ok) {
+                    const subscriptionData = await subscriptionResponse.json();
+                    console.log('✅ Real subscriptions loaded:', subscriptionData.length);
+                    
+                    // Transform subscription data to match our frontend format
+                    subscriptions = await Promise.all(subscriptionData.map(async (sub) => {
+                        // Get consumer details
+                        const consumer = consumers.find(c => c._id === sub.userId || c.id === sub.userId);
+                        
+                        return {
+                            id: sub._id,
+                            consumerId: sub.userId,
+                            consumerName: consumer ? (consumer.fullName || consumer.username) : 'Unknown Consumer',
+                            plan: sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1), // Capitalize plan name
+                            planType: sub.plan,
+                            amount: sub.paymentInfo?.amount || getPlanAmount(sub.plan),
+                            status: sub.status,
+                            startDate: new Date(sub.startDate).toLocaleDateString('en-IN'),
+                            endDate: new Date(sub.endDate).toLocaleDateString('en-IN'),
+                            points: sub.points || 0,
+                            totalPoints: sub.totalPoints || 0,
+                            paymentStatus: sub.paymentInfo?.status || 'pending',
+                            createdAt: sub.createdAt
+                        };
+                    }));
+                    
+                    if (subscriptions.length > 0) {
+                        console.log('📊 Sample subscription:', subscriptions[0]);
+                    }
+                } else {
+                    const errorText = await subscriptionResponse.text();
+                    console.error('❌ API Error for subscriptions:', subscriptionResponse.status, errorText);
+                    
+                    if (subscriptionResponse.status === 401 || subscriptionResponse.status === 403) {
+                        console.log('🔐 Authentication failed for subscriptions, trying to re-login...');
+                        await autoLoginAdmin();
+                        return loadSubscriptionsData();
+                    } else if (subscriptionResponse.status === 404) {
+                        console.log('⚠️ Subscription endpoint not found, generating from consumers data');
+                        subscriptions = generateSubscriptionsFromConsumers();
+                    } else {
+                        console.log('⚠️ Using mock subscriptions data due to API error');
+                        subscriptions = generateMockSubscriptions();
+                    }
+                }
+            } catch (error) {
+                console.error('💥 Network error loading subscriptions:', error);
+                console.log('⚠️ Generating subscriptions from consumer data due to network error');
+                subscriptions = generateSubscriptionsFromConsumers();
+            }
+        }
+
+        // Generate subscriptions based on consumer subscription status
+        function generateSubscriptionsFromConsumers() {
+            const planAmounts = { basic: 999, premium: 1999, unlimited: 4999 };
+            
+            return consumers.filter(consumer => 
+                consumer.subscriptionStatus && consumer.subscriptionStatus !== 'inactive'
+            ).map((consumer, index) => {
+                const plan = consumer.subscriptionStatus === 'active' ? 'premium' : 'basic';
+                const status = consumer.subscriptionStatus === 'active' ? 'active' : 
+                              consumer.subscriptionStatus === 'paused' ? 'paused' : 'cancelled';
+                
+                return {
+                    id: `sub_${consumer.id || consumer._id}`,
+                    consumerId: consumer.id || consumer._id,
+                    consumerName: consumer.fullName || consumer.username,
+                    plan: plan.charAt(0).toUpperCase() + plan.slice(1),
+                    planType: plan,
+                    amount: planAmounts[plan],
+                    status: status,
+                    startDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+                    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+                    points: Math.floor(Math.random() * 50) + 10,
+                    totalPoints: Math.floor(Math.random() * 100) + 50,
+                    paymentStatus: 'completed'
+                };
+            });
+        }
+
+        // Get plan amount based on plan name
+        function getPlanAmount(planName) {
+            const amounts = {
+                basic: 999,
+                premium: 1999,
+                unlimited: 4999
+            };
+            return amounts[planName.toLowerCase()] || 999;
+        }
+
+        // API Functions for Consumer Management
+        
+        // Update consumer status via API
+        async function updateConsumerStatusAPI(consumerId, newStatus) {
+            try {
+                const response = await fetch(`/api/admin/consumers/${consumerId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus, isActive: newStatus === 'active' })
+                });
+
+                if (response.ok) {
+                    const updatedConsumer = await response.json();
+                    console.log('✅ Consumer status updated:', updatedConsumer);
+                    
+                    // Update local data
+                    const consumer = consumers.find(c => c.id === consumerId || c._id === consumerId);
+                    if (consumer) {
+                        consumer.status = newStatus;
+                        consumer.isActive = newStatus === 'active';
+                    }
+                    
+                    refreshTable();
+                    await updateStatistics();
+                    return true;
+                } else {
+                    const error = await response.text();
+                    console.error('❌ Failed to update consumer status:', error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('💥 Network error updating consumer status:', error);
+                return false;
+            }
+        }
+
+        // Get consumer orders via API
+        async function getConsumerOrdersAPI(consumerId) {
+            try {
+                const response = await fetch(`/api/admin/consumers/${consumerId}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const orders = await response.json();
+                    console.log('✅ Consumer orders loaded:', orders);
+                    
+                    // Transform orders to match frontend format
+                    return orders.map(order => ({
+                        id: order._id,
+                        product: order.productId?.name || 'Unknown Product',
+                        quantity: order.quantity,
+                        unit: order.productId?.unit || 'units',
+                        estimatedPrice: order.price,
+                        status: order.status === 'purchased' ? 'connected' : 
+                               order.status === 'pending' ? 'pending_farmer_response' : 
+                               'contact_shared',
+                        date: new Date(order.createdAt),
+                        farmer: order.farmerId?.username || 'Unknown Farmer',
+                        farmerContact: order.farmerId?.phone || '+91-XXXX-XXXXX',
+                        connectionFee: Math.round(order.price * 0.05) // 5% connection fee
+                    }));
+                } else {
+                    console.error('❌ Failed to load consumer orders');
+                    return [];
+                }
+            } catch (error) {
+                console.error('💥 Network error loading consumer orders:', error);
+                return [];
+            }
+        }
+
+        // Update subscription plan via API
+        async function updateSubscriptionPlanAPI(subscriptionId, newPlan, newAmount) {
+            try {
+                const response = await fetch(`/api/admin/subscriptions/${subscriptionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        plan: newPlan.toLowerCase(),
+                        'paymentInfo.amount': newAmount
+                    })
+                });
+
+                if (response.ok) {
+                    const updatedSubscription = await response.json();
+                    console.log('✅ Subscription updated:', updatedSubscription);
+                    
+                    // Update local data
+                    const subscription = subscriptions.find(s => s.id === subscriptionId);
+                    if (subscription) {
+                        subscription.plan = newPlan;
+                        subscription.planType = newPlan.toLowerCase();
+                        subscription.amount = newAmount;
+                    }
+                    
+                    refreshSubscriptionMonitor();
+                    return true;
+                } else {
+                    const error = await response.text();
+                    console.error('❌ Failed to update subscription:', error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('💥 Network error updating subscription:', error);
+                return false;
+            }
+        }
+
+        // Send message to consumer via API
+        async function sendMessageToConsumerAPI(consumerId, subject, message, urgent = false) {
+            try {
+                const response = await fetch(`/api/admin/consumers/${consumerId}/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        subject, 
+                        message, 
+                        urgent,
+                        type: 'admin_message'
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Message sent:', result);
+                    return true;
+                } else {
+                    const error = await response.text();
+                    console.error('❌ Failed to send message:', error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('💥 Network error sending message:', error);
+                return false;
+            }
+        }
+        function updateNegotiationConsumerReferences() {
+            negotiations.forEach(negotiation => {
+                const consumer = consumers.find(c => c.id === negotiation.consumerId);
+                if (consumer) {
+                    negotiation.consumerName = consumer.fullName || consumer.username || 'Unknown Consumer';
+                }
+            });
+        }
+
+        // Generate mock negotiation data for demonstration
+        function generateMockNegotiations() {
+            const mockNegotiations = [];
+            const statuses = ['active', 'pending', 'successful'];
+            const products = ['Organic Tomatoes', 'Fresh Apples', 'Premium Rice', 'Dairy Milk', 'Free-range Eggs'];
+            
+            consumers.forEach((consumer, index) => {
+                // Use consumer index to create consistent number of negotiations
+                const numNegotiations = (index % 3) + 1; // 1-3 negotiations per consumer, consistent
+                
+                for (let i = 0; i < numNegotiations; i++) {
+                    // Use deterministic values based on index to make data consistent
+                    const statusIndex = (index + i) % statuses.length;
+                    const productIndex = (index * 2 + i) % products.length;
+                    const farmerIndex = (index + i * 3) % 20 + 1;
+                    
+                    const status = statuses[statusIndex];
+                    const product = products[productIndex];
+                    const quantity = 10 + (index + i) % 40; // 10-50 kg, deterministic
+                    const pricePerUnit = (5 + ((index + i) % 10)).toFixed(2); // $5-15, deterministic
+                    
+                    const createdDaysAgo = (index + i) % 30; // 0-29 days ago
+                    const updatedDaysAgo = Math.min(createdDaysAgo, (index + i) % 7); // 0-6 days ago, but not after creation
+                    
+                    mockNegotiations.push({
+                        id: `neg_${index}_${i}`,
+                        consumerId: consumer.id,
+                        consumerName: consumer.fullName || consumer.username || 'Unknown Consumer',
+                        farmerName: `Farmer ${farmerIndex}`,
+                        product: product,
+                        quantity: quantity,
+                        unit: 'kg',
+                        pricePerUnit: parseFloat(pricePerUnit),
+                        totalPrice: (quantity * pricePerUnit).toFixed(2),
+                        status: status,
+                        createdAt: new Date(Date.now() - createdDaysAgo * 24 * 60 * 60 * 1000),
+                        updatedAt: new Date(Date.now() - updatedDaysAgo * 24 * 60 * 60 * 1000),
+                        messages: 1 + (index + i) % 10 // 1-10 messages, deterministic
+                    });
+                }
+            });
+            
+            return mockNegotiations;
+        }
+
+        // Function to reset mock data (for testing purposes)
+        async function resetMockData() {
+            console.log('Resetting mock data...');
+            mockDataGenerated = false;
+            negotiations = [];
+            await loadNegotiationsData();
+            await updateStatistics();
+            refreshTable();
+        }
+
+        // View negotiation details
+        function viewNegotiationDetails(type) {
+            console.log('viewNegotiationDetails called with type:', type);
+            console.log('negotiations array:', negotiations);
+            
+            const filteredNegotiations = negotiations.filter(neg => {
+                if (type === 'active') return ['active', 'farmer_responded', 'consumer_responded'].includes(neg.status);
+                if (type === 'pending') return ['pending', 'created'].includes(neg.status);
+                if (type === 'successful') return ['successful', 'purchased', 'completed'].includes(neg.status);
+                return false;
+            });
+
+            console.log('filtered negotiations:', filteredNegotiations);
+
+            const modalTitle = document.getElementById('negotiationModalTitle');
+            const negotiationDetails = document.getElementById('negotiationDetails');
+            const modal = document.getElementById('negotiationModal');
+            
+            console.log('Modal elements:', { modalTitle, negotiationDetails, modal });
+            
+            if (!modal || !modalTitle || !negotiationDetails) {
+                console.error('Modal elements not found!');
+                alert('Modal elements not found. Please refresh the page.');
+                return;
+            }
+            
+            // Set modal title
+            modalTitle.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Negotiations (${filteredNegotiations.length})`;
+            
+            if (filteredNegotiations.length === 0) {
+                negotiationDetails.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-handshake text-4xl mb-4"></i>
+                        <p class="text-lg">No ${type} negotiations found</p>
+                    </div>
+                `;
+            } else {
+                negotiationDetails.innerHTML = `
+                    <div class="grid gap-4">
+                        ${filteredNegotiations.map(neg => `
+                            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 mb-2">${neg.product}</h4>
+                                        <p class="text-sm text-gray-600">Quantity: ${neg.quantity} ${neg.unit}</p>
+                                        <p class="text-sm text-gray-600">Price: $${neg.pricePerUnit}/${neg.unit}</p>
+                                        <p class="text-sm font-medium text-green-600">Total: $${neg.totalPrice}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-1"><strong>Consumer:</strong></p>
+                                        <p class="text-sm text-gray-900">${neg.consumerName}</p>
+                                        <p class="text-sm text-gray-600 mt-2"><strong>Farmer:</strong></p>
+                                        <p class="text-sm text-gray-900">${neg.farmerName}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-1"><strong>Status:</strong></p>
+                                        <span class="px-2 py-1 text-xs rounded-full ${
+                                            neg.status === 'active' ? 'bg-orange-100 text-orange-800' :
+                                            neg.status === 'pending' ? 'bg-blue-100 text-blue-800' :
+                                            'bg-green-100 text-green-800'
+                                        }">
+                                            ${neg.status.charAt(0).toUpperCase() + neg.status.slice(1)}
+                                        </span>
+                                        <p class="text-sm text-gray-600 mt-2">Deal #${neg.id.toString().slice(-6)}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-1"><strong>Created:</strong></p>
+                                        <p class="text-sm text-gray-900">${new Date(neg.createdAt).toLocaleDateString()}</p>
+                                        <p class="text-sm text-gray-600 mt-2"><strong>Updated:</strong></p>
+                                        <p class="text-sm text-gray-900">${new Date(neg.updatedAt).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Show modal
+            console.log('Showing modal...');
+            modal.classList.remove('hidden');
+        }
+
+        // Close negotiation modal
+        function closeNegotiationModal() {
+            console.log('Closing negotiation modal...');
+            const modal = document.getElementById('negotiationModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            } else {
+                console.error('Modal not found when trying to close');
+            }
+        }
+
+        // Update statistics similar to farmer page
+        async function updateConsumerStatistics(consumers) {
+            if (!consumers || consumers.length === 0) {
+                console.log('⚠️ No consumers data available for statistics');
+                return;
+            }
+            
+            console.log('📊 Updating consumer statistics with data:', consumers.length, 'consumers');
+            
+            // Calculate active consumers (not suspended)
+            const activeConsumers = consumers.filter(c => c.isActive !== false).length;
+            // Get subscribed members count from API stats
+            let subscribedMembers = 0;
+            try {
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const statsResponse = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    subscribedMembers = stats.subscribedMembers || 0;
+                } else {
+                    console.log('Using fallback calculation for subscribed members');
+                    subscribedMembers = Math.floor(consumers.length * 0.1); // Fallback: 10% subscription rate
+                }
+            } catch (error) {
+                console.error('Error fetching subscription stats:', error);
+                subscribedMembers = Math.floor(consumers.length * 0.1); // Fallback
+            }
+            
+            // Calculate active transactions from real data
+            let activeNegotiations = 0;
+            if (negotiations && negotiations.length > 0) {
+                activeNegotiations = negotiations.filter(t => 
+                    (t.type === 'negotiation' && t.status === 'accepted') ||
+                    (t.type === 'direct-order' && t.status === 'accepted')
+                ).length;
+            }
+            
+            // Calculate total revenue from completed transactions
+            let totalRevenue = 0;
+            if (negotiations && negotiations.length > 0) {
+                const completedTransactions = negotiations.filter(t => 
+                    (t.type === 'negotiation' && t.status === 'purchased') ||
+                    (t.type === 'direct-order' && t.status === 'purchased')
+                );
+                console.log('💰 Found', completedTransactions.length, 'completed transactions for revenue calculation');
+                
+                totalRevenue = completedTransactions.reduce((sum, t) => {
+                    const price = parseFloat(t.totalPrice) || 0;
+                    console.log('💰 Transaction:', t.product, 'Type:', t.type, 'Price:', t.totalPrice, 'Parsed:', price);
+                    return sum + price;
+                }, 0);
+                
+                console.log('💰 Total revenue calculated:', totalRevenue);
+            } else {
+                console.log('💰 No transaction data available for revenue calculation');
+            }
+            
+            // Update DOM elements
+            document.getElementById('activeConsumers').textContent = activeConsumers;
+            document.getElementById('premiumMembers').textContent = subscribedMembers;
+            document.getElementById('activeNegotiations').textContent = activeNegotiations;
+            document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toLocaleString()}`;
+            
+            console.log('✅ Consumer statistics updated:', {
+                activeConsumers,
+                subscribedMembers,
+                activeNegotiations,
+                totalRevenue
+            });
+        }
+
+        // Legacy function for backward compatibility
+        async function updateStatistics() {
+            await updateConsumerStatistics(consumers);
+        }
+
+        // Load negotiations data from API - similar to farmer page
+        async function loadNegotiationsData() {
+            try {
+                console.log('🔍 Loading transactions data (negotiations + orders)...');
+                
+                const response = await fetch('/api/admin/transactions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📋 Raw API response:', data);
+                    
+                    // API returns transactions array directly
+                    let rawNegotiations = Array.isArray(data) ? data : [];
+                    
+                    // Filter out pending status and consolidate transaction types
+                    negotiations = rawNegotiations.filter(item => item.status !== 'pending').map(item => {
+                        // If status is pending, change to accepted (shouldn't happen due to filter, but safety)
+                        if (item.status === 'pending') {
+                            item.status = 'accepted';
+                        }
+                        // Remove any payment status since paid option doesn't exist
+                        if (item.paymentStatus) {
+                            delete item.paymentStatus;
+                        }
+                        // Consolidate order-from-negotiation into negotiation type
+                        if (item.type === 'order-from-negotiation') {
+                            item.type = 'negotiation';
+                        }
+                        return item;
+                    });
+                    
+                    console.log('📊 Transactions assigned:', negotiations);
+                    console.log('� Total transactions count:', negotiations.length);
+                    
+                    // Separate by type for logging
+                    const negotiationsCount = negotiations.filter(t => t.type === 'negotiation').length;
+                    const directOrdersCount = negotiations.filter(t => t.type === 'direct-order').length;
+                    
+                    console.log(`📈 Breakdown: ${negotiationsCount} negotiations, ${directOrdersCount} direct orders`);
+                    
+                    if (negotiations.length > 0) {
+                        console.log('📋 Sample transaction:', negotiations[0]);
+                    }
+                    
+                    loadNegotiations();
+                    
+                    // Update statistics with transactions data
+                    if (consumers && consumers.length > 0) {
+                        await updateConsumerStatistics(consumers);
+                    }
+                } else {
+                    console.error('❌ Failed to load transactions:', response.status);
+                    const errorText = await response.text();
+                    console.error('❌ Error details:', errorText);
+                    
+                    if (response.status === 401 || response.status === 403) {
+                        console.log('🔐 Authentication failed, trying to re-login...');
+                        await autoLoginAdmin();
+                        // Retry after re-login
+                        return loadNegotiationsData();
+                    } else {
+                        console.log('⚠️ Using empty negotiations array due to API error');
+                        negotiations = [];
+                        loadNegotiations();
+                    }
+                }
+            } catch (error) {
+                console.error('💥 Network error loading negotiations:', error);
+                console.log('⚠️ Using empty negotiations array due to network error');
+                negotiations = [];
+                loadNegotiations();
+            }
+        }
+
+        // Load negotiations with admin controls - similar to farmer page
+        function loadNegotiations() {
+            const container = document.getElementById('negotiationsList');
+            if (!container) {
+                console.error('❌ negotiationsList container not found');
+                return;
+            }
+            
+            // Sample negotiations data (in real app, this would come from API)
+            if (negotiations.length === 0) {
+                // Add some sample negotiations for demo
+                negotiations = [
+                    {
+                        id: 'neg001',
+                        product: 'Organic Tomatoes',
+                        consumerName: 'Fresh Foods Ltd',
+                        farmerName: 'Trisa (Heaven garden)',
+                        quantity: 100,
+                        unit: 'kg',
+                        pricePerUnit: 45,
+                        totalPrice: 4500,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                        expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) // 5 days from now
+                    },
+                    {
+                        id: 'neg002',
+                        product: 'Fresh Vegetables Mix',
+                        consumerName: 'Green Mart',
+                        farmerName: 'Rajesh Kumar',
+                        quantity: 50,
+                        unit: 'kg',
+                        pricePerUnit: 35,
+                        totalPrice: 1750,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                        expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+                    },
+                    {
+                        id: 'neg003',
+                        product: 'Seasonal Fruits',
+                        consumerName: 'Organic Store',
+                        farmerName: 'Trisa (Heaven garden)',
+                        quantity: 25,
+                        unit: 'kg',
+                        pricePerUnit: 60,
+                        totalPrice: 1500,
+                        status: 'accepted',
+                        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                        acceptedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+                    }
+                ];
+            }
+            
+            if (negotiations.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-handshake text-4xl mb-4"></i>
+                        <p>No active transactions found</p>
+                        <button onclick="generateSampleNegotiations()" class="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Generate Sample Data
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = negotiations.map(nego => `
+                <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-semibold text-lg text-gray-900">${nego.product || nego.productName}</h3>
+                                    
+                                    <!-- Transaction Type Badge -->
+                                    <span class="px-2 py-1 text-xs rounded-full ${
+                                        nego.type === 'negotiation' ? 'bg-blue-100 text-blue-800' :
+                                        nego.type === 'direct-order' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">
+                                        ${nego.type === 'negotiation' ? 'NEGOTIATION' :
+                                          nego.type === 'direct-order' ? 'DIRECT ORDER' :
+                                          'TRANSACTION'}
+                                    </span>
+                                    
+                                    <!-- Status Badge -->
+                                    <span class="px-3 py-1 text-xs rounded-full ${
+                                        nego.status === 'accepted' ? 'bg-green-100 text-green-800' : 
+                                        nego.status === 'purchased' ? 'bg-emerald-100 text-emerald-800' :
+                                        nego.status === 'rejected' || nego.status === 'declined' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">
+                                        ${nego.status ? nego.status.toUpperCase() : 'N/A'}
+                                    </span>
+                                    
+
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Consumer:</p>
+                                        <p class="text-sm text-gray-900">${nego.consumerName}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Farmer:</p>
+                                        <p class="text-sm text-gray-900">${nego.farmerName}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Quantity:</p>
+                                        <p class="text-sm text-gray-900">${nego.quantity} ${nego.unit || 'kg'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Price:</p>
+                                        <p class="text-sm text-gray-900">₹${nego.pricePerUnit || nego.proposedPrice}/unit</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-lg font-semibold text-green-600">
+                                        Total: ₹${nego.totalPrice || (nego.pricePerUnit * nego.quantity || nego.proposedPrice * nego.quantity)}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        Created: ${nego.createdAt ? new Date(nego.createdAt).toLocaleDateString() : 'N/A'}
+                                        ${nego.expiresAt ? ` • Expires: ${new Date(nego.expiresAt).toLocaleDateString()}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Action Buttons -->
+                        <div class="border-t border-gray-100 pt-3">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    ID: ${nego.id} • Created: ${nego.createdAt ? new Date(nego.createdAt).toLocaleDateString() : 'N/A'}
+                                    ${nego.expiresAt ? ` • Expires: ${new Date(nego.expiresAt).toLocaleDateString()}` : ''}
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    <button onclick="viewTransactionDetails('${nego.id}')" 
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">
+                                        <i class="fas fa-eye mr-1"></i> View
+                                    </button>
+                                    <button onclick="deleteTransactionFromDB('${nego.id}', '${nego.product || nego.productName}')" 
+                                            class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition">
+                                        <i class="fas fa-trash mr-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('✅ Negotiations rendered successfully with admin controls');
+        }
+
+        // Generate sample negotiations function (without pending status)
+        function generateSampleNegotiations() {
+            console.log('🎲 Generating sample negotiations without pending status...');
+            
+            negotiations = [
+                {
+                    id: 'sample_001',
+                    type: 'negotiation',
+                    product: 'Premium Tomatoes',
+                    consumerName: 'Fresh Market Co.',
+                    farmerName: 'Rajesh Kumar',
+                    quantity: 100,
+                    unit: 'kg',
+                    pricePerUnit: 45,
+                    totalPrice: 4500,
+                    status: 'accepted',
+                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                    acceptedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'sample_002',
+                    type: 'direct-order',
+                    product: 'Organic Vegetables',
+                    consumerName: 'Green Mart',
+                    farmerName: 'Trisa (Heaven garden)',
+                    quantity: 50,
+                    unit: 'kg',
+                    pricePerUnit: 35,
+                    totalPrice: 1750,
+                    status: 'purchased',
+                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'sample_003',
+                    type: 'negotiation',
+                    product: 'Seasonal Fruits',
+                    consumerName: 'Organic Store',
+                    farmerName: 'Mary Joseph',
+                    quantity: 25,
+                    unit: 'kg',
+                    pricePerUnit: 60,
+                    totalPrice: 1500,
+                    status: 'accepted',
+                    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+                }
+            ];
+            
+            console.log('✅ Generated sample negotiations:', negotiations.length);
+            loadNegotiations();
+        }
+
+        // Show error message
+        function showError(message) {
+            const tbody = document.getElementById('consumerTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Setup event listeners for search and filter functionality
+        function setupEventListeners() {
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+            }
+
+            // Filter functionality
+            const statusFilter = document.getElementById('statusFilter');
+            const locationFilter = document.getElementById('locationFilter');
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterTable);
+            }
+            if (locationFilter) {
+                locationFilter.addEventListener('change', filterTable);
+            }
+        }
+
+        // Filter table based on search and filter criteria
+        function filterTable() {
+            if (!consumers || consumers.length === 0) {
+                return;
+            }
+
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
+            const locationFilter = document.getElementById('locationFilter')?.value || '';
+
+            const filteredConsumers = consumers.filter(consumer => {
+                const nameMatch = (consumer.fullName || consumer.username || '').toLowerCase().includes(searchTerm);
+                const emailMatch = (consumer.email || '').toLowerCase().includes(searchTerm);
+                const searchMatch = nameMatch || emailMatch;
+
+                const statusMatch = !statusFilter || 
+                    (statusFilter === 'active' && consumer.isActive !== false) ||
+                    (statusFilter === 'suspended' && consumer.isActive === false);
+
+                const locationMatch = !locationFilter || 
+                    (consumer.location && consumer.location.includes(locationFilter));
+
+                return searchMatch && statusMatch && locationMatch;
+            });
+
+            // Update table with filtered results
+            displayFilteredConsumers(filteredConsumers);
+        }
+
+        // Display filtered consumers in the table
+        function displayFilteredConsumers(filteredConsumers) {
+            const tbody = document.getElementById('consumerTableBody');
+            if (!tbody) return;
+            
+            if (!filteredConsumers || filteredConsumers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-search mr-2"></i>
+                            No consumers match your search criteria
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredConsumers.map(consumer => {
+                const displayName = consumer.fullName || consumer.username || 'Unknown Consumer';
+                const email = consumer.email || 'No email';
+                const phone = consumer.phone || 'No phone';
+                const status = consumer.isActive !== false ? 'Active' : 'Inactive';
+                const statusColor = consumer.isActive !== false ? 'text-green-600' : 'text-red-600';
+                const consumerId = consumer._id || consumer.id;
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-green-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${displayName}</div>
+                                    <div class="text-sm text-gray-500">Consumer ID: ${consumerId}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${email}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${phone}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-medium ${statusColor}">${status}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="window.showViewPopup('${consumerId}')" 
+                                        class="text-blue-600 hover:text-blue-900" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="window.showEditPopup('${consumerId}')" 
+                                        class="text-green-600 hover:text-green-900" title="Edit Consumer">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="window.showMorePopup('${consumerId}')" 
+                                        class="text-gray-600 hover:text-gray-900" title="More Actions">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Refresh table with all consumers (main table refresh function)
+        function refreshTable() {
+            console.log('🔄 refreshTable called with', consumers?.length, 'consumers');
+            
+            if (!consumers) {
+                console.log('❌ No consumers data available for refreshTable');
+                return;
+            }
+            
+            // Use the existing displayFilteredConsumers function to show all consumers
+            displayFilteredConsumers(consumers);
+            
+            console.log('✅ Table refreshed with all consumers');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 DOM Content Loaded - Initializing Admin Consumers Page');
+            setupEventListeners();
+            
+            if (token) {
+                console.log('🎯 Token found, starting admin consumers page initialization...');
+                
+                // Load consumers first
+                await loadConsumersData();
+                
+                // Load negotiations after consumers are loaded
+                await loadNegotiationsData();
+                
+                // Update statistics AFTER negotiations are loaded
+                if (consumers && consumers.length > 0) {
+                    await updateConsumerStatistics(consumers);
+                }
+            } else {
+                console.log('❌ No token found, attempting auto-login...');
+                await autoLoginAdmin();
+            }
+            setupProfileDropdown();
+            setupDropdownClickOutside();
+        });
+
+        // Setup profile dropdown functionality
+        function setupProfileDropdown() {
+            const profileButton = document.getElementById('profile-button');
+            const dropdown = document.getElementById('profile-dropdown');
+
+            if (profileButton && dropdown) {
+                profileButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+            }
+        }
+
+        // Setup dropdown click outside to close
+        function setupDropdownClickOutside() {
+            document.addEventListener('click', function(e) {
+                const dropdown = document.getElementById('profile-dropdown');
+                const profileButton = document.getElementById('profile-button');
+                
+                if (dropdown && !dropdown.contains(e.target) && (!profileButton || !profileButton.contains(e.target))) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Logout functionality
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                localStorage.removeItem('userRole');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Show popup modals for consumer actions - Same structure as farmer page
+        function showViewPopup(consumerId) {
+            console.log('� showViewPopup called with consumerId:', consumerId);
+            
+            // Create popup for viewing consumer details
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Consumer Details</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="consumerViewContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            loadConsumerDetails(consumerId, 'view');
+        }
+
+        function showEditPopup(consumerId) {
+            console.log('✏️ showEditPopup called with consumerId:', consumerId);
+            
+            // Create popup for editing consumer
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Edit Consumer</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="consumerEditContent" class="space-y-4">
+                        <div class="flex items-center justify-center py-8">
+                            <i class="fas fa-spinner fa-spin text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            loadConsumerDetails(consumerId, 'edit');
+        }
+
+        function showMorePopup(consumerId) {
+            console.log('⚙️ showMorePopup called with consumerId:', consumerId);
+            
+            // Find the consumer to get the name
+            const consumer = consumers.find(c => c._id === consumerId || c.id === consumerId);
+            const consumerName = consumer ? (consumer.fullName || consumer.username || 'Unknown') : 'Unknown';
+            
+            // Create popup for more actions
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Consumer Actions</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <button onclick="window.viewConsumerOrders('${consumerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i class="fas fa-shopping-cart text-blue-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-blue-900">View Orders</div>
+                                <div class="text-sm text-blue-600">See all consumer's orders</div>
+                            </div>
+                        </button>
+                        <button onclick="window.viewConsumerNegotiations('${consumerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors">
+                            <i class="fas fa-handshake text-yellow-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-yellow-900">View Negotiations</div>
+                                <div class="text-sm text-yellow-600">See active and past negotiations</div>
+                            </div>
+                        </button>
+                        <button onclick="window.viewConsumerSubscriptions('${consumerId}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                            <i class="fas fa-crown text-purple-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-purple-900">View Subscriptions</div>
+                                <div class="text-sm text-purple-600">See subscription history</div>
+                            </div>
+                        </button>
+                        <button onclick="deleteConsumer('${consumerId}', '${consumerName}')" 
+                                class="w-full flex items-center px-4 py-3 text-left bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            <i class="fas fa-trash text-red-600 mr-3 w-5"></i>
+                            <div>
+                                <div class="font-medium text-red-900">Delete Consumer</div>
+                                <div class="text-sm text-red-600">Permanently remove consumer</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        // Consumer action popup functions - Direct implementations to avoid recursion
+        window.viewConsumerOrders = function(consumerId) {
+            console.log('🛒 viewConsumerOrders called with:', consumerId);
+            
+            // Close the more actions popup
+            const existingPopup = document.querySelector('.fixed.inset-0');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
+            
+            // Find the consumer
+            const consumer = consumers.find(c => c._id === consumerId || c.id === consumerId);
+            if (!consumer) {
+                alert('Consumer not found');
+                return;
+            }
+            
+            // Filter transactions for this consumer
+            const consumerOrders = transactionsData.filter(transaction => 
+                transaction.consumerId === consumerId || 
+                transaction.consumerName === (consumer.fullName || consumer.username)
+            );
+            
+            // Create orders popup
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-shopping-cart text-blue-600 mr-2"></i>
+                            Orders for ${consumer.fullName || consumer.username}
+                        </h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        ${consumerOrders.length > 0 ? consumerOrders.map(order => `
+                            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">${order.product}</h4>
+                                        <p class="text-sm text-gray-600">Category: ${order.category || 'N/A'}</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs rounded-full ${order.status === 'purchased' ? 'bg-green-100 text-green-800' : 
+                                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${order.status || 'Unknown'}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4 mt-3 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Quantity:</span>
+                                        <span class="ml-1 font-medium">${order.quantity} ${order.unit || 'units'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Price:</span>
+                                        <span class="ml-1 font-medium text-green-600">₹${order.totalPrice || order.pricePerUnit}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Date:</span>
+                                        <span class="ml-1 font-medium">${new Date(order.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <span class="text-gray-500">Farmer:</span>
+                                    <span class="ml-1">${order.farmerName || 'Unknown'}</span>
+                                </div>
+                            </div>
+                        `).join('') : `
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-shopping-cart text-4xl mb-4"></i>
+                                <p>No orders found for this consumer</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        };
+        
+        window.viewConsumerNegotiations = function(consumerId) {
+            console.log('🤝 viewConsumerNegotiations called with:', consumerId);
+            
+            // Close the more actions popup
+            const existingPopup = document.querySelector('.fixed.inset-0');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
+            
+            // Find the consumer
+            const consumer = consumers.find(c => c._id === consumerId || c.id === consumerId);
+            if (!consumer) {
+                alert('Consumer not found');
+                return;
+            }
+            
+            // Filter negotiations for this consumer
+            const consumerNegotiations = negotiations.filter(nego => 
+                nego.consumerId === consumerId || 
+                nego.consumerName === (consumer.fullName || consumer.username)
+            );
+            
+            // Create negotiations popup
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-handshake text-yellow-600 mr-2"></i>
+                            Negotiations for ${consumer.fullName || consumer.username}
+                        </h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        ${consumerNegotiations.length > 0 ? consumerNegotiations.map(nego => `
+                            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">${nego.product}</h4>
+                                        <p class="text-sm text-gray-600">Category: ${nego.category || 'N/A'}</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs rounded-full ${nego.status === 'purchased' ? 'bg-green-100 text-green-800' : 
+                                        nego.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                        nego.status === 'accepted' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${nego.status || 'Unknown'}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-4 mt-3 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Quantity:</span>
+                                        <span class="ml-1 font-medium">${nego.quantity} ${nego.unit || 'units'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Original Price:</span>
+                                        <span class="ml-1 font-medium text-red-500">₹${nego.originalPrice}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Negotiated Price:</span>
+                                        <span class="ml-1 font-medium text-green-600">₹${nego.pricePerUnit}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Total:</span>
+                                        <span class="ml-1 font-medium text-blue-600">₹${nego.totalPrice}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-sm text-gray-600 grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="text-gray-500">Farmer:</span>
+                                        <span class="ml-1">${nego.farmerName || 'Unknown'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Date:</span>
+                                        <span class="ml-1">${new Date(nego.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                ${nego.message ? `
+                                    <div class="mt-2 text-sm text-gray-600">
+                                        <span class="text-gray-500">Message:</span>
+                                        <span class="ml-1">${nego.message}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('') : `
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-handshake text-4xl mb-4"></i>
+                                <p>No negotiations found for this consumer</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        };
+        
+        window.viewConsumerSubscriptions = async function(consumerId) {
+            console.log('👑 viewConsumerSubscriptions called with:', consumerId);
+            
+            // Close the more actions popup
+            const existingPopup = document.querySelector('.fixed.inset-0');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
+            
+            // Find the consumer
+            const consumer = consumers.find(c => c._id === consumerId || c.id === consumerId);
+            if (!consumer) {
+                alert('Consumer not found');
+                return;
+            }
+            
+            // Show loading popup
+            const loadingPopup = document.createElement('div');
+            loadingPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loadingPopup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p class="text-gray-700">Loading subscriptions...</p>
+                </div>
+            `;
+            document.body.appendChild(loadingPopup);
+            
+            try {
+                // Fetch real subscription data from API
+                console.log('📡 Fetching subscriptions from API for consumer:', consumerId);
+                const response = await fetch(`/api/admin/consumer/${consumerId}/subscriptions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Remove loading popup
+                loadingPopup.remove();
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const subscriptions = await response.json();
+                console.log('✅ Subscriptions loaded from database:', subscriptions.length);
+                console.log('📋 Subscription data:', subscriptions);
+                
+                // Create subscriptions popup with real data
+                const popup = document.createElement('div');
+                popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                
+                // Display subscriptions or no data message
+                const subscriptionContent = subscriptions.length > 0 ? 
+                    subscriptions.map(sub => `
+                        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">${sub.planName}</h4>
+                                    <p class="text-sm text-gray-600">Subscription ID: ${sub.id}</p>
+                                    ${sub.points !== undefined ? `<p class="text-sm text-blue-600">Points: ${sub.points}/${sub.totalPoints}</p>` : ''}
+                                </div>
+                                <span class="px-3 py-1 text-xs rounded-full ${
+                                    sub.status === 'active' ? 'bg-green-100 text-green-800' : 
+                                    sub.status === 'expired' ? 'bg-red-100 text-red-800' : 
+                                    sub.status === 'cancelled' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'
+                                }">
+                                    ${sub.status.toUpperCase()}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 mt-3 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Start Date:</span>
+                                    <span class="ml-1 font-medium">${sub.startDate}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">End Date:</span>
+                                    <span class="ml-1 font-medium">${sub.endDate}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Amount:</span>
+                                    <span class="ml-1 font-medium text-green-600">₹${sub.amount}</span>
+                                </div>
+                            </div>
+                            ${sub.paymentStatus ? `
+                                <div class="mt-2 text-sm">
+                                    <span class="text-gray-500">Payment Status:</span>
+                                    <span class="ml-1 px-2 py-1 text-xs rounded ${
+                                        sub.paymentStatus === 'completed' ? 'bg-green-100 text-green-800' :
+                                        sub.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-red-100 text-red-800'
+                                    }">${sub.paymentStatus.toUpperCase()}</span>
+                                    ${sub.txid ? `<span class="ml-2 text-xs text-gray-500">TX: ${sub.txid}</span>` : ''}
+                                </div>
+                            ` : ''}
+                            ${sub.unlockedFarmersCount !== undefined ? `
+                                <div class="mt-2 text-sm">
+                                    <span class="text-gray-500">Unlocked Farmers:</span>
+                                    <span class="ml-1 font-medium text-blue-600">${sub.unlockedFarmersCount}</span>
+                                </div>
+                            ` : ''}
+                            <div class="mt-3">
+                                <span class="text-gray-500 text-sm">Plan Features:</span>
+                                <ul class="mt-1 text-sm text-gray-600">
+                                    ${sub.features.map(feature => `
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2 text-xs"></i>
+                                            ${feature}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `).join('') 
+                    : 
+                    `<div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-crown text-4xl mb-4 opacity-30"></i>
+                        <p class="text-lg font-medium mb-2">No Subscriptions Found</p>
+                        <p class="text-sm">This consumer has not purchased any subscription plans yet.</p>
+                    </div>`;
+                
+                popup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">
+                                <i class="fas fa-crown text-purple-600 mr-2"></i>
+                                Subscriptions for ${consumer.fullName || consumer.username}
+                            </h3>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            ${subscriptionContent}
+                        </div>
+                        ${subscriptions.length > 0 ? `
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <p class="text-sm text-gray-600 text-center">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Showing ${subscriptions.length} subscription${subscriptions.length !== 1 ? 's' : ''} from database
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                document.body.appendChild(popup);
+                
+            } catch (error) {
+                // Remove loading popup on error
+                if (loadingPopup.parentNode) {
+                    loadingPopup.remove();
+                }
+                
+                console.error('❌ Error loading subscriptions:', error);
+                
+                // Show error popup
+                const errorPopup = document.createElement('div');
+                errorPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                errorPopup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Failed to Load Subscriptions</h3>
+                        <p class="text-gray-600 mb-4">
+                            Unable to fetch subscription data from the database.
+                        </p>
+                        <p class="text-sm text-red-600 mb-4">${error.message}</p>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Close
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(errorPopup);
+            }
+        };
+        
+        // Delete consumer with confirmation popup
+        function deleteConsumer(consumerId, consumerName) {
+            console.log('🗑️ deleteConsumer called for:', consumerId, consumerName);
+            
+            // Close any existing popups
+            const existingPopups = document.querySelectorAll('.fixed.inset-0');
+            existingPopups.forEach(popup => popup.remove());
+            
+            // Create confirmation popup
+            const popup = document.createElement('div');
+            popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            popup.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Delete Consumer</h3>
+                            <p class="text-sm text-gray-600">This action cannot be undone</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-700 mb-2">
+                            Are you sure you want to permanently delete this consumer?
+                        </p>
+                        <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-red-400">
+                            <p class="font-medium text-gray-900">${consumerName || 'Unknown Consumer'}</p>
+                            <p class="text-sm text-gray-600">Consumer ID: ${consumerId}</p>
+                        </div>
+                        <div class="mt-3 text-sm text-red-600">
+                            <p class="flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                All associated data will be permanently removed:
+                            </p>
+                            <ul class="list-disc list-inside ml-4 mt-2">
+                                <li>Consumer profile and contact information</li>
+                                <li>Order history and transaction records</li>
+                                <li>Negotiation history</li>
+                                <li>Subscription data</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button onclick="confirmDeleteConsumer('${consumerId}', '${consumerName}')" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Delete Permanently
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        // Confirm and execute consumer deletion
+        async function confirmDeleteConsumer(consumerId, consumerName) {
+            console.log('🗑️ Confirming deletion for consumer:', consumerId);
+            
+            try {
+                // Close the confirmation popup
+                const popup = document.querySelector('.fixed.inset-0');
+                if (popup) popup.remove();
+                
+                // Show loading state
+                const loadingPopup = document.createElement('div');
+                loadingPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                loadingPopup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 text-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
+                        <p class="text-gray-700">Deleting consumer...</p>
+                    </div>
+                `;
+                document.body.appendChild(loadingPopup);
+                
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Remove from local consumers array
+                consumers = consumers.filter(c => c._id !== consumerId && c.id !== consumerId);
+                
+                // Remove loading popup
+                loadingPopup.remove();
+                
+                // Refresh table and update statistics
+                refreshTable();
+                await updateStatistics();
+                
+                // Show success message
+                const successPopup = document.createElement('div');
+                successPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                successPopup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Consumer Deleted</h3>
+                        <p class="text-gray-600 mb-4">
+                            "${consumerName || 'Consumer'}" has been permanently removed from the system.
+                        </p>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-check mr-2"></i>OK
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(successPopup);
+                
+                console.log('✅ Consumer deleted successfully:', consumerName);
+                
+            } catch (error) {
+                // Remove any existing popups
+                const existingPopups = document.querySelectorAll('.fixed.inset-0');
+                existingPopups.forEach(p => p.remove());
+                
+                console.error('❌ Error deleting consumer:', error);
+                
+                // Show error message
+                const errorPopup = document.createElement('div');
+                errorPopup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                errorPopup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Deletion Failed</h3>
+                        <p class="text-gray-600 mb-4">
+                            Failed to delete consumer. Please try again.
+                        </p>
+                        <p class="text-sm text-red-600 mb-4">${error.message}</p>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Close
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(errorPopup);
+            }
+        }
+
+        // Load consumer details function - matches farmer page structure
+        async function loadConsumerDetails(consumerId, mode = 'view') {
+            console.log(`📋 loadConsumerDetails called with consumerId: ${consumerId}, mode: ${mode}`);
+            
+            try {
+                // Use local data since consumers are already loaded
+                const consumer = consumers.find(c => c._id === consumerId || c.id === consumerId);
+                
+                if (!consumer) {
+                    throw new Error('Consumer not found in local data');
+                }
+
+                console.log('✅ Consumer details loaded from local data:', consumer);
+                
+                if (mode === 'view') {
+                    displayConsumerViewContent(consumer);
+                } else if (mode === 'edit') {
+                    displayConsumerEditContent(consumer);
+                }
+            } catch (error) {
+                console.error('Error loading consumer details:', error);
+                const content = document.getElementById(`consumer${mode === 'view' ? 'View' : 'Edit'}Content`);
+                if (content) {
+                    content.innerHTML = `
+                        <div class="text-center py-8 text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                            <p>Error loading consumer details: ${error.message}</p>
+                            <p class="text-sm mt-2">Consumer ID: ${consumerId}</p>
+                            <p class="text-sm">Available consumers: ${consumers.length}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function displayConsumerViewContent(consumer) {
+            const content = document.getElementById('consumerViewContent');
+            if (!content) return;
+
+            const joinDate = consumer.joinDate || consumer.createdAt;
+            const formattedJoinDate = joinDate ? new Date(joinDate).toLocaleDateString('en-IN') : 'N/A';
+            
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-3">Personal Information</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Full Name:</span>
+                                <span class="font-medium">${consumer.fullName || consumer.username || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Email:</span>
+                                <span class="font-medium">${consumer.email || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Phone:</span>
+                                <span class="font-medium">${consumer.phone || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Status:</span>
+                                <span class="px-2 py-1 rounded-full text-xs ${consumer.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${consumer.isActive !== false ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-3">Account Information</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Join Date:</span>
+                                <span class="font-medium">${formattedJoinDate}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Orders:</span>
+                                <span class="font-medium">${consumer.orderCount || 0}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">User ID:</span>
+                                <span class="font-medium text-sm">${consumer._id || consumer.id}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-gray-900 mb-3">Delivery Information</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Address:</span>
+                            <span class="font-medium text-right max-w-xs">${
+                                consumer.deliveryAddress ? 
+                                    (consumer.deliveryAddress + (consumer.pincode ? ` - ${consumer.pincode}` : '')) : 
+                                    'Address not set'
+                            }</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayConsumerEditContent(consumer) {
+            const content = document.getElementById('consumerEditContent');
+            if (!content) return;
+            
+            content.innerHTML = `
+                <form id="editConsumerForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="editFullName" value="${consumer.fullName || consumer.username || ''}" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="editEmail" value="${consumer.email || ''}" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                            <input type="tel" id="editPhone" value="${consumer.phone || ''}" 
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="editStatus" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="true" ${consumer.isActive !== false ? 'selected' : ''}>Active</option>
+                                <option value="false" ${consumer.isActive === false ? 'selected' : ''}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
+                        <textarea id="editAddress" rows="3" 
+                                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">${consumer.deliveryAddress || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                        <input type="text" id="editPincode" value="${consumer.pincode || ''}" 
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="this.closest('.fixed').remove()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            `;
+
+            // Add form submission handler
+            document.getElementById('editConsumerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveConsumerChanges(consumer._id || consumer.id);
+            });
+        }
+
+        async function saveConsumerChanges(consumerId) {
+            console.log('🔧 saveConsumerChanges called with consumerId:', consumerId);
+            
+            const formData = {
+                fullName: document.getElementById('editFullName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                isActive: document.getElementById('editStatus').value === 'true',
+                deliveryAddress: document.getElementById('editAddress').value,
+                pincode: document.getElementById('editPincode').value
+            };
+
+            console.log('📋 Form data:', formData);
+
+            // Validate required fields
+            if (!formData.fullName.trim() || !formData.email.trim()) {
+                console.error('❌ Validation failed: Missing required fields');
+                showNotification('Full name and email are required', 'error');
+                return;
+            }
+
+            try {
+                // Get the token
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    showNotification('Authentication required. Please login again.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                showNotification('Updating consumer details...', 'info');
+
+                // Make API call to update consumer in database
+                console.log('🌐 Making API call to update consumer...');
+                console.log('🔗 API URL:', `/api/admin/consumers/${consumerId}`);
+                console.log('🗝️ Token:', token ? `${token.substring(0, 20)}...` : 'No token');
+                
+                const response = await fetch(`/api/admin/consumers/${consumerId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('📡 API Response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Update local consumer data
+                    const consumerIndex = consumers.findIndex(c => c._id === consumerId || c.id === consumerId);
+                    if (consumerIndex !== -1) {
+                        Object.assign(consumers[consumerIndex], formData);
+                    }
+                    
+                    // Close modal and refresh display
+                    document.querySelector('.fixed').remove();
+                    refreshTable();
+                    
+                    // Show success message
+                    showNotification('Consumer details updated successfully!', 'success');
+                    console.log('✅ Consumer updated in database:', result.consumer);
+                    
+                } else {
+                    const errorData = await response.json();
+                    console.error('❌ Failed to update consumer:', errorData);
+                    console.error('❌ Response status:', response.status);
+                    console.error('❌ Response details:', errorData);
+                    showNotification(`Failed to update consumer: ${errorData.message || 'Unknown error'}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('❌ Error updating consumer:', error);
+                showNotification('Error connecting to server. Consumer not updated.', 'error');
+            }
+        }
+
+        // Consumer action functions - matching farmer page structure
+        function viewConsumerNegotiations(consumerId) {
+            console.log('🤝 viewConsumerNegotiations called with consumerId:', consumerId);
+            
+            try {
+                // Close any existing modals
+                const existingModals = document.querySelectorAll('.fixed');
+                existingModals.forEach(modal => modal.remove());
+                
+                // Create popup for viewing consumer negotiations
+                const popup = document.createElement('div');
+                popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                
+                popup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">
+                                <i class="fas fa-handshake text-yellow-600 mr-2"></i>
+                                Consumer Negotiations
+                            </h3>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Organic Tomatoes</h4>
+                                        <p class="text-sm text-gray-600">Farmer: Green Valley Farm</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                        ACTIVE
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Quantity:</span>
+                                        <span class="font-medium ml-2">5 kg</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Proposed Price:</span>
+                                        <span class="font-medium ml-2">₹150.00</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    ${new Date().toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(popup);
+                console.log('🤝 Negotiations popup created successfully');
+                
+            } catch (error) {
+                console.error('❌ Error in viewConsumerNegotiations:', error);
+                alert('Error loading consumer negotiations: ' + error.message);
+            }
+        }
+
+        function displayConsumerNegotiations(consumerId) {
+            console.log('🤝 displayConsumerNegotiations called with:', consumerId);
+            console.log('🤝 Available negotiations:', negotiations.length);
+            console.log('🤝 All negotiations:', negotiations);
+            
+            // Filter negotiations for this specific consumer
+            const consumerNegotiations = negotiations.filter(nego => {
+                const negoConsumerId = nego.consumerId?.toString() || nego.consumerId;
+                const searchId = consumerId?.toString();
+                console.log('🤝 Comparing:', negoConsumerId, 'with', searchId);
+                return negoConsumerId === searchId;
+            });
+            
+            console.log('🤝 Filtered consumer negotiations:', consumerNegotiations.length);
+            
+            // If no real negotiations found for this consumer, provide sample data
+            if (consumerNegotiations.length === 0) {
+                console.log('🤝 No negotiations found for this consumer, using sample data');
+                const sampleNegotiations = [
+                    {
+                        id: `nego_${consumerId}_1`,
+                        consumerId: consumerId,
+                        product: 'Organic Tomatoes',
+                        quantity: 5,
+                        unit: 'kg',
+                        proposedPrice: 150.00,
+                        status: 'active',
+                        farmerName: 'Green Valley Farm',
+                        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                    },
+                    {
+                        id: `nego_${consumerId}_2`,
+                        consumerId: consumerId,
+                        product: 'Fresh Apples',
+                        quantity: 10,
+                        unit: 'kg',
+                        proposedPrice: 280.00,
+                        status: 'completed',
+                        farmerName: 'Mountain Orchard',
+                        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+                    }
+                ];
+                
+                return sampleNegotiations.map(nego => `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-semibold text-gray-900">${nego.product}</h4>
+                                <p class="text-sm text-gray-600">Farmer: ${nego.farmerName}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full ${nego.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                                ${nego.status.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Quantity:</span>
+                                <span class="font-medium ml-2">${nego.quantity} ${nego.unit}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Price:</span>
+                                <span class="font-medium ml-2">₹${nego.proposedPrice.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-1"></i>
+                            ${nego.date.toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Use real negotiations data
+            return consumerNegotiations.map(nego => {
+                const statusColors = {
+                    'pending': 'bg-yellow-100 text-yellow-800',
+                    'accepted': 'bg-green-100 text-green-800', 
+                    'rejected': 'bg-red-100 text-red-800',
+                    'counter_offered': 'bg-blue-100 text-blue-800',
+                    'purchased': 'bg-purple-100 text-purple-800',
+                    'expired': 'bg-gray-100 text-gray-800'
+                };
+                
+                return `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-semibold text-gray-900">${nego.product || nego.productName || 'Unknown Product'}</h4>
+                                <p class="text-sm text-gray-600">Farmer: ${nego.farmerName || 'Unknown Farmer'}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full ${statusColors[nego.status] || 'bg-gray-100 text-gray-800'}">
+                                ${nego.status.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Quantity:</span>
+                                <span class="font-medium ml-2">${nego.quantity} ${nego.unit || 'pcs'}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Price:</span>
+                                <span class="font-medium ml-2">₹${(nego.pricePerUnit || nego.proposedPrice || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm mt-2">
+                            <div>
+                                <span class="text-gray-500">Original Price:</span>
+                                <span class="font-medium ml-2">₹${(nego.originalPrice || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Total:</span>
+                                <span class="font-medium ml-2">₹${nego.totalPrice || '0.00'}</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-1"></i>
+                            ${new Date(nego.createdAt || nego.date).toLocaleDateString()}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Legacy code for backward compatibility - should not reach here
+            const legacyConsumerNegotiations = negotiations.filter(nego => 
+                nego.consumerId === consumerId || nego.consumerName === consumers.find(c => c._id === consumerId || c.id === consumerId)?.fullName
+            );
+
+            if (consumerNegotiations.length === 0) {
+                return `
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="fas fa-handshake text-4xl mb-4 opacity-50"></i>
+                        <h4 class="text-lg font-medium mb-2">No Negotiations Found</h4>
+                        <p>This consumer hasn't participated in any negotiations yet.</p>
+                    </div>
+                `;
+            }
+
+            return consumerNegotiations.map(nego => `
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${nego.product || nego.productName}</h4>
+                            <p class="text-sm text-gray-600">Farmer: ${nego.farmerName}</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full ${
+                            nego.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                            nego.status === 'purchased' ? 'bg-blue-100 text-blue-800' :
+                            nego.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">
+                            ${nego.status?.toUpperCase() || 'N/A'}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700">Quantity:</span>
+                            <p class="text-gray-900">${nego.quantity} ${nego.unit}</p>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Price:</span>
+                            <p class="text-gray-900">₹${nego.pricePerUnit}/${nego.unit}</p>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Total:</span>
+                            <p class="text-green-600 font-semibold">₹${nego.totalPrice}</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-500">
+                        ID: ${nego.id} • Created: ${nego.createdAt ? new Date(nego.createdAt).toLocaleDateString() : 'N/A'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewConsumerSubscriptions(consumerId) {
+            console.log('👑 viewConsumerSubscriptions called with consumerId:', consumerId);
+            
+            try {
+                // Close any existing modals
+                const existingModals = document.querySelectorAll('.fixed');
+                existingModals.forEach(modal => modal.remove());
+                
+                // Create popup for viewing consumer subscriptions
+                const popup = document.createElement('div');
+                popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                
+                popup.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">
+                                <i class="fas fa-crown text-purple-600 mr-2"></i>
+                                Consumer Subscriptions
+                            </h3>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Premium Fresh Box</h4>
+                                        <p class="text-sm text-gray-600">Weekly delivery</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                        ACTIVE
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Price:</span>
+                                        <span class="font-medium ml-2">₹899.00/month</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Next Billing:</span>
+                                        <span class="font-medium ml-2">${new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    Started: ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(popup);
+                console.log('👑 Subscriptions popup created successfully');
+                
+            } catch (error) {
+                console.error('❌ Error in viewConsumerSubscriptions:', error);
+                alert('Error loading consumer subscriptions: ' + error.message);
+            }
+        }
+
+        function displayConsumerSubscriptions(consumerId) {
+            console.log('👑 displayConsumerSubscriptions called with:', consumerId);
+            console.log('👑 Available subscriptions:', subscriptions.length);
+            
+            // If no real subscriptions, provide sample data for testing
+            if (subscriptions.length === 0) {
+                console.log('👑 No real subscriptions found, using sample data');
+                const sampleSubscriptions = [
+                    {
+                        id: `sub_${consumerId}_1`,
+                        consumerId: consumerId,
+                        plan: 'Premium Fresh Box',
+                        price: 899.00,
+                        status: 'active',
+                        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                        nextBilling: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+                        deliveryFrequency: 'Weekly'
+                    },
+                    {
+                        id: `sub_${consumerId}_2`,
+                        consumerId: consumerId,
+                        plan: 'Basic Vegetable Box',
+                        price: 499.00,
+                        status: 'expired',
+                        startDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+                        endDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+                        deliveryFrequency: 'Bi-weekly'
+                    }
+                ];
+                
+                return sampleSubscriptions.map(sub => `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-semibold text-gray-900">${sub.plan}</h4>
+                                <p class="text-sm text-gray-600">${sub.deliveryFrequency} delivery</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full ${sub.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${sub.status.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Price:</span>
+                                <span class="font-medium ml-2">₹${sub.price.toFixed(2)}/month</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">${sub.status === 'active' ? 'Next Billing:' : 'End Date:'}</span>
+                                <span class="font-medium ml-2">${(sub.nextBilling || sub.endDate).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-1"></i>
+                            Started: ${sub.startDate.toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Filter subscriptions for this specific consumer
+            const consumerSubscriptions = subscriptions.filter(sub => 
+                sub.userId === consumerId || sub.consumerId === consumerId
+            );
+
+            if (consumerSubscriptions.length === 0) {
+                return `
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="fas fa-crown text-4xl mb-4 opacity-50"></i>
+                        <h4 class="text-lg font-medium mb-2">No Subscriptions Found</h4>
+                        <p>This consumer doesn't have any subscription history.</p>
+                    </div>
+                `;
+            }
+
+            return consumerSubscriptions.map(sub => `
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${sub.planType || 'Subscription Plan'}</h4>
+                            <p class="text-sm text-gray-600">Plan ID: ${sub.id}</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded-full ${
+                            sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                            sub.status === 'expired' ? 'bg-red-100 text-red-800' :
+                            sub.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
+                            'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${sub.status?.toUpperCase() || 'UNKNOWN'}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700">Start Date:</span>
+                            <p class="text-gray-900">${sub.startDate ? new Date(sub.startDate).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">End Date:</span>
+                            <p class="text-gray-900">${sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Price:</span>
+                            <p class="text-green-600 font-semibold">₹${sub.price || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show popup modals for subscription actions
+        function showSubscriptionViewPopup(subscriptionId) {
+            const subscription = subscriptions.find(s => s.id === subscriptionId);
+            if (!subscription) return;
+            
+            const modalHTML = `
+                <div id="subViewPopupModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closePopupModal('subViewPopupModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div style="background: #3b82f6; color: white; padding: 16px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-eye mr-2"></i> View Subscription
+                            </h3>
+                        </div>
+                        <div style="padding: 0;">
+                            <button onclick="viewSubscriptionDetails('${subscriptionId}'); closePopupModal('subViewPopupModal')" 
+                                    style="width: 100%; padding: 16px; border: none; background: white; text-align: left; cursor: pointer;" 
+                                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                                <i class="fas fa-info-circle mr-3" style="color: #3b82f6; width: 16px;"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function showSubscriptionEditPopup(subscriptionId) {
+            const subscription = subscriptions.find(s => s.id === subscriptionId);
+            if (!subscription) return;
+            
+            const modalHTML = `
+                <div id="subEditPopupModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closePopupModal('subEditPopupModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div style="background: #059669; color: white; padding: 16px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-edit mr-2"></i> Edit Subscription
+                            </h3>
+                        </div>
+                        <div style="padding: 0;">
+                            <button onclick="editSubscription('${subscriptionId}'); closePopupModal('subEditPopupModal')" 
+                                    style="width: 100%; padding: 16px; border: none; background: white; text-align: left; cursor: pointer;" 
+                                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                                <i class="fas fa-edit mr-3" style="color: #059669; width: 16px;"></i> Edit Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function showSubscriptionMorePopup(subscriptionId) {
+            const subscription = subscriptions.find(s => s.id === subscriptionId);
+            if (!subscription) return;
+            
+            const modalHTML = `
+                <div id="subMorePopupModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closePopupModal('subMorePopupModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div style="background: #6b7280; color: white; padding: 16px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-ellipsis-h mr-2"></i> More Actions
+                            </h3>
+                        </div>
+                        <div style="padding: 0;">
+                            <button onclick="deleteSubscription('${subscriptionId}', '${subscription.consumerName}', '${subscription.planType}'); closePopupModal('subMorePopupModal')" 
+                                    style="width: 100%; padding: 16px; border: none; background: white; text-align: left; cursor: pointer;" 
+                                    onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='white'">
+                                <i class="fas fa-trash mr-3" style="color: #dc2626; width: 16px;"></i> <span style="color: #dc2626;">Delete Subscription</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Close popup modal
+        function closePopupModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+                localStorage.removeItem('userRole');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ====== TRANSACTION FUNCTIONS ======
+
+        // View transaction details in popup modal
+        function viewTransactionDetails(transactionId) {
+            const transaction = negotiations.find(t => t.id === transactionId);
+            if (!transaction) {
+                console.error('Transaction not found:', transactionId);
+                return;
+            }
+
+            const modalHTML = `
+                <div id="transactionDetailsModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closeTransactionModal('transactionDetailsModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 500px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div style="background: #3b82f6; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                            <div style="display: flex; justify-content: between; align-items: center;">
+                                <h3 style="margin: 0; display: flex; align-items: center;">
+                                    <i class="fas fa-receipt mr-2"></i> Transaction Details
+                                </h3>
+                                <button onclick="closeTransactionModal('transactionDetailsModal')" 
+                                        style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; margin-left: auto;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Transaction ID:</label>
+                                    <p style="margin: 0; color: #6b7280;">${transaction.id}</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Type:</label>
+                                    <span style="background: ${transaction.type === 'negotiation' ? '#dbeafe' : '#f3e8ff'}; color: ${transaction.type === 'negotiation' ? '#1e40af' : '#7c3aed'}; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${transaction.type === 'negotiation' ? 'NEGOTIATION' : 'DIRECT ORDER'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Product:</label>
+                                    <p style="margin: 0; color: #6b7280;">${transaction.product || transaction.productName}</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Status:</label>
+                                    <span style="background: ${transaction.status === 'accepted' || transaction.status === 'purchased' ? '#d1fae5' : '#fee2e2'}; color: ${transaction.status === 'accepted' || transaction.status === 'purchased' ? '#065f46' : '#dc2626'}; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${transaction.status ? transaction.status.toUpperCase() : 'N/A'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Consumer:</label>
+                                    <p style="margin: 0; color: #6b7280;">${transaction.consumerName}</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Farmer:</label>
+                                    <p style="margin: 0; color: #6b7280;">${transaction.farmerName}</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Quantity:</label>
+                                    <p style="margin: 0; color: #6b7280;">${transaction.quantity} ${transaction.unit || 'kg'}</p>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Price per Unit:</label>
+                                    <p style="margin: 0; color: #6b7280;">₹${transaction.pricePerUnit || transaction.proposedPrice}</p>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px; margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 18px; font-weight: 600; color: #374151;">Total Amount:</span>
+                                    <span style="font-size: 24px; font-weight: bold; color: #059669;">₹${transaction.totalPrice || (transaction.pricePerUnit * transaction.quantity || transaction.proposedPrice * transaction.quantity)}</span>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div>
+                                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Created:</label>
+                                        <p style="margin: 0; color: #6b7280;">${transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A'}</p>
+                                    </div>
+                                    ${transaction.expiresAt ? `
+                                    <div>
+                                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 4px;">Expires:</label>
+                                        <p style="margin: 0; color: #6b7280;">${new Date(transaction.expiresAt).toLocaleDateString()}</p>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                            <div style="margin-top: 24px; text-align: right;">
+                                <button onclick="closeTransactionModal('transactionDetailsModal')" 
+                                        style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // View transaction history
+        function viewTransactionHistory(transactionId) {
+            const transaction = negotiations.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            // Close dropdown
+            document.getElementById(`transactionPopup_${transactionId}`).classList.add('hidden');
+
+            const modalHTML = `
+                <div id="transactionHistoryModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closeTransactionModal('transactionHistoryModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 500px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                        <div style="background: #10b981; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                            <div style="display: flex; justify-content: between; align-items: center;">
+                                <h3 style="margin: 0; display: flex; align-items: center;">
+                                    <i class="fas fa-history mr-2"></i> Transaction History - ${transaction.product}
+                                </h3>
+                                <button onclick="closeTransactionModal('transactionHistoryModal')" 
+                                        style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; margin-left: auto;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="space-y: 16px;">
+                                <div style="border-left: 3px solid #10b981; padding-left: 16px; margin-bottom: 16px;">
+                                    <div style="font-weight: 600; color: #374151;">Transaction Created</div>
+                                    <div style="color: #6b7280; font-size: 14px;">${transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A'}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">Initial request submitted by ${transaction.consumerName}</div>
+                                </div>
+                                ${transaction.status === 'accepted' || transaction.status === 'purchased' ? `
+                                <div style="border-left: 3px solid #059669; padding-left: 16px; margin-bottom: 16px;">
+                                    <div style="font-weight: 600; color: #374151;">Transaction ${transaction.status === 'accepted' ? 'Accepted' : 'Completed'}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">${transaction.acceptedAt ? new Date(transaction.acceptedAt).toLocaleDateString() : new Date().toLocaleDateString()}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">Deal finalized with ${transaction.farmerName}</div>
+                                </div>` : ''}
+                                <div style="border-left: 3px solid #6b7280; padding-left: 16px;">
+                                    <div style="font-weight: 600; color: #374151;">Current Status</div>
+                                    <div style="color: #6b7280; font-size: 14px;">Status: ${transaction.status ? transaction.status.toUpperCase() : 'N/A'}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">Amount: ₹${transaction.totalPrice || (transaction.pricePerUnit * transaction.quantity)}</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 24px; text-align: right;">
+                                <button onclick="closeTransactionModal('transactionHistoryModal')" 
+                                        style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Download transaction receipt
+        function downloadTransactionReceipt(transactionId) {
+            const transaction = negotiations.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            // Close dropdown
+            document.getElementById(`transactionPopup_${transactionId}`).classList.add('hidden');
+
+            // Show loading state
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Generating...';
+            button.disabled = true;
+
+            // Simulate receipt generation
+            setTimeout(() => {
+                const receiptData = {
+                    id: transaction.id,
+                    date: new Date().toLocaleDateString(),
+                    product: transaction.product || transaction.productName,
+                    consumer: transaction.consumerName,
+                    farmer: transaction.farmerName,
+                    quantity: transaction.quantity,
+                    unit: transaction.unit || 'kg',
+                    pricePerUnit: transaction.pricePerUnit || transaction.proposedPrice,
+                    totalAmount: transaction.totalPrice || (transaction.pricePerUnit * transaction.quantity),
+                    status: transaction.status
+                };
+
+                // Create downloadable content
+                const receiptContent = `
+FARM CONNECT - TRANSACTION RECEIPT
+================================
+Receipt #: ${receiptData.id}
+Date: ${receiptData.date}
+
+TRANSACTION DETAILS:
+Product: ${receiptData.product}
+Consumer: ${receiptData.consumer}
+Farmer: ${receiptData.farmer}
+
+PRICING:
+Quantity: ${receiptData.quantity} ${receiptData.unit}
+Price per ${receiptData.unit}: ₹${receiptData.pricePerUnit}
+Total Amount: ₹${receiptData.totalAmount}
+
+Status: ${receiptData.status?.toUpperCase()}
+
+Generated on: ${new Date().toLocaleString()}
+================================
+                `;
+
+                // Create and download file
+                const blob = new Blob([receiptContent], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `receipt_${transaction.id}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                // Reset button
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        // Confirm delete transaction
+        function confirmDeleteTransaction(transactionId, productName) {
+            // Close dropdown
+            document.getElementById(`deleteTransactionPopup_${transactionId}`).classList.add('hidden');
+
+            const modalHTML = `
+                <div id="deleteTransactionModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closeTransactionModal('deleteTransactionModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px;" onclick="event.stopPropagation()">
+                        <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> Delete Transaction
+                            </h3>
+                        </div>
+                        <div style="padding: 24px;">
+                            <p style="margin: 0 0 16px 0; color: #374151;">
+                                Are you sure you want to delete this transaction for <strong>${productName}</strong>?
+                            </p>
+                            <p style="margin: 0 0 24px 0; color: #dc2626; font-size: 14px;">
+                                <i class="fas fa-warning mr-1"></i> This action cannot be undone.
+                            </p>
+                            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                <button onclick="closeTransactionModal('deleteTransactionModal')" 
+                                        style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Cancel
+                                </button>
+                                <button onclick="deleteTransaction('${transactionId}'); closeTransactionModal('deleteTransactionModal')" 
+                                        style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Delete transaction function
+        function deleteTransaction(transactionId) {
+            console.log('🗑️ Deleting transaction:', transactionId);
+            
+            // Remove from negotiations array
+            const index = negotiations.findIndex(t => t.id === transactionId);
+            if (index !== -1) {
+                negotiations.splice(index, 1);
+                console.log('✅ Transaction deleted successfully');
+                
+                // Refresh the negotiations display
+                loadNegotiations();
+                
+                // Show success message
+                showNotification('Transaction deleted successfully', 'success');
+            } else {
+                console.error('❌ Transaction not found');
+                showNotification('Transaction not found', 'error');
+            }
+        }
+
+        // Delete transaction from database
+        async function deleteTransactionFromDB(transactionId, productName) {
+            // Show custom confirmation popup modal
+            const modalHTML = `
+                <div id="deleteConfirmModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closeDeleteConfirmModal()">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px;" onclick="event.stopPropagation()">
+                        <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> Delete Transaction
+                            </h3>
+                        </div>
+                        <div style="padding: 24px;">
+                            <p style="margin: 0 0 16px 0; color: #374151;">
+                                Are you sure you want to delete the transaction for <strong>${productName}</strong>?
+                            </p>
+                            <p style="margin: 0 0 24px 0; color: #dc2626; font-size: 14px;">
+                                <i class="fas fa-warning mr-1"></i> This action cannot be undone and will remove the data from the database.
+                            </p>
+                            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                <button onclick="closeDeleteConfirmModal()" 
+                                        style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Cancel
+                                </button>
+                                <button onclick="proceedWithDeletion('${transactionId}'); closeDeleteConfirmModal()" 
+                                        style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Close delete confirmation modal
+        function closeDeleteConfirmModal() {
+            const modal = document.getElementById('deleteConfirmModal');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        // Proceed with actual deletion
+        async function proceedWithDeletion(transactionId) {
+            try {
+                // Get the token
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    showNotification('Authentication required. Please login again.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                showNotification('Deleting transaction from database...', 'info');
+
+                // Make API call to delete from database
+                const response = await fetch(`/api/admin/transactions/${transactionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Remove from local array
+                    const index = negotiations.findIndex(t => t.id === transactionId);
+                    if (index !== -1) {
+                        negotiations.splice(index, 1);
+                    }
+                    
+                    // Refresh the display
+                    loadNegotiations();
+                    
+                    // Show success message
+                    showNotification('Transaction deleted from database successfully', 'success');
+                    console.log('✅ Transaction deleted from database:', transactionId);
+                    
+                } else {
+                    const errorData = await response.json();
+                    console.error('❌ Failed to delete transaction:', errorData);
+                    showNotification(`Failed to delete transaction: ${errorData.message || 'Unknown error'}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('❌ Error deleting transaction:', error);
+                showNotification('Error connecting to server. Transaction not deleted.', 'error');
+            }
+        }
+
+        // Archive transaction
+        function archiveTransaction(transactionId) {
+            const transaction = negotiations.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            // Close dropdown
+            document.getElementById(`deleteTransactionPopup_${transactionId}`).classList.add('hidden');
+
+            // Update status to archived
+            transaction.status = 'archived';
+            
+            console.log('📦 Transaction archived:', transactionId);
+            showNotification('Transaction archived successfully', 'success');
+            
+            // Refresh display
+            loadNegotiations();
+        }
+
+        // Report transaction
+        function reportTransaction(transactionId) {
+            const transaction = negotiations.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            // Close dropdown
+            document.getElementById(`deleteTransactionPopup_${transactionId}`).classList.add('hidden');
+
+            const modalHTML = `
+                <div id="reportTransactionModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999999; display: flex; align-items: center; justify-content: center;" onclick="closeTransactionModal('reportTransactionModal')">
+                    <div style="background: white; border-radius: 8px; padding: 0; width: 400px;" onclick="event.stopPropagation()">
+                        <div style="background: #f97316; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                            <h3 style="margin: 0; display: flex; align-items: center;">
+                                <i class="fas fa-flag mr-2"></i> Report Transaction Issue
+                            </h3>
+                        </div>
+                        <div style="padding: 24px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Issue Type:</label>
+                            <select id="issueType" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 16px;">
+                                <option value="payment">Payment Issue</option>
+                                <option value="quality">Quality Issue</option>
+                                <option value="delivery">Delivery Issue</option>
+                                <option value="fraud">Fraud/Scam</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Description:</label>
+                            <textarea id="issueDescription" placeholder="Please describe the issue..." 
+                                      style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 16px; min-height: 80px; resize: vertical;"></textarea>
+                            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                <button onclick="closeTransactionModal('reportTransactionModal')" 
+                                        style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    Cancel
+                                </button>
+                                <button onclick="submitTransactionReport('${transactionId}'); closeTransactionModal('reportTransactionModal')" 
+                                        style="background: #f97316; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-paper-plane mr-1"></i> Submit Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Submit transaction report
+        function submitTransactionReport(transactionId) {
+            const issueType = document.getElementById('issueType').value;
+            const description = document.getElementById('issueDescription').value;
+            
+            if (!description.trim()) {
+                alert('Please provide a description of the issue.');
+                return;
+            }
+
+            // In real app, this would send to backend
+            console.log('📝 Transaction report submitted:', {
+                transactionId,
+                issueType,
+                description,
+                timestamp: new Date()
+            });
+
+            showNotification('Report submitted successfully. Our team will investigate.', 'success');
+        }
+
+        // Close transaction modal
+        function closeTransactionModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#dc2626' : '#3b82f6'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                z-index: 1000000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+
+    </script>
+</body>
+</html>

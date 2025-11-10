@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Admin Consumer API</title>
+</head>
+<body>
+    <h1>Testing Admin Consumer API</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // First, login to get token
+                console.log('🔐 Testing login...');
+                const loginResponse = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                console.log('Login response:', loginData);
+                
+                if (!loginResponse.ok || !loginData.token) {
+                    resultsDiv.innerHTML = '<p style="color: red;">❌ Login failed</p>';
+                    return;
+                }
+                
+                const token = loginData.token;
+                resultsDiv.innerHTML += '<p style="color: green;">✅ Login successful</p>';
+                
+                // Now test consumer API
+                console.log('📋 Testing consumer API...');
+                const consumerResponse = await fetch('/api/admin/consumers', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const consumerData = await consumerResponse.json();
+                console.log('Consumer response:', consumerData);
+                
+                if (consumerResponse.ok) {
+                    resultsDiv.innerHTML += '<p style="color: green;">✅ Consumer API working</p>';
+                    resultsDiv.innerHTML += `<p>Found ${consumerData.length} consumers:</p>`;
+                    resultsDiv.innerHTML += '<pre>' + JSON.stringify(consumerData, null, 2) + '</pre>';
+                } else {
+                    resultsDiv.innerHTML += '<p style="color: red;">❌ Consumer API failed</p>';
+                    resultsDiv.innerHTML += '<pre>' + JSON.stringify(consumerData, null, 2) + '</pre>';
+                }
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                resultsDiv.innerHTML += '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        // Run test when page loads
+        window.addEventListener('DOMContentLoaded', testAPI);
+    </script>
+</body>
+</html>

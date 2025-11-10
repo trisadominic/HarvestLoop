@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; color: red; }
+        .success { background: #e6ffe6; color: green; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Admin Login & API Test</h1>
+    
+    <h2>Step 1: Test Admin Login</h2>
+    <button onclick="testLogin()">Login as Admin</button>
+    <div id="loginResult" class="result"></div>
+    
+    <h2>Step 2: Test Admin Stats API</h2>
+    <button onclick="testStats()">Get Admin Stats</button>
+    <div id="statsResult" class="result"></div>
+    
+    <h2>Step 3: Test Admin Activity API</h2>
+    <button onclick="testActivity()">Get Admin Activity</button>
+    <div id="activityResult" class="result"></div>
+    
+    <h2>Debug Info</h2>
+    <div id="debugInfo" class="result"></div>
+
+    <script>
+        let adminToken = null;
+        
+        function updateDebug(message) {
+            const debug = document.getElementById('debugInfo');
+            debug.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+        }
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            updateDebug('Testing admin login...');
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                updateDebug(`Login response status: ${response.status}`);
+                updateDebug(`Login response data: ${JSON.stringify(data)}`);
+                
+                if (response.ok && data.token) {
+                    adminToken = data.token;
+                    localStorage.setItem('token', adminToken);
+                    resultDiv.innerHTML = `<div class="success">✅ Login successful!<br>Token: ${adminToken.substring(0, 50)}...<br>Role: ${data.role}</div>`;
+                    updateDebug('Admin token saved to localStorage');
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateDebug(`Login error: ${error.message}`);
+            }
+        }
+        
+        async function testStats() {
+            const resultDiv = document.getElementById('statsResult');
+            const token = adminToken || localStorage.getItem('token');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No token available. Please login first.</div>';
+                return;
+            }
+            
+            updateDebug('Testing admin stats API...');
+            
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                updateDebug(`Stats response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    updateDebug(`Stats data: ${JSON.stringify(stats)}`);
+                    resultDiv.innerHTML = `<div class="success">✅ Stats loaded successfully!<br>
+                        Farmers: ${stats.totalFarmers}<br>
+                        Consumers: ${stats.totalConsumers}<br>
+                        Products: ${stats.totalProducts}<br>
+                        Orders: ${stats.totalOrders}</div>`;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ API Error: ${response.status} - ${errorText}</div>`;
+                    updateDebug(`Stats error: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateDebug(`Stats error: ${error.message}`);
+            }
+        }
+        
+        async function testActivity() {
+            const resultDiv = document.getElementById('activityResult');
+            const token = adminToken || localStorage.getItem('token');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="error">❌ No token available. Please login first.</div>';
+                return;
+            }
+            
+            updateDebug('Testing admin activity API...');
+            
+            try {
+                const response = await fetch('/api/admin/activity', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                updateDebug(`Activity response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const activities = await response.json();
+                    updateDebug(`Activity data: ${JSON.stringify(activities)}`);
+                    resultDiv.innerHTML = `<div class="success">✅ Activity loaded successfully!<br>
+                        Found ${activities.length} activities</div>`;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ API Error: ${response.status} - ${errorText}</div>`;
+                    updateDebug(`Activity error: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                updateDebug(`Activity error: ${error.message}`);
+            }
+        }
+        
+        // Check if token exists on page load
+        window.onload = function() {
+            const existingToken = localStorage.getItem('token');
+            if (existingToken) {
+                adminToken = existingToken;
+                updateDebug(`Found existing token: ${existingToken.substring(0, 50)}...`);
+            } else {
+                updateDebug('No existing token found');
+            }
+        }
+    </script>
+</body>
+</html>

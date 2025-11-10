@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Consumers - Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Admin Consumers - Debug Version</h1>
+        
+        <div id="debug-info" class="bg-white p-4 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Information</h2>
+            <div id="debug-logs"></div>
+        </div>
+        
+        <div id="consumer-data" class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Consumer Data</h2>
+            <div id="consumer-list">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            console.log(message);
+            const debugLogs = document.getElementById('debug-logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'text-sm mb-2 p-2 bg-gray-100 rounded';
+            logEntry.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            debugLogs.appendChild(logEntry);
+        }
+
+        async function testConsumerAPI() {
+            try {
+                log('🚀 Starting consumer API test...');
+                
+                // Step 1: Login
+                log('🔐 Attempting login...');
+                const loginResponse = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@farmconnect.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    throw new Error('Login failed: ' + loginResponse.status);
+                }
+                
+                const loginData = await loginResponse.json();
+                log('✅ Login successful, token received');
+                
+                // Step 2: Get consumers
+                log('📋 Fetching consumers...');
+                const consumersResponse = await fetch('/api/admin/consumers', {
+                    headers: {
+                        'Authorization': 'Bearer ' + loginData.token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!consumersResponse.ok) {
+                    throw new Error('Consumers API failed: ' + consumersResponse.status);
+                }
+                
+                const consumersData = await consumersResponse.json();
+                log('✅ Consumers API successful, received ' + consumersData.length + ' consumers');
+                
+                // Step 3: Display consumers
+                const consumerList = document.getElementById('consumer-list');
+                if (consumersData.length === 0) {
+                    consumerList.innerHTML = '<p class="text-red-500">No consumers found</p>';
+                } else {
+                    let html = '<table class="w-full border-collapse border border-gray-300">';
+                    html += '<tr class="bg-gray-200"><th class="border p-2">Name</th><th class="border p-2">Email</th><th class="border p-2">Phone</th><th class="border p-2">Address</th></tr>';
+                    
+                    consumersData.forEach(consumer => {
+                        html += '<tr>';
+                        html += '<td class="border p-2">' + (consumer.fullName || consumer.username || 'N/A') + '</td>';
+                        html += '<td class="border p-2">' + (consumer.email || 'N/A') + '</td>';
+                        html += '<td class="border p-2">' + (consumer.phone || 'N/A') + '</td>';
+                        html += '<td class="border p-2">' + (consumer.deliveryAddress || 'N/A') + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</table>';
+                    consumerList.innerHTML = html;
+                }
+                
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+                const consumerList = document.getElementById('consumer-list');
+                consumerList.innerHTML = '<p class="text-red-500">Error: ' + error.message + '</p>';
+            }
+        }
+
+        // Start the test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📱 Page loaded, starting test...');
+            testConsumerAPI();
+        });
+    </script>
+</body>
+</html>
